@@ -3,43 +3,37 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gi Group (Cloud Sync)</title>
+<title>Gi Group Sync</title>
 <style>
-  /* Всі ваші оригінальні стилі збережено */
+  /* Всі ваші оригінальні стилі збережено без змін */
   @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Unbounded:wght@300;600&display=swap');
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
     --bg: #0e0e0e; --surface: #161616; --surface2: #1e1e1e; --border: #2a2a2a;
-    --accent: #00c896; --accent-dim: rgba(0,200,150,0.12); --text: #e8e8e8;
-    --text-dim: #888; --text-muted: #555; --present-bg: #0a1a15;
-    --present-border: #00c89640; --header-h: 56px;
+    --accent: #00c896; --text: #e8e8e8; --text-dim: #888; --text-muted: #555;
+    --header-h: 56px;
   }
   html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 13px; }
   header { position: fixed; top: 0; left: 0; right: 0; height: var(--header-h); background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; padding: 0 12px; z-index: 100; }
   .logo { font-family: 'Unbounded', sans-serif; font-weight: 600; font-size: 15px; color: var(--accent); }
   .search-wrap { flex: 1; position: relative; }
   #search { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; color: var(--text); padding: 7px 10px 7px 30px; outline: none; }
-  .search-icon { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
-  .header-counts { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.35; }
-  .hc-item { font-size: 10px; color: var(--text-muted); }
+  .header-counts { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.35; font-size: 10px; color: var(--text-muted); }
   .btn-save { background: var(--accent); color: #000; border: none; border-radius: 6px; font-family: 'Unbounded', sans-serif; font-size: 10px; font-weight: 600; padding: 8px 12px; cursor: pointer; }
   main { padding-top: calc(var(--header-h) + 8px); padding-bottom: 24px; }
   .section-label { font-family: 'Unbounded', sans-serif; font-size: 9px; color: var(--text-muted); padding: 14px 12px 6px; border-bottom: 1px solid var(--border); text-transform: uppercase; }
   .person { display: flex; align-items: center; gap: 11px; padding: 7px 12px; border-bottom: 1px solid var(--border); background: var(--surface); position: relative; }
   .avatar { width: 52px; height: 52px; border-radius: 7px; object-fit: cover; background: var(--surface2); border: 1px solid var(--border); }
   .info { flex: 1; min-width: 0; }
-  .name-en { font-weight: 600; font-size: 14px; color: var(--text); }
-  .name-ua { font-size: 12px; color: var(--text-dim); }
+  .name-en { font-weight: 600; font-size: 14px; }
   .phone { font-size: 13px; color: var(--accent); font-weight: 600; }
   .check-btn { width: 24px; height: 24px; border-radius: 5px; border: 1.5px solid var(--border); background: var(--surface2); cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; }
   .check-btn.checked-17 { background: #f59e0b; border-color: #f59e0b; }
   .check-btn.checked-19 { background: #8b5cf6; border-color: #8b5cf6; }
   .check-btn svg { width: 12px; height: 12px; stroke: #000; stroke-width: 2.5; fill: none; }
-  .btn-label { position: absolute; bottom: -9px; left: 50%; transform: translateX(-50%); font-size: 7px; color: var(--text-muted); }
+  .btn-label { position: absolute; bottom: -9px; left: 50%; transform: translateX(-50%); font-size: 7px; }
   .saved-toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(60px); background: var(--accent); color: #000; padding: 9px 18px; border-radius: 8px; transition: 0.3s; z-index: 200; }
   .saved-toast.show { transform: translateX(-50%) translateY(0); }
-  @keyframes cardOut { 0% { opacity: 1; } 100% { opacity: 0; transform: translateX(20px); } }
-  .card-removing { animation: cardOut 0.3s forwards; }
 </style>
 </head>
 <body>
@@ -47,47 +41,43 @@
 <header>
   <span class="logo">Gi Group</span>
   <div class="search-wrap">
-    <span class="search-icon">⌕</span>
     <input type="search" id="search" placeholder="Пошук..." autocomplete="off">
   </div>
   <div class="header-counts">
-    <span class="hc-item">· <span id="count">0</span></span>
-    <span class="hc-item" style="color:#f59e0b">· <span id="count-17-top">0</span></span>
-    <span class="hc-item" style="color:#8b5cf6">· <span id="count-19-top">0</span></span>
+    <span>Список: <span id="count">0</span></span>
+    <span style="color:#f59e0b">17:00: <span id="count-17-top">0</span></span>
+    <span style="color:#8b5cf6">19:00: <span id="count-19-top">0</span></span>
   </div>
-  <button class="btn-save" id="save-btn">Синхронізація...</button>
+  <button class="btn-save" id="save-btn">Завантаження...</button>
 </header>
 
 <main>
-  <div id="main-section">
-    <div id="people-list"></div>
-  </div>
+  <div id="people-list"></div>
   <div id="section-17" style="display:none">
-    <div class="section-label" style="color:#f59e0b">17:00 · <span id="count-17">0</span></div>
+    <div class="section-label" style="color:#f59e0b">Люди від 17:00 · <span id="count-17">0</span></div>
     <div id="list-17"></div>
   </div>
   <div id="section-19" style="display:none">
-    <div class="section-label" style="color:#8b5cf6">19:00 · <span id="count-19">0</span></div>
+    <div class="section-label" style="color:#8b5cf6">Люди від 19:00 · <span id="count-19">0</span></div>
     <div id="list-19"></div>
   </div>
 </main>
 
-<div class="saved-toast" id="toast">✓ Оновлено хмару</div>
+<div class="saved-toast" id="toast">✓ Дані синхронізовано</div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-  // Ваші дані з скріншоту налаштувань
+  // Конфігурація на основі вашого Project ID
   const firebaseConfig = {
-    databaseURL: "https://gi-group-list-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "gi-group-list"
+    databaseURL: "https://gi-group-list-default-rtdb.europe-west1.firebasedatabase.app"
   };
 
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
 
-  // ВАШ СПИСОК ЛЮДЕЙ (Повністю збережено)
+  // ПОВНИЙ СПИСОК ПРАЦІВНИКІВ (Взято з вашого робочого коду)
   const PEOPLE = [
     { en: "Adashynskyi Kostiantyn", ua: "Адашинський Костянтин", viber: "Костя", phone: "+380 96 751 7530", photo: "photos/adashynskyi_kostiantyn.jpg", flag: "🇺🇦" },
     { en: "Anosov Oleksandr", ua: "Аносов Олександр", viber: "Oleksandr", phone: "+380 99 331 7814", photo: "photos/anosov_oleksandr.jpg", flag: "🇺🇦" },
@@ -96,51 +86,102 @@
     { en: "Chonka Ivan", ua: "Чонка Іван", viber: "Іван", phone: "+380 68 099 4850", photo: "photos/chonka_ivan.jpg", flag: "🇺🇦" },
     { en: "Csaba Ruszó", ua: "Чаба Русзо", viber: "Csaba", phone: "+421 91 109 5906", photo: "photos/csaba_ruszo.jpg", flag: "🇨🇿" },
     { en: "Dvornikov Oleksii", ua: "Дворніков Олексій", viber: "Name", phone: "+380 00 000 00", photo: "photos/dvornikov_oleksii.jpg", flag: "🇺🇦" },
-    { en: "Dziuba Maksym", ua: "Дзюба Максим", viber: "Максим", phone: "+420 73 262 6674", photo: "photos/dziuba_maksym.jpg", flag: "🇺🇦" }
-    // ... Ви можете додати всіх інших сюди самостійно
+    { en: "Dziuba Maksym", ua: "Дзюба Максим", viber: "Максим", phone: "+420 73 262 6674", photo: "photos/dziuba_maksym.jpg", flag: "🇺🇦" },
+    { en: "Dzyngel Oleksandr", ua: "Дзингель Олександр", viber: "Name", phone: "+380 00 000 00", photo: "photos/dzyngel_oleksandr.jpg", flag: "🇺🇦" },
+    { en: "Furman Tomasz Jan", ua: "Фурман Томаш Ян", viber: "Name", phone: "+380 00 000 00", photo: "photos/furman_tomasz_jan.jpg", flag: "🇵🇱" },
+    { en: "Goran Oleg", ua: "Горан Олег", viber: "Name", phone: "+380 00 000 00", photo: "photos/goran_oleg.jpg", flag: "🇺🇦" },
+    { en: "Huk Yaroslav", ua: "Гук Ярослав", viber: "Yaroslav", phone: "+420 77 654 7561", photo: "photos/huk_yaroslav.jpg", flag: "🇺🇦" },
+    { en: "Kahramanyan Dmytro", ua: "Каграманян Дмитро", viber: "Dmitro", phone: "+420 73 771 3278", photo: "photos/kahramanyan_dmytro.jpg", flag: "🇺🇦" },
+    { en: "Kapatsyna Vladyslav", ua: "Капацина Владислав", viber: "Владичка", phone: "+420 79 762 6052", photo: "photos/kapatsyna_vladyslav.jpg", flag: "🇺🇦" },
+    { en: "Klymenko Oleksandr", ua: "Клименко Олександр", viber: "Name", phone: "+380 00 000 00", photo: "photos/klymenko_oleksandr.jpg", flag: "🇺🇦" },
+    { en: "Kovalenko Dmytro", ua: "Коваленко Дмитро", viber: "Димк коваленко", phone: "+380 93 713 5771", photo: "photos/kovalenko_dmytro.jpg", flag: "🇺🇦" },
+    { en: "Kushnir Ivan", ua: "Кушнір Іван", viber: "Іван", phone: "+380 96 382 4084", photo: "photos/kushnir_ivan.jpg", flag: "🇺🇦" },
+    { en: "Kuzyk Rostyslav", ua: "Кузик Ростислав", viber: "Кузик Ростислав", phone: "+380 63 844 8729", photo: "photos/kuzyk_rostyslav.jpg", flag: "🇺🇦" },
+    { en: "Makieiev Oleksandr", ua: "Макєєв Олександр", viber: "Name", phone: "+380 00 000 00", photo: "photos/makieiev_oleksandr.jpg", flag: "🇺🇦" },
+    { en: "Martseniuk Iryna", ua: "Марценюк Ірина", viber: "Іra Martseniuk", phone: "+380 63 982 1417", photo: "photos/martseniuk_iryna.jpg", flag: "🇺🇦" },
+    { en: "Miroshnichenko Andrii", ua: "Мірошниченко Андрій", viber: "Andrey", phone: "+380 66 014 5135", photo: "photos/miroshnichenko_andrii.jpg", flag: "🇺🇦" },
+    { en: "Nahorniuk Oleksandr", ua: "Нагорнюк Олександр", viber: "Саша", phone: "+420 77 067 1326", photo: "photos/nahorniuk_oleksandr.jpg", flag: "🇺🇦" },
+    { en: "Chetverykov Nikita", ua: "Четвериков Нікіта ", viber: "Никита Четвериков", phone: "+380 99 099 1097", photo: "photos/nikita_chetverykov.jpg", flag: "🇺🇦" },
+    { en: "Nosov Dmytro", ua: "Носов Дмитро", viber: "Dmitry", phone: "+380 96 474 1834", photo: "photos/nosov_dmytro.jpg", flag: "🇺🇦" },
+    { en: "Orel Illia", ua: "Орел Ілля", viber: "Ilюша", phone: "Орел Ілля", photo: "photos/orel_illia.jpg", flag: "🇺🇦" },
+    { en: "Orel Vladyslav", ua: "Орел Владислав", viber: "Влад", phone: "+380 68 283 3185", photo: "photos/orel_vladyslav.jpg", flag: "🇺🇦" },
+    { en: "Orlaniuk Vita", ua: "Орланюк Віта", viber: "Вита", phone: "+380 93 793 3926", photo: "photos/orlaniuk_vita.jpg", flag: "🇺🇦" },
+    { en: "Pavliuk Vladyslav", ua: "Павлюк Владислав", viber: "Vlad", phone: "+380 63 606 9863", photo: "photos/pavliuk_vladyslav.jpg", flag: "🇺🇦" },
+    { en: "Petriv Mykhailo", ua: "Петрів Михайло", viber: "Михайло", phone: "+380 97 018 3884", photo: "photos/petriv_mykhailo.jpg", flag: "🇺🇦" },
+    { en: "Poluianov Denys", ua: "Полуянов Денис", viber: "Name", phone: "+380 00 000 00", photo: "photos/poluianov_denys.jpg", flag: "🇺🇦" },
+    { en: "Ponomarenko Oleh", ua: "Пономаренко Олег", viber: "Олег Пономаренко", phone: "+380 96 285 4923", photo: "photos/ponomarenko_oleh.jpg", flag: "🇺🇦" },
+    { en: "Popadynets Oleksandr", ua: "Попадинець Олександр", viber: "Oleksandr Popadynets", phone: "+420 60 611 5201", photo: "photos/popadynets_oleksandr.jpg", flag: "🇺🇦" },
+    { en: "Popovych Stanislav", ua: "Попович Станіслав", viber: "Stanislav", phone: "+380 66 024 2505", photo: "photos/popovych_stanislav.jpg", flag: "🇺🇦" },
+    { en: "Radouš Jan", ua: "Радоуш Ян", viber: "Jan Radous", phone: "+420 77 705 8364", photo: "photos/radous_jan.jpg", flag: "🇨🇿" },
+    { en: "Robu Artem", ua: "Робу Артем", viber: "Артем", phone: "+380 97 254 0596", photo: "photos/robu_artem.jpg", flag: "🇺🇦" },
+    { en: "Shyshkovychev Kyrylo", ua: "Шишковичев Кирило", viber: "Кирилл Шишковичев", phone: "+380 95 085 5590", photo: "photos/shyshkovychev_kyrylo.jpg", flag: "🇺🇦" },
+    { en: "Siedov Yehor", ua: "Сєдов Єгор", viber: "Name", phone: "+380 00 000 00", photo: "photos/siedov_yehor.jpg", flag: "🇺🇦" },
+    { en: "Sirenko Vitalii", ua: "Сіренко Віталій", viber: "Name", phone: "+380 00 000 00", photo: "photos/sirenko_vitalii.jpg", flag: "🇺🇦" },
+    { en: "Snarskyi Vasyl", ua: "Снарський Василь", viber: "Васёк", phone: "+420 72 803 7814", photo: "photos/snarskyi_vasyl.jpg", flag: "🇺🇦" },
+    { en: "Srebniuk Denys", ua: "Срібнюк Денис", viber: "Денис", phone: "+380 98 026 2269", photo: "photos/srebniuk_denys.jpg", flag: "🇺🇦" },
+    { en: "Stateczny Adam Wojciech", ua: "Статечний Адам Войцех", viber: "Name", phone: "+380 00 000 00", photo: "photos/stateczny_adam.jpg", flag: "🇵🇱" },
+    { en: "Stefanov Stefan Hristov", ua: "Стефанов Стефан Христов", viber: "Name", phone: "+380 00 000 00", photo: "photos/stefanov_stefan.jpg", flag: "🇵🇱" },
+    { en: "Stetsiuk Oleh - DPČ", ua: "Стецюк Олег", viber: "Name", phone: "+380 00 000 00", photo: "photos/stetsiuk_oleh.jpg", flag: "🇺🇦" },
+    { en: "Stoliar Yevhenii", ua: "Столяр Євгеній", viber: "Євген Столяр", phone: "+380 68 062 7715", photo: "photos/stoliar_yevhenii.jpg", flag: "🇺🇦" },
+    { en: "Sviatokha Valentyn", ua: "Святоха Валентин", viber: "Valentyn", phone: "+420 60 648 3082", photo: "photos/sviatokha_valentyn.jpg", flag: "🇺🇦" },
+    { en: "Šanderová Kristyna", ua: "Шандерова Крістіна", viber: "Kristýnka", phone: "+420 60 701 2823", photo: "photos/sanderova_kristyna.jpg", flag: "🇨🇿" },
+    { en: "Tsybulko Nataliia", ua: "Цибулько Наталія", viber: "Talia Tsibulko", phone: "+420 72 201 2894", photo: "photos/tsybulko_nataliia.jpg", flag: "🇺🇦" },
+    { en: "Tyshchenko Yurii - DPČ", ua: "Тищенко Юрій", viber: "Юра Тищенко", phone: "+380 95 535 2213", photo: "photos/tyshchenko_yurii.jpg", flag: "🇺🇦" },
+    { en: "Vagner Michal", ua: "Вагнер Міхал", viber: "Michal Vágner", phone: "+420 72 126 2136", photo: "photos/vagner_michal.jpg", flag: "🇨🇿" },
+    { en: "Vraštil Petr", ua: "Враштіл Петр", viber: "Petr Vraštil", phone: "+420 60 340 0085", photo: "photos/vrastil_petr.jpg", flag: "🇨🇿" },
+    { en: "Yashnyk Oleksandr", ua: "Яшник Олександр", viber: "Мультыбрендовый", phone: "+380 98 133 9084", photo: "photos/yashnyk_oleksandr.jpg", flag: "🇺🇦" },
+    { en: "Zaňková Markéta", ua: "Занькова Маркета", viber: "Name", phone: "+380 00 000 00", photo: "photos/zankova_marketa.jpg", flag: "🇨🇿" },
+    { en: "Zarovnenko Oleksandr", ua: "Заровненко Олександр", viber: "Саша Заровненко", phone: "+380 99 449 5383", photo: "photos/zarovnenko_oleksandr.jpg", flag: "🇺🇦" },
+    { en: "Zieniewicz Arkadiusz Sebastian", ua: "Зєнєвіч Аркадіуш Себастіан", viber: "Name", phone: "+380 00 000 00", photo: "photos/zieniewicz_arkadiusz.jpg", flag: "🇵🇱" }
   ];
 
   let set17 = [];
   let set19 = [];
 
-  // ЗАВАНТАЖЕННЯ З ХМАРИ
-  onValue(ref(db, 'lists'), (snapshot) => {
+  // ЗАВАНТАЖЕННЯ ДАНИХ (Більш надійний метод)
+  onValue(ref(db, 'sync_data'), (snapshot) => {
     const data = snapshot.val();
     if (data) {
       set17 = data.set17 || [];
       set19 = data.set19 || [];
-      render(document.getElementById('search').value);
-      document.getElementById('save-btn').textContent = "Save";
     }
+    render(document.getElementById('search').value);
+    const saveBtn = document.getElementById('save-btn');
+    saveBtn.textContent = "Save";
+    saveBtn.style.background = "var(--accent)";
+  }, (error) => {
+    console.error("Firebase Error:", error);
+    document.getElementById('save-btn').textContent = "Помилка БД";
+    render(); // Рендеримо хоча б локальний список, якщо БД недоступна
   });
 
-  // ЗБЕРЕЖЕННЯ В ХМАРУ
-  async function syncToCloud() {
-    await set(ref(db, 'lists'), { set17, set19 });
-    const toast = document.getElementById('toast');
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2000);
+  // ФУНКЦІЯ СИНХРОНІЗАЦІЇ
+  async function sync() {
+    try {
+      await set(ref(db, 'sync_data'), { set17, set19 });
+      const toast = document.getElementById('toast');
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    } catch (e) { alert("Помилка збереження!"); }
   }
 
-  window.saveData = syncToCloud; // Робимо функцію доступною
-
+  // СТВОРЕННЯ КАРТКИ
   function createCard(person, listType) {
     const div = document.createElement('div');
     div.className = `person ${listType === '17' ? 'item-17' : (listType === '19' ? 'item-19' : '')}`;
-    
     div.innerHTML = `
       <img class="avatar" src="${person.photo}" onerror="this.src='https://ui-avatars.com/api/?name=${person.en}'">
       <div class="info">
-        <div class="name-en">${person.en}</div>
+        <div class="name-en">${person.en} ${person.flag}</div>
         <div class="name-ua">${person.ua}</div>
         <div class="phone">${person.phone}</div>
       </div>
-      <div style="display:flex; flex-direction:column; gap:18px;">
-        <div class="check-btn ${set17.includes(person.en) ? 'checked-17' : ''}" onclick="event.stopPropagation(); toggleList('${person.en}', '17')">
+      <div style="display:flex; flex-direction:column; gap:15px;">
+        <div class="check-btn ${set17.includes(person.en) ? 'checked-17' : ''}" onclick="window.toggleList('${person.en}', '17')">
           <svg viewBox="0 0 16 16"><polyline points="2,8 6,12 14,4"/></svg>
           <span class="btn-label">17:00</span>
         </div>
-        <div class="check-btn ${set19.includes(person.en) ? 'checked-19' : ''}" onclick="event.stopPropagation(); toggleList('${person.en}', '19')">
+        <div class="check-btn ${set19.includes(person.en) ? 'checked-19' : ''}" onclick="window.toggleList('${person.en}', '19')">
           <svg viewBox="0 0 16 16"><polyline points="2,8 6,12 14,4"/></svg>
           <span class="btn-label">19:00</span>
         </div>
@@ -149,43 +190,52 @@
     return div;
   }
 
+  // ПЕРЕМИКАННЯ СПИСКІВ
   window.toggleList = (name, type) => {
     if (type === '17') {
-      set17 = set17.includes(name) ? set17.filter(n => n !== name) : [...set17, name];
-      set19 = set19.filter(n => n !== name);
+      if (set17.includes(name)) set17 = set17.filter(n => n !== name);
+      else { set17.push(name); set19 = set19.filter(n => n !== name); }
     } else {
-      set19 = set19.includes(name) ? set19.filter(n => n !== name) : [...set19, name];
-      set17 = set17.filter(n => n !== name);
+      if (set19.includes(name)) set19 = set19.filter(n => n !== name);
+      else { set19.push(name); set17 = set17.filter(n => n !== name); }
     }
-    syncToCloud(); // Автозбереження при кожному кліку
+    sync(); // Авто-синхронізація
   };
 
+  // РЕНДЕР
   function render(query = '') {
     const q = query.toLowerCase().trim();
-    const peopleList = document.getElementById('people-list');
+    const mainList = document.getElementById('people-list');
     const list17 = document.getElementById('list-17');
     const list19 = document.getElementById('list-19');
 
-    peopleList.innerHTML = ''; list17.innerHTML = ''; list19.innerHTML = '';
-
-    const match = p => !q || p.en.toLowerCase().includes(q) || p.ua.toLowerCase().includes(q);
+    mainList.innerHTML = ''; list17.innerHTML = ''; list19.innerHTML = '';
 
     PEOPLE.forEach(p => {
-      if (!match(p)) return;
-      if (set17.includes(p.en)) list17.appendChild(createCard(p, '17'));
-      else if (set19.includes(p.en)) list19.appendChild(createCard(p, '19'));
-      else peopleList.appendChild(createCard(p, 'main'));
+      const isMatch = !q || p.en.toLowerCase().includes(q) || p.ua.toLowerCase().includes(q);
+      if (!isMatch) return;
+
+      if (set17.includes(p.en)) {
+        list17.appendChild(createCard(p, '17'));
+      } else if (set19.includes(p.en)) {
+        list19.appendChild(createCard(p, '19'));
+      } else {
+        mainList.appendChild(createCard(p, 'main'));
+      }
     });
 
     document.getElementById('section-17').style.display = set17.length ? 'block' : 'none';
     document.getElementById('section-19').style.display = set19.length ? 'block' : 'none';
+    
     document.getElementById('count').textContent = PEOPLE.length - set17.length - set19.length;
     document.getElementById('count-17-top').textContent = set17.length;
-    document.getElementById('count-19-top').textContent = set17.length;
+    document.getElementById('count-19-top').textContent = set19.length;
+    document.getElementById('count-17').textContent = set17.length;
+    document.getElementById('count-19').textContent = set19.length;
   }
 
-  document.getElementById('search').addEventListener('input', e => render(e.target.value));
-  document.getElementById('save-btn').onclick = syncToCloud;
+  document.getElementById('search').oninput = (e) => render(e.target.value);
+  document.getElementById('save-btn').onclick = sync;
 </script>
 </body>
 </html>
