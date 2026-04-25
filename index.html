@@ -586,7 +586,7 @@
     <span class="hc-item" style="color:#f59e0b">· <span id="count-17-top">0</span></span>
     <span class="hc-item" style="color:#8b5cf6">· <span id="count-19-top">0</span></span>
   </div>
-  <button class="btn-save" id="btn-save-fb" onclick="saveData()">Save</button>
+  <button class="btn-save" id="btn-save-main" onclick="saveData()">Save</button>
 </header>
 
 <main>
@@ -1396,59 +1396,67 @@ function render(query = '') {
   }
 }
 
-// ══════════════════════════════════════════════════════════════
-// FIREBASE SYNC — REST API (без SDK, без module)
-// ══════════════════════════════════════════════════════════════
-const FB_URL = 'https://gi-group-list-default-rtdb.europe-west1.firebasedatabase.app/gigroup.json';
+// ═══════════════════════════════════════════════════════
+// JSONBIN SYNC
+// ═══════════════════════════════════════════════════════
+const JBIN_ID  = '69ec31bd36566621a8ec44ae';
+const JBIN_KEY = '$2a$10$YDsIKQri9u4UI8GuUJFjTetgHXwy95KY1JqoYSaoaZZILyfiTqKKm';
+const JBIN_URL = 'https://api.jsonbin.io/v3/b/' + JBIN_ID;
 
-// Індикатор синхронізації у кнопці Save
-function setSaveBtn(state) {
-  const btn = document.getElementById('btn-save-fb');
+function setBtnState(state) {
+  const btn = document.getElementById('btn-save-main');
   if (!btn) return;
-  if (state === 'saving')  { btn.textContent = '⏳ Sync...'; btn.style.opacity = '.6'; }
-  if (state === 'ok')      { btn.textContent = '✓ Saved';   btn.style.opacity = '1';  setTimeout(() => { btn.textContent = 'Save'; }, 2000); }
-  if (state === 'error')   { btn.textContent = '✗ Error';   btn.style.opacity = '1';  setTimeout(() => { btn.textContent = 'Save'; }, 3000); }
-  if (state === 'idle')    { btn.textContent = 'Save';       btn.style.opacity = '1'; }
+  if (state === 'saving') { btn.textContent = '⏳ Sync...'; btn.style.opacity = '.6'; btn.disabled = true; }
+  if (state === 'ok')     { btn.textContent = '✓ Saved';   btn.style.opacity = '1';  btn.disabled = false; setTimeout(() => { btn.textContent = 'Save'; }, 2000); }
+  if (state === 'error')  { btn.textContent = '✗ Error';   btn.style.opacity = '1';  btn.disabled = false; setTimeout(() => { btn.textContent = 'Save'; }, 3000); }
+  if (state === 'idle')   { btn.textContent = 'Save';       btn.style.opacity = '1';  btn.disabled = false; }
 }
 
-async function syncToFirebase() {
-  setSaveBtn('saving');
+async function syncToJsonbin() {
+  setBtnState('saving');
   try {
-    const res = await fetch(FB_URL, {
+    const res = await fetch(JBIN_URL, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Master-Key': JBIN_KEY,
+        'X-Bin-Versioning': 'false'
+      },
       body: JSON.stringify({ set17, set19, ts: Date.now() })
     });
-    if (res.ok) { setSaveBtn('ok'); }
-    else        { setSaveBtn('error'); }
-  } catch (e)   { setSaveBtn('error'); }
+    if (res.ok) { setBtnState('ok'); }
+    else        { console.error('JSONBin write error', res.status); setBtnState('error'); }
+  } catch(e)    { console.error('JSONBin fetch error', e); setBtnState('error'); }
 }
 
-async function loadFromFirebase() {
+async function loadFromJsonbin() {
   try {
-    const res = await fetch(FB_URL);
+    const res = await fetch(JBIN_URL + '/latest', {
+      headers: { 'X-Master-Key': JBIN_KEY }
+    });
     if (!res.ok) return;
-    const data = await res.json();
+    const json = await res.json();
+    const data = json.record;
     if (data && Array.isArray(data.set17) && Array.isArray(data.set19)) {
       set17 = data.set17;
       set19 = data.set19;
       render(document.getElementById('search').value);
     }
-  } catch (e) { /* мовчки — локальні дані вже відображені */ }
+  } catch(e) { /* мовчки — локальні дані вже відображені */ }
 }
 
-// Перевизначаємо saveData щоб також писало у Firebase
-const _origSaveData = saveData;
+// Перевизначаємо saveData — додаємо JSONBin поверх localStorage
+const _localSave = saveData;
 saveData = function() {
-  _origSaveData();       // localStorage + toast — як раніше
-  syncToFirebase();      // додатково Firebase
+  _localSave();        // localStorage + тост "✓ Збережено" — як раніше
+  syncToJsonbin();     // + JSONBin синхронізація
 };
 
 // Init
-loadData();   // 1. Миттєво завантажуємо з localStorage
+loadData();   // 1. Миттєво з localStorage
 render();     // 2. Миттєво рендеримо список
 
-loadFromFirebase(); // 3. Фоново оновлюємо з Firebase
+loadFromJsonbin(); // 3. Фоново оновлюємо з JSONBin
 
 document.getElementById('search').addEventListener('input', e => render(e.target.value));
 
