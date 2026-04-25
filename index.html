@@ -15,12 +15,9 @@
     --surface2: #1e1e1e;
     --border: #2a2a2a;
     --accent: #00c896;
-    --accent-dim: rgba(0,200,150,0.12);
     --text: #e8e8e8;
     --text-dim: #888;
     --text-muted: #555;
-    --present-bg: #0a1a15;
-    --present-border: #00c89640;
     --header-h: 56px;
   }
 
@@ -30,10 +27,8 @@
     color: var(--text);
     font-family: 'JetBrains Mono', monospace;
     font-size: 13px;
-    -webkit-tap-highlight-color: transparent;
   }
 
-  /* HEADER */
   header {
     position: fixed;
     top: 0; left: 0; right: 0;
@@ -47,530 +42,79 @@
     z-index: 100;
   }
 
-  .logo {
-    font-family: 'Unbounded', sans-serif;
-    font-weight: 600;
-    font-size: 15px;
-    color: var(--accent);
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
+  .logo { font-family: 'Unbounded', sans-serif; font-weight: 600; font-size: 15px; color: var(--accent); }
 
-  .search-wrap {
-    flex: 1;
-    position: relative;
-  }
-
+  .search-wrap { flex: 1; position: relative; }
   #search {
-    width: 100%;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    color: var(--text);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-    padding: 7px 10px 7px 30px;
-    outline: none;
-    transition: border-color .2s;
-  }
-  #search:focus { border-color: var(--accent); }
-  #search::placeholder { color: var(--text-muted); }
-
-  .search-icon {
-    position: absolute;
-    left: 9px; top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-muted);
-    pointer-events: none;
-    font-size: 12px;
+    width: 100%; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 6px; color: var(--text); padding: 7px 10px 7px 30px; outline: none;
   }
 
-  .header-counts {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    flex-shrink: 0;
-    line-height: 1.35;
-  }
-
-  .hc-item {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    color: var(--text-muted);
-    white-space: nowrap;
-  }
-
-  .hc-item::before {
-    font-size: 9px;
-    margin-right: 2px;
-  }
-
-  .hc-item:nth-child(1)::before { content: "Список"; color: var(--text-muted); }
-  .hc-item:nth-child(2)::before { content: "17:00"; }
-  .hc-item:nth-child(3)::before { content: "19:00"; }
-
-  .hc-present { color: var(--accent); }
-
+  .header-counts { display: flex; flex-direction: column; align-items: flex-end; font-size: 10px; line-height: 1.2; }
+  .hc-item { color: var(--text-muted); white-space: nowrap; }
+  
   .btn-save {
-    background: var(--accent);
-    color: #000;
-    border: none;
-    border-radius: 6px;
-    font-family: 'Unbounded', sans-serif;
-    font-size: 10px;
-    font-weight: 600;
-    padding: 8px 12px;
-    cursor: pointer;
-    white-space: nowrap;
-    flex-shrink: 0;
-    transition: opacity .2s;
+    background: var(--accent); color: #000; border: none; border-radius: 6px;
+    font-family: 'Unbounded', sans-serif; font-size: 10px; font-weight: 600;
+    padding: 8px 12px; cursor: pointer; transition: opacity 0.2s;
   }
-  .btn-save:active { opacity: .7; }
+  .btn-save:active { opacity: 0.7; }
 
-  /* MAIN */
-  main {
-    padding-top: calc(var(--header-h) + 8px);
-    padding-bottom: 24px;
-  }
+  main { padding-top: calc(var(--header-h) + 10px); padding-bottom: 40px; }
 
-  /* SECTION LABEL */
   .section-label {
-    font-family: 'Unbounded', sans-serif;
-    font-size: 9px;
-    font-weight: 300;
-    letter-spacing: .15em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    padding: 14px 12px 6px;
-    border-bottom: 1px solid var(--border);
+    font-family: 'Unbounded', sans-serif; font-size: 9px; text-transform: uppercase;
+    color: var(--text-muted); padding: 15px 12px 5px; border-bottom: 1px solid var(--border);
+    letter-spacing: 1px;
   }
 
-  .section-label.present-label {
-    color: var(--accent);
-    border-bottom-color: var(--present-border);
-  }
-
-  .hc-item:nth-child(1) { color: var(--text-muted); }
-  .hc-item:nth-child(1) span { color: var(--accent); }
-
-  /* PERSON CARD */
   .person {
-    display: flex;
-    align-items: center;
-    gap: 11px;
-    padding: 7px 12px; /* ← ВІДСТУПИ РЯДКА — змінюй тут (верх/низ горизонт) */
-    border-bottom: 1px solid var(--border);
-    background: var(--surface);
-    transition: background .15s;
-    position: relative;
+    display: flex; align-items: center; gap: 12px; padding: 10px 12px;
+    border-bottom: 1px solid var(--border); background: var(--surface);
+    transition: background 0.3s;
   }
+  .person.item-17 { background: #1a1408; }
+  .person.item-19 { background: #120e1a; }
 
-  .person.present-item {
-    background: var(--present-bg);
-    border-bottom-color: var(--present-border);
-  }
+  .avatar-wrap { position: relative; flex-shrink: 0; }
+  .avatar { width: 52px; height: 52px; border-radius: 6px; object-fit: cover; background: #222; border: 1px solid var(--border); }
+  .flag-below { position: absolute; bottom: -2px; right: -2px; font-size: 12px; background: var(--surface); border-radius: 3px; padding: 1px; }
 
-  .person:active { background: var(--surface); }
-  .person.present-item:active { background: var(--present-bg); }
+  .info { flex: 1; min-width: 0; }
+  .name-en { font-weight: 600; font-size: 14px; color: var(--text); cursor: pointer; }
+  .name-ua { font-size: 11px; color: var(--text-dim); }
+  .viber-name { font-size: 10px; color: var(--text-muted); }
+  .phone { color: var(--accent); font-size: 12px; margin-top: 3px; font-weight: 600; }
 
-  /* AVATAR */
-  .avatar {
-    width: 52px;
-    height: 52px;
-    border-radius: 7px;
-    object-fit: cover;
-    flex-shrink: 0;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    display: block;
-    cursor: zoom-in;
-    transition: opacity .15s;
-  }
-  .avatar:active { opacity: .75; }
-
-  .avatar-placeholder {
-    width: 52px;
-    height: 52px;
-    border-radius: 7px;
-    flex-shrink: 0;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Unbounded', sans-serif;
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--accent);
-  }
-
-  /* INFO */
-  .info {
-    flex: 1;
-    min-width: 0;
-    line-height: 1.3;
-  }
-
-  .name-en {
-    font-weight: 600;
-    font-size: 14px;
-    color: var(--text);
-    white-space: normal;
-    word-break: break-word;
-    cursor: pointer;
-    display: inline-block;
-    max-width: 100%;
-    border-radius: 3px;
-    transition: color .15s;
-  }
-  .name-en:active { color: var(--accent); }
-
-  .avatar-wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 3px;
-    flex-shrink: 0;
-  }
-
-  .flag-below {
-    font-size: 13px;
-    line-height: 1;
-    text-align: center;
-  }
-
-  .name-ua {
-    font-size: 12px;
-    color: var(--text-dim);
-    margin-top: 2px;
-    white-space: normal;
-    word-break: break-word;
-  }
-
-  .viber-name {
-    font-size: 12px;
-    color: var(--text-muted);
-    margin-top: 1px;
-  }
-
-  .phone {
-    font-size: 13px;
-    color: var(--accent);
-    margin-top: 2px;
-    font-weight: 600;
-    min-height: 16px;
-  }
-
-  /* LIGHTBOX */
-  .lightbox {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.93);
-    z-index: 500;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    cursor: zoom-out;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity .25s ease;
-  }
-  .lightbox.active {
-    opacity: 1;
-    pointer-events: all;
-  }
-  .lightbox img {
-    max-width: 100%;
-    max-height: 88vh;
-    border-radius: 10px;
-    object-fit: contain;
-    box-shadow: 0 8px 60px rgba(0,0,0,.9);
-    transform: scale(0.88);
-    transition: transform .28s cubic-bezier(.22,.68,0,1.2);
-  }
-  .lightbox.active img {
-    transform: scale(1);
-  }
-  .lightbox-name {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-family: 'Unbounded', sans-serif;
-    font-size: 11px;
-    color: rgba(255,255,255,0.45);
-    white-space: nowrap;
-    letter-spacing: .05em;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 3px;
-  }
-  .lightbox-name-ua {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: rgba(255,255,255,0.3);
-  }
-
-  /* COPY TOAST */
-  .copy-toast {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%) translateY(60px);
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    color: var(--text);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    padding: 8px 16px;
-    border-radius: 8px;
-    transition: transform .25s ease;
-    z-index: 300;
-    pointer-events: none;
-    white-space: nowrap;
-  }
-  .copy-toast.show { transform: translateX(-50%) translateY(0); }
-
-  /* BUTTONS COLUMN */
-  .btn-col {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-    flex-shrink: 0;
-  }
-
-  /* CHECKBOX */
+  .controls { display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
   .check-btn {
-    width: 24px;
-    height: 24px;
-    border-radius: 5px;
-    border: 1.5px solid var(--border);
-    background: var(--surface2);
-    flex-shrink: 0;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background .15s, border-color .15s;
-    -webkit-user-select: none;
-    user-select: none;
-    position: relative;
+    width: 36px; height: 26px; border-radius: 4px; border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center; font-size: 8px; 
+    cursor: pointer; position: relative; background: var(--surface2);
+    transition: all 0.2s;
   }
+  .check-btn svg { width: 12px; height: 12px; stroke: #000; stroke-width: 3; fill: none; display: none; }
+  
+  .check-btn.checked-17 { background: #f59e0b; border-color: #f59e0b; }
+  .check-btn.checked-19 { background: #8b5cf6; border-color: #8b5cf6; }
+  .check-btn.checked-17 svg, .check-btn.checked-19 svg { display: block; }
+  
+  .btn-label { position: absolute; bottom: -10px; font-size: 7px; color: var(--text-muted); }
 
-  .check-btn:active { opacity: .7; }
+  .toast {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px);
+    background: var(--accent); color: #000; padding: 10px 20px; border-radius: 8px;
+    transition: transform 0.3s; z-index: 1000; font-weight: 600;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
 
-  .check-btn.checked-present {
-    background: var(--accent);
-    border-color: var(--accent);
+  /* Lightbox */
+  .lightbox {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000;
+    display: none; align-items: center; justify-content: center; padding: 20px;
   }
-  .check-btn.checked-17 {
-    background: #f59e0b;
-    border-color: #f59e0b;
-  }
-  .check-btn.checked-19 {
-    background: #8b5cf6;
-    border-color: #8b5cf6;
-  }
-
-  .check-btn svg {
-    width: 12px;
-    height: 12px;
-    stroke: #000;
-    stroke-width: 2.5;
-    fill: none;
-    opacity: 0;
-    transition: opacity .15s;
-  }
-  .check-btn.checked-present svg,
-  .check-btn.checked-17 svg,
-  .check-btn.checked-19 svg { opacity: 1; }
-
-  .check-btn .btn-label {
-    position: absolute;
-    bottom: -9px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 7px;
-    color: var(--text-muted);
-    white-space: nowrap;
-    font-family: 'JetBrains Mono', monospace;
-    pointer-events: none;
-  }
-
-  /* NAME EN WRAP */
-  .name-en-wrap {
-    display: flex;
-    align-items: flex-start;
-    gap: 5px;
-  }
-
-  /* EDIT BUTTON — прихована, появляється при наведенні */
-  .edit-btn {
-    background: none;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    color: var(--text-muted);
-    font-size: 10px;
-    padding: 1px 4px;
-    cursor: pointer;
-    font-family: 'JetBrains Mono', monospace;
-    transition: color .15s, border-color .15s, opacity .2s;
-    line-height: 1.4;
-    flex-shrink: 0;
-    opacity: 0;
-    pointer-events: none;
-  }
-  .name-en-wrap:hover .edit-btn,
-  .name-en-wrap:focus-within .edit-btn {
-    opacity: 1;
-    pointer-events: all;
-  }
-  /* На мобільних — показуємо при активному стані картки */
-  .person:active .edit-btn,
-  .edit-btn-visible {
-    opacity: 1;
-    pointer-events: all;
-  }
-  .edit-btn:active { color: var(--accent); border-color: var(--accent); }
-
-  /* EDIT MODAL */
-  .edit-modal {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.85);
-    z-index: 600;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity .2s;
-  }
-  .edit-modal.active {
-    opacity: 1;
-    pointer-events: all;
-  }
-  .edit-modal-box {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 20px;
-    width: 100%;
-    max-width: 340px;
-  }
-  .edit-modal-title {
-    font-family: 'Unbounded', sans-serif;
-    font-size: 10px;
-    color: var(--text-muted);
-    margin-bottom: 10px;
-    letter-spacing: .1em;
-  }
-  .edit-modal input {
-    width: 100%;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    color: var(--text);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-    padding: 9px 10px;
-    outline: none;
-    margin-bottom: 12px;
-  }
-  .edit-modal input:focus { border-color: var(--accent); }
-  .edit-modal-btns {
-    display: flex;
-    gap: 8px;
-    justify-content: flex-end;
-  }
-  .edit-modal-btns button {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    padding: 7px 14px;
-    border-radius: 6px;
-    cursor: pointer;
-    border: 1px solid var(--border);
-    background: var(--surface2);
-    color: var(--text);
-    transition: opacity .15s;
-  }
-  .edit-modal-btns button.save {
-    background: var(--accent);
-    color: #000;
-    border-color: var(--accent);
-    font-weight: 600;
-  }
-  .edit-modal-btns button:active { opacity: .7; }
-
-  /* EMPTY STATE */
-  .empty-state {
-    text-align: center;
-    padding: 32px 16px;
-    color: var(--text-muted);
-    font-size: 12px;
-    display: none;
-  }
-
-  /* SAVED BADGE */
-  .saved-toast {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%) translateY(60px);
-    background: var(--accent);
-    color: #000;
-    font-family: 'Unbounded', sans-serif;
-    font-size: 10px;
-    font-weight: 600;
-    padding: 9px 18px;
-    border-radius: 8px;
-    transition: transform .3s ease;
-    z-index: 200;
-    pointer-events: none;
-  }
-  .saved-toast.show { transform: translateX(-50%) translateY(0); }
-
-  #no-results {
-    padding: 32px 16px;
-    text-align: center;
-    color: var(--text-muted);
-    font-size: 12px;
-    display: none;
-  }
-
-  #section-17, #section-19 { display: none; }
-
-  .person.item-17 {
-    background: #1a1200;
-    border-bottom-color: #f59e0b30;
-  }
-  .person.item-17:active { background: #1a1200; }
-
-  .person.item-19 {
-    background: #110d1a;
-    border-bottom-color: #8b5cf630;
-  }
-  .person.item-19:active { background: #110d1a; }
-
-  .btn-col {
-    padding-bottom: 4px;
-  }
-
-  @keyframes cardOut {
-    0%   { opacity: 1; transform: translateX(0) scaleY(1); max-height: 100px; }
-    40%  { opacity: .4; transform: translateX(18px) scaleY(1); }
-    100% { opacity: 0; transform: translateX(40px) scaleY(0.6); max-height: 0; padding-top: 0; padding-bottom: 0; }
-  }
-  .card-removing {
-    overflow: hidden;
-    animation: cardOut .38s cubic-bezier(.4,0,.6,1) forwards;
-    pointer-events: none;
-  }
+  .lightbox.active { display: flex; }
+  .lightbox img { max-width: 100%; max-height: 80vh; border-radius: 8px; }
 </style>
 </head>
 <body>
@@ -578,598 +122,174 @@
 <header>
   <span class="logo">Gi Group</span>
   <div class="search-wrap">
-    <span class="search-icon">⌕</span>
     <input type="search" id="search" placeholder="Пошук..." autocomplete="off">
   </div>
   <div class="header-counts">
-    <span class="hc-item">· <span id="count">0</span></span>
-    <span class="hc-item" style="color:#f59e0b">· <span id="count-17-top">0</span></span>
-    <span class="hc-item" style="color:#8b5cf6">· <span id="count-19-top">0</span></span>
+    <span class="hc-item">Всього: <span id="count-all">0</span></span>
+    <span class="hc-item" style="color:#f59e0b">17:00: <span id="count-17-top">0</span></span>
+    <span class="hc-item" style="color:#8b5cf6">19:00: <span id="count-19-top">0</span></span>
   </div>
-  <button class="btn-save" onclick="saveData()">Save</button>
+  <button class="btn-save" id="save-btn">Save</button>
 </header>
 
 <main>
-  <div id="main-section">
-    <div id="people-list"></div>
-    <div id="no-results">Нікого не знайдено</div>
+  <div id="section-main">
+    <div class="section-label">Доступні працівники</div>
+    <div id="list-main"></div>
   </div>
 
   <div id="section-17" style="display:none">
-    <div class="section-label" style="color:#f59e0b; border-bottom-color:#f59e0b40">Люди від 17:00 · <span id="count-17">0</span></div>
+    <div class="section-label" style="color:#f59e0b">Список на 17:00 (<span id="count-17">0</span>)</div>
     <div id="list-17"></div>
   </div>
 
   <div id="section-19" style="display:none">
-    <div class="section-label" style="color:#8b5cf6; border-bottom-color:#8b5cf640">Люди від 19:00 · <span id="count-19">0</span></div>
+    <div class="section-label" style="color:#8b5cf6">Список на 19:00 (<span id="count-19">0</span>)</div>
     <div id="list-19"></div>
   </div>
 </main>
 
-<div class="saved-toast" id="toast">✓ Збережено</div>
-<div class="copy-toast" id="copy-toast"></div>
+<div class="toast" id="toast">✓ Дані збережено в хмару</div>
 
-<div class="lightbox" id="lightbox">
-  <img id="lightbox-img" src="" alt="">
-  <div class="lightbox-name">
-    <span id="lightbox-name-en"></span>
-    <span class="lightbox-name-ua" id="lightbox-name-ua"></span>
-  </div>
+<div class="lightbox" id="lightbox" onclick="this.classList.remove('active')">
+  <img id="lightbox-img" src="">
 </div>
 
-<div class="edit-modal" id="edit-modal">
-  <div class="edit-modal-box">
-    <div class="edit-modal-title">РЕДАГУВАТИ ІМ'Я (EN)</div>
-    <input type="text" id="edit-input" autocomplete="off">
-    <div class="edit-modal-btns">
-      <button onclick="closeEditModal()">Скасувати</button>
-      <button class="save" onclick="saveEditModal()">Зберегти</button>
-    </div>
-  </div>
-</div>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <script>
-// ╔══════════════════════════════════════════════════════════════╗
-// ║           СПИСОК ЛЮДЕЙ — редагуй тут                       ║
-// ║                                                              ║
-// ║  en    — прізвище та ім'я англійською (унікальний ID)       ║
-// ║  ua    — прізвище та ім'я українською                       ║
-// ║  viber — нікнейм у Viber                                    ║
-// ║  phone — номер телефону                                     ║
-// ║  photo — шлях до фото (відносно HTML-файлу)                 ║
-// ╚══════════════════════════════════════════════════════════════╝
+const firebaseConfig = {
+  projectId: "gi-group-list",
+  databaseURL: "https://gi-group-list-default-rtdb.europe-west1.firebasedatabase.app"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
 const PEOPLE = [
-
-  {
-    en:    "Adashynskyi Kostiantyn",
-    ua:    "Адашинський Костянтин",
-    viber: "Адашинський Костя",
-    phone: "+380 96 751 7530",
-    photo: "photos/adashynskyi_kostiantyn.jpg",
-    flag:  "🇺🇦",
-  },
-  {
-    en:    "Anosov Oleksandr",
-    ua:    "Аносов Олександр",
-    viber: "Anosov Oleksandr",
-    phone: "+380 99 331 7814",
-    photo: "photos/anosov_oleksandr.jpg",
-    flag:  "🇺🇦",
-  },
-    {
-    en:    "Bokoch Mykhailo",
-    ua:    "Бокоч Михайло",
-    viber: "Bokoch Misha",
-    phone: "+380 68 229 2395",
-    photo: "photos/bokoch_mykhailo.jpg",
-    flag:  "🇺🇦",
-  },
-  {
-    en:    "Chesnokov Pavlo",
-    ua:    "Чесноков Павло",
-    viber: "Name",
-    phone: "+380 00 000 00",
-    photo: "photos/chesnokov_pavlo.jpg",
-    flag:  "🇺🇦",
-  },
-  {
-    en:    "Chonka Ivan",
-    ua:    "Чонка Іван",
-    viber: "Чонка Іван",
-    phone: "+380 68 099 4850",
-    photo: "photos/chonka_ivan.jpg",
-    flag:  "🇺🇦",
-  },
-  {
-    en:    "Csaba Ruszó",
-    ua:    "Чаба Русзо",
-    viber: "Csaba Ruszó",
-    phone: "+421 91 109 5906",
-    photo: "photos/csaba_ruszo.jpg",
-    flag:  "🇨🇿",
-  },
-  {
-    en:    "Dvornikov Oleksii",
-    ua:    "Дворніков Олексій",
-    viber: "Name",
-    phone: "+380 00 000 00",
-    photo: "photos/dvornikov_oleksii.jpg",
-    flag:  "🇺🇦",
-  },
-  {
-    en:    "Dziuba Maksym",
-    ua:    "Дзюба Максим",
-    viber: "Максим",
-    phone: "+420 73 262 6674",
-    photo: "photos/dziuba_maksym.jpg",
-    flag:  "🇺🇦",
-  },
-  {
-    en:    "Dzyngel Oleksandr",
-    ua:    "Дзингель Олександр",
-    viber: "Name",
-    phone: "+380 00 000 00",
-    photo: "photos/dzyngel_oleksandr.jpg",
-    flag:  "🇺🇦",
-  },
-  {
-    en:    "Furman Tomasz Jan",
-    ua:    "Фурман Томаш Ян",
-    viber: "Name",
-    phone: "+380 00 000 00",
-    photo: "photos/furman_tomasz_jan.jpg",
-    flag:  "🇵🇱",
-  },
-  {
-    en:    "Goran Oleg",
-    ua:    "Горан Олег",
-    viber: "Name",
-    phone: "+380 00 000 00",
-    photo: "photos/goran_oleg.jpg",
-    flag:  "🇺🇦",
-  },
-  {
-    en:    "Huk Yaroslav",
-    ua:    "Гук Ярослав",
-    viber: "Yaroslav",
-    phone: "+420 77 654 7561",
-    photo: "photos/huk_yaroslav.jpg",
-    flag:  "🇺🇦",
-  },
-  {
-    en:    "Kahramanyan Dmytro",
-    ua:    "Каграманян Дмитро",
-    viber: "Dmitro",
-    phone: "+420 73 771 3278",
-    photo: "photos/kahramanyan_dmytro.jpg",
-    flag:  "🇺🇦",
-  },
-  {
-    en:    "Kapatsyna Vladyslav",
-    ua:    "Капацина Владислав",
-    viber: "Владичка",
-    phone: "+420 79 762 6052",
-    photo: "photos/kapatsyna_vladyslav.jpg",
-    flag:  "🇺🇦",
-  },
-  {
-    en:    "Klymenko Oleksandr",
-    ua:    "Клименко Олександр",
-    viber: "Name",
-    phone: "+380 00 000 00",
-    photo: "photos/klymenko_oleksandr.jpg",
-    flag:  "🇺🇦",
-  },
-  {
-    en:    "Kovalenko Dmytro",
-    ua:    "Коваленко Дмитро",
-    viber: "Димк коваленко",
-    phone: "+380 93 713 5771",
-    photo: "photos/kovalenko_dmytro.jpg",
-    flag:  "🇺🇦",
-  },
-  {
-    en:    "Kushnir Ivan",
-    ua:    "Кушнір Іван",
-    viber: "Іван",
-    phone: "+380 96 382 4084",
-    photo: "photos/kushnir_ivan.jpg",
-    flag:  "🇺🇦",
-  },
-  {
-    en:    "Kuzyk Rostyslav",
-    ua:    "Кузик Ростислав",
-    viber: "Кузик Ростислав",
-    phone: "+380 63 844 8729",
-    photo: "photos/kuzyk_rostyslav.jpg",
-    flag:  "🇺🇦",
-  },
-  {
-    en:    "Makieiev Oleksandr",
-    ua:    "Макєєв Олександр",
-    viber: "Name",
-    phone: "+380 00 000 00",
-    photo: "photos/makieiev_oleksandr.jpg",
-    flag:  "🇺🇦",
-  },
-  {
-    en:    "Martseniuk Iryna",
-    ua:    "Марценюк Ірина",
-    viber: "Іra Martseniuk",
-    phone: "+380 63 982 1417",
-    photo: "photos/martseniuk_iryna.jpg",
-    flag:  "🇺🇦",
-  },
-  {
-    en:    "Miroshnichenko Andrii",
-    ua:    "Мірошниченко Андрій",
-    viber: "Andrey",
-    phone: "+380 66 014 5135",
-    photo: "photos/miroshnichenko_andrii.jpg",
-    flag:  "🇺🇦",
-  },
-  {
-    en:    "Nahorniuk Oleksandr",
-    ua:    "Нагорнюк Олександр",
-    viber: "Саша",
-    phone: "+420 77 067 1326",
-    photo: "photos/nahorniuk_oleksandr.jpg",
-    flag:  "🇺🇦",
-  },
-  {
-    en:    "Chetverykov Nikita",
-    ua:    "Четвериков Нікіта ",
-    viber: "Никита Четвериков",
-    phone: "+380 99 099 1097",
-    photo: "photos/nikita_chetverykov.jpg",
-    flag:  "🇺🇦",
-  },
-  {
-    en:    "Nosov Dmytro",
-    ua:    "Носов Дмитро",
-    viber: "Dmitry",
-    phone: "+380 96 474 1834",
-    photo: "photos/nosov_dmytro.jpg",
-    flag:  "🇺🇦",
-	},
-    {
-    en:    "Orel Illia",
-    ua:    "Орел Ілля",
-    viber: "Ilюша",
-    phone: "Орел Ілля",
-    photo: "photos/orel_illia.jpg",
-    flag:  "🇺🇦",
-  },
-  {
-    en:    "Orel Vladyslav",
-    ua:    "Орел Владислав",
-    viber: "Влад",
-    phone: "+380 68 283 3185",
-    photo: "photos/orel_vladyslav.jpg",
-    flag:  "🇺🇦",
-  },
-  {
-    en:    "Orlaniuk Vita",
-    ua:    "Орланюк Віта",
-    viber: "Вита",
-    phone: "+380 93 793 3926",
-    photo: "photos/orlaniuk_vita.jpg",
-    flag:  "🇺🇦",
-  },
-  {
-    en:    "Pavliuk Vladyslav",
-    ua:    "Павлюк Владислав",
-    viber: "Vlad",
-    phone: "+380 63 606 9863",
-    photo: "photos/pavliuk_vladyslav.jpg",
-    flag:  "🇺🇦",
-  },
-  {
-    en:    "Petriv Mykhailo",
-    ua:    "Петрів Михайло",
-    viber: "Михайло",
-    phone: "+380 97 018 3884",
-    photo: "photos/petriv_mykhailo.jpg",
-    flag:  "🇺🇦",
-  },
-  {
-    en:    "Poluianov Denys",
-    ua:    "Полуянов Денис",
-    viber: "Name",
-    phone: "+380 00 000 00",
-    photo: "photos/poluianov_denys.jpg",
-    flag:  "🇺🇦",
-  },
-  {
-    en:    "Ponomarenko Oleh",
-    ua:    "Пономаренко Олег",
-    viber: "Олег Пономаренко",
-    phone: "+380 96 285 4923",
-    photo: "photos/ponomarenko_oleh.jpg",
-    flag:  "🇺🇦",
-  },
-    {
-    en:    "Popadynets Oleksandr",
-    ua:    "Попадинець Олександр",
-    viber: "Oleksandr Popadynets",
-    phone: "+420 60 611 5201",
-    photo: "photos/popadynets_oleksandr.jpg",
-    flag:  "🇺🇦",
-  },
-  {
-    en:    "Popovych Stanislav",
-    ua:    "Попович Станіслав",
-    viber: "Stanislav",
-    phone: "+380 66 024 2505",
-    photo: "photos/popovych_stanislav.jpg",
-    flag:  "🇺🇦",
-  },
-  {
-    en:    "Radouš Jan",
-    ua:    "Радоуш Ян",
-    viber: "Jan Radous",
-    phone: "+420 77 705 8364",
-    photo: "photos/radous_jan.jpg",
-    flag:  "🇨🇿",
-  },
-  {
-    en:    "Robu Artem",
-    ua:    "Робу Артем",
-    viber: "Артем",
-    phone: "+380 97 254 0596",
-    photo: "photos/robu_artem.jpg",
-    flag:  "🇺🇦",
-  },
-  {
-    en:    "Shyshkovychev Kyrylo",
-    ua:    "Шишковичев Кирило",
-    viber: "Кирилл Шишковичев",
-    phone: "+380 95 085 5590",
-    photo: "photos/shyshkovychev_kyrylo.jpg",
-    flag:  "🇺🇦",
-  },
-  {
-    en:    "Siedov Yehor",
-    ua:    "Сєдов Єгор",
-    viber: "Name",
-    phone: "+380 00 000 00",
-    photo: "photos/siedov_yehor.jpg",
-    flag:  "🇺🇦",
-  },
-  {
-    en:    "Sirenko Vitalii",
-    ua:    "Сіренко Віталій",
-    viber: "Name",
-    phone: "+380 00 000 00",
-    photo: "photos/sirenko_vitalii.jpg",
-    flag:  "🇺🇦",
-  },
-  {
-    en:    "Snarskyi Vasyl",
-    ua:    "Снарський Василь",
-    viber: "Васёк",
-    phone: "+420 72 803 7814",
-    photo: "photos/snarskyi_vasyl.jpg",
-    flag:  "🇺🇦",
-  },
-  {
-    en:    "Srebniuk Denys",
-    ua:    "Срібнюк Денис",
-    viber: "Денис",
-    phone: "+380 98 026 2269",
-    photo: "photos/srebniuk_denys.jpg",
-    flag:  "🇺🇦",
-  },
-  {
-    en:    "Stateczny Adam Wojciech",
-    ua:    "Статечний Адам Войцех",
-    viber: "Name",
-    phone: "+380 00 000 00",
-    photo: "photos/stateczny_adam.jpg",
-    flag:  "🇵🇱",
-  },
-  {
-    en:    "Stefanov Stefan Hristov",
-    ua:    "Стефанов Стефан Христов",
-    viber: "Name",
-    phone: "+380 00 000 00",
-    photo: "photos/stefanov_stefan.jpg",
-    flag:  "🇵🇱",
-  },
-  {
-    en:    "Stetsiuk Oleh - DPČ",
-    ua:    "Стецюк Олег",
-    viber: "Name",
-    phone: "+380 00 000 00",
-    photo: "photos/stetsiuk_oleh.jpg",
-    flag:  "🇺🇦",
-  },
-  {
-    en:    "Stoliar Yevhenii",
-    ua:    "Столяр Євгеній",
-    viber: "Євген Столяр",
-    phone: "+380 68 062 7715",
-    photo: "photos/stoliar_yevhenii.jpg",
-    flag:  "🇺🇦",
-  },
-  {
-    en:    "Sviatokha Valentyn",
-    ua:    "Святоха Валентин",
-    viber: "Valentyn",
-    phone: "+420 60 648 3082",
-    photo: "photos/sviatokha_valentyn.jpg",
-    flag:  "🇺🇦",
-  },
-  {
-    en:    "Šanderová Kristyna",
-    ua:    "Шандерова Крістіна",
-    viber: "Kristýnka",
-    phone: "+420 60 701 2823",
-    photo: "photos/sanderova_kristyna.jpg",
-    flag:  "🇨🇿",
-  },
-  {
-    en:    "Tsybulko Nataliia",
-    ua:    "Цибулько Наталія",
-    viber: "Talia Tsibulko",
-    phone: "+420 72 201 2894",
-    photo: "photos/tsybulko_nataliia.jpg",
-    flag:  "🇺🇦",
-  },
-    {
-    en:    "Tyshchenko Yurii - DPČ",
-    ua:    "Тищенко Юрій",
-    viber: "Юра Тищенко",
-    phone: "+380 95 535 2213",
-    photo: "photos/tyshchenko_yurii.jpg",
-    flag:  "🇺🇦",
-  },
-  {
-    en:    "Vagner Michal",
-    ua:    "Вагнер Міхал",
-    viber: "Michal Vágner",
-    phone: "+420 72 126 2136",
-    photo: "photos/vagner_michal.jpg",
-    flag:  "🇨🇿",
-  },
-  {
-    en:    "Vraštil Petr",
-    ua:    "Враштіл Петр",
-    viber: "Petr Vraštil",
-    phone: "+420 60 340 0085",
-    photo: "photos/vrastil_petr.jpg",
-    flag:  "🇨🇿",
-  },
-  {
-    en:    "Yashnyk Oleksandr",
-    ua:    "Яшник Олександр",
-    viber: "Мультыбрендовый",
-    phone: "+380 98 133 9084",
-    photo: "photos/yashnyk_oleksandr.jpg",
-    flag:  "🇺🇦",
-  },
-  {
-    en:    "Zaňková Markéta",
-    ua:    "Занькова Маркета",
-    viber: "Name",
-    phone: "+380 00 000 00",
-    photo: "photos/zankova_marketa.jpg",
-    flag:  "🇨🇿",
-  },
-  {
-    en:    "Zarovnenko Oleksandr",
-    ua:    "Заровненко Олександр",
-    viber: "Саша Заровненко",
-    phone: "+380 99 449 5383",
-    photo: "photos/zarovnenko_oleksandr.jpg",
-    flag:  "🇺🇦",
-  },
-  {
-    en:    "Zieniewicz Arkadiusz Sebastian",
-    ua:    "Зєнєвіч Аркадіуш Себастіан",
-    viber: "Name",
-    phone: "+380 00 000 00",
-    photo: "photos/zieniewicz_arkadiusz.jpg",
-    flag:  "🇵🇱",
-  },
-
+  { en: "Adashynskyi Kostiantyn", ua: "Адашинський Костянтин", viber: "Адашинський Костя", phone: "+380 96 751 7530", photo: "photos/adashynskyi_kostiantyn.jpg", flag: "🇺🇦" },
+  { en: "Anosov Oleksandr", ua: "Аносов Олександр", viber: "Anosov Oleksandr", phone: "+380 99 331 7814", photo: "photos/anosov_oleksandr.jpg", flag: "🇺🇦" },
+  { en: "Bokoch Mykhailo", ua: "Бокоч Михайло", viber: "Bokoch Misha", phone: "+380 68 229 2395", photo: "photos/bokoch_mykhailo.jpg", flag: "🇺🇦" },
+  { en: "Chesnokov Pavlo", ua: "Чесноков Павло", viber: "Name", phone: "+380 00 000 00", photo: "photos/chesnokov_pavlo.jpg", flag: "🇺🇦" },
+  { en: "Chonka Ivan", ua: "Чонка Іван", viber: "Чонка Іван", phone: "+380 68 099 4850", photo: "photos/chonka_ivan.jpg", flag: "🇺🇦" },
+  { en: "Csaba Ruszó", ua: "Чаба Русзо", viber: "Csaba Ruszó", phone: "+421 91 109 5906", photo: "photos/csaba_ruszo.jpg", flag: "🇨🇿" },
+  { en: "Dvornikov Oleksii", ua: "Дворніков Олексій", viber: "Name", phone: "+380 00 000 00", photo: "photos/dvornikov_oleksii.jpg", flag: "🇺🇦" },
+  { en: "Dziuba Maksym", ua: "Дзюба Максим", viber: "Максим", phone: "+420 73 262 6674", photo: "photos/dziuba_maksym.jpg", flag: "🇺🇦" },
+  { en: "Dzyngel Oleksandr", ua: "Дзингель Олександр", viber: "Name", phone: "+380 00 000 00", photo: "photos/dzyngel_oleksandr.jpg", flag: "🇺🇦" },
+  { en: "Furman Tomasz Jan", ua: "Фурман Томаш Ян", viber: "Name", phone: "+380 00 000 00", photo: "photos/furman_tomasz_jan.jpg", flag: "🇵🇱" },
+  { en: "Goran Oleg", ua: "Горан Олег", viber: "Name", phone: "+380 00 000 00", photo: "photos/goran_oleg.jpg", flag: "🇺🇦" },
+  { en: "Huk Yaroslav", ua: "Гук Ярослав", viber: "Yaroslav", phone: "+420 77 654 7561", photo: "photos/huk_yaroslav.jpg", flag: "🇺🇦" },
+  { en: "Kahramanyan Dmytro", ua: "Каграманян Дмитро", viber: "Dmitro", phone: "+420 73 771 3278", photo: "photos/kahramanyan_dmytro.jpg", flag: "🇺🇦" },
+  { en: "Kapatsyna Vladyslav", ua: "Капацина Владислав", viber: "Владичка", phone: "+420 79 762 6052", photo: "photos/kapatsyna_vladyslav.jpg", flag: "🇺🇦" },
+  { en: "Klymenko Oleksandr", ua: "Клименко Олександр", viber: "Name", phone: "+380 00 000 00", photo: "photos/klymenko_oleksandr.jpg", flag: "🇺🇦" },
+  { en: "Kovalenko Dmytro", ua: "Коваленко Дмитро", viber: "Димк коваленко", phone: "+380 93 713 5771", photo: "photos/kovalenko_dmytro.jpg", flag: "🇺🇦" },
+  { en: "Kushnir Ivan", ua: "Кушнір Іван", viber: "Іван", phone: "+380 96 382 4084", photo: "photos/kushnir_ivan.jpg", flag: "🇺🇦" },
+  { en: "Kuzyk Rostyslav", ua: "Кузик Ростислав", viber: "Кузик Ростислав", phone: "+380 63 844 8729", photo: "photos/kuzyk_rostyslav.jpg", flag: "🇺🇦" },
+  { en: "Makieiev Oleksandr", ua: "Макєєв Олександр", viber: "Name", phone: "+380 00 000 00", photo: "photos/makieiev_oleksandr.jpg", flag: "🇺🇦" },
+  { en: "Martseniuk Iryna", ua: "Марценюк Ірина", viber: "Іra Martseniuk", phone: "+380 63 982 1417", photo: "photos/martseniuk_iryna.jpg", flag: "🇺🇦" },
+  { en: "Miroshnichenko Andrii", ua: "Мірошниченко Андрій", viber: "Andrey", phone: "+380 66 014 5135", photo: "photos/miroshnichenko_andrii.jpg", flag: "🇺🇦" },
+  { en: "Nahorniuk Oleksandr", ua: "Нагорнюк Олександр", viber: "Саша", phone: "+420 77 067 1326", photo: "photos/nahorniuk_oleksandr.jpg", flag: "🇺🇦" },
+  { en: "Chetverykov Nikita", ua: "Четвериков Нікіта ", viber: "Никита Четвериков", phone: "+380 99 099 1097", photo: "photos/nikita_chetverykov.jpg", flag: "🇺🇦" },
+  { en: "Nosov Dmytro", ua: "Носов Дмитро", viber: "Dmitry", phone: "+380 96 474 1834", photo: "photos/nosov_dmytro.jpg", flag: "🇺🇦" },
+  { en: "Orel Illia", ua: "Орел Ілля", viber: "Ilюша", phone: "Орел Ілля", photo: "photos/orel_illia.jpg", flag: "🇺🇦" },
+  { en: "Orel Vladyslav", ua: "Орел Владислав", viber: "Влад", phone: "+380 68 283 3185", photo: "photos/orel_vladyslav.jpg", flag: "🇺🇦" },
+  { en: "Orlaniuk Vita", ua: "Орланюк Віта", viber: "Вита", phone: "+380 93 793 3926", photo: "photos/orlaniuk_vita.jpg", flag: "🇺🇦" },
+  { en: "Pavliuk Vladyslav", ua: "Павлюк Владислав", viber: "Vlad", phone: "+380 63 606 9863", photo: "photos/pavliuk_vladyslav.jpg", flag: "🇺🇦" },
+  { en: "Petriv Mykhailo", ua: "Петрів Михайло", viber: "Михайло", phone: "+380 97 018 3884", photo: "photos/petriv_mykhailo.jpg", flag: "🇺🇦" },
+  { en: "Poluianov Denys", ua: "Полуянов Денис", viber: "Name", phone: "+380 00 000 00", photo: "photos/poluianov_denys.jpg", flag: "🇺🇦" },
+  { en: "Ponomarenko Oleh", ua: "Пономаренко Олег", viber: "Олег Пономаренко", phone: "+380 96 285 4923", photo: "photos/ponomarenko_oleh.jpg", flag: "🇺🇦" },
+  { en: "Popadynets Oleksandr", ua: "Попадинець Олександр", viber: "Oleksandr Popadynets", phone: "+420 60 611 5201", photo: "photos/popadynets_oleksandr.jpg", flag: "🇺🇦" },
+  { en: "Popovych Stanislav", ua: "Попович Станіслав", viber: "Stanislav", phone: "+380 66 024 2505", photo: "photos/popovych_stanislav.jpg", flag: "🇺🇦" },
+  { en: "Radouš Jan", ua: "Радоуш Ян", viber: "Jan Radous", phone: "+420 77 705 8364", photo: "photos/radous_jan.jpg", flag: "🇨🇿" },
+  { en: "Robu Artem", ua: "Робу Артем", viber: "Артем", phone: "+380 97 254 0596", photo: "photos/robu_artem.jpg", flag: "🇺🇦" },
+  { en: "Shyshkovychev Kyrylo", ua: "Шишковичев Кирило", viber: "Кирилл Шишковичев", phone: "+380 95 085 5590", photo: "photos/shyshkovychev_kyrylo.jpg", flag: "🇺🇦" },
+  { en: "Siedov Yehor", ua: "Сєдов Єгор", viber: "Name", phone: "+380 00 000 00", photo: "photos/siedov_yehor.jpg", flag: "🇺🇦" },
+  { en: "Sirenko Vitalii", ua: "Сіренко Віталій", viber: "Name", phone: "+380 00 000 00", photo: "photos/sirenko_vitalii.jpg", flag: "🇺🇦" },
+  { en: "Snarskyi Vasyl", ua: "Снарський Василь", viber: "Васёк", phone: "+420 72 803 7814", photo: "photos/snarskyi_vasyl.jpg", flag: "🇺🇦" },
+  { en: "Srebniuk Denys", ua: "Срібнюк Денис", viber: "Денис", phone: "+380 98 026 2269", photo: "photos/srebniuk_denys.jpg", flag: "🇺🇦" },
+  { en: "Stateczny Adam Wojciech", ua: "Статечний Адам Войцех", viber: "Name", phone: "+380 00 000 00", photo: "photos/stateczny_adam.jpg", flag: "🇵🇱" },
+  { en: "Stefanov Stefan Hristov", ua: "Стефанов Стефан Христов", viber: "Name", phone: "+380 00 000 00", photo: "photos/stefanov_stefan.jpg", flag: "🇵🇱" },
+  { en: "Stetsiuk Oleh - DPČ", ua: "Стецюк Олег", viber: "Name", phone: "+380 00 000 00", photo: "photos/stetsiuk_oleh.jpg", flag: "🇺🇦" },
+  { en: "Stoliar Yevhenii", ua: "Столяр Євгеній", viber: "Євген Столяр", phone: "+380 68 062 7715", photo: "photos/stoliar_yevhenii.jpg", flag: "🇺🇦" },
+  { en: "Sviatokha Valentyn", ua: "Святоха Валентин", viber: "Valentyn", phone: "+420 60 648 3082", photo: "photos/sviatokha_valentyn.jpg", flag: "🇺🇦" },
+  { en: "Šanderová Kristyna", ua: "Шандерова Крістіна", viber: "Kristýnka", phone: "+420 60 701 2823", photo: "photos/sanderova_kristyna.jpg", flag: "🇨🇿" },
+  { en: "Tsybulko Nataliia", ua: "Цибулько Наталія", viber: "Talia Tsibulko", phone: "+420 72 201 2894", photo: "photos/tsybulko_nataliia.jpg", flag: "🇺🇦" },
+  { en: "Tyshchenko Yurii - DPČ", ua: "Тищенко Юрій", viber: "Юра Тищенко", phone: "+380 95 535 2213", photo: "photos/tyshchenko_yurii.jpg", flag: "🇺🇦" },
+  { en: "Vagner Michal", ua: "Вагнер Міхал", viber: "Michal Vágner", phone: "+420 72 126 2136", photo: "photos/vagner_michal.jpg", flag: "🇨🇿" },
+  { en: "Vraštil Petr", ua: "Враштіл Петр", viber: "Petr Vraštil", phone: "+420 60 340 0085", photo: "photos/vrastil_petr.jpg", flag: "🇨🇿" },
+  { en: "Yashnyk Oleksandr", ua: "Яшник Олександр", viber: "Мультыбрендовый", phone: "+380 98 133 9084", photo: "photos/yashnyk_oleksandr.jpg", flag: "🇺🇦" },
+  { en: "Zaňková Markéta", ua: "Занькова Маркета", viber: "Name", phone: "+380 00 000 00", photo: "photos/zankova_marketa.jpg", flag: "🇨🇿" },
+  { en: "Zarovnenko Oleksandr", ua: "Заровненко Олександр", viber: "Саша Заровненко", phone: "+380 99 449 5383", photo: "photos/zarovnenko_oleksandr.jpg", flag: "🇺🇦" },
+  { en: "Zieniewicz Arkadiusz Sebastian", ua: "Зєнєвіч Аркадіуш Себастіан", viber: "Name", phone: "+380 00 000 00", photo: "photos/zieniewicz_arkadiusz.jpg", flag: "🇵🇱" }
 ];
-// ══════════════════════════════════════════════════════════════
 
-// Сортування ВИМКНЕНО — порядок задається вручну вище у масиві PEOPLE
-// Щоб увімкнути сортування за алфавітом — розкоментуй рядок нижче:
-// PEOPLE.sort((a, b) => a.en.localeCompare(b.en));
-
-// ══════════════════════════════════════════════════════════════
-// FIREBASE SDK (Підключення бібліотек)
-const scriptApp = document.createElement('script');
-scriptApp.src = "https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js";
-document.head.appendChild(scriptApp);
-
-const scriptDb = document.createElement('script');
-scriptDb.src = "https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js";
-document.head.appendChild(scriptDb);
-
-// State
 let set17 = [];
 let set19 = [];
-let editedNames = {}; 
-let db;
-
-// Ініціалізація Firebase після завантаження скриптів
-scriptDb.onload = () => {
-  const firebaseConfig = {
-    projectId: "gi-group-list",
-    databaseURL: "https://gi-group-list-default-rtdb.europe-west1.firebasedatabase.app"
-  };
-  firebase.initializeApp(firebaseConfig);
-  db = firebase.database();
-  loadData(); // Завантажуємо дані з хмари
-};
 
 function loadData() {
   db.ref('attendance').on('value', (snapshot) => {
     const data = snapshot.val() || {};
     set17 = data.set17 || [];
     set19 = data.set19 || [];
-    editedNames = data.edits || {};
-
-    // Застосовуємо редагування імен до PEOPLE
-    Object.entries(editedNames).forEach(([orig, newN]) => {
-      const p = PEOPLE.find(x => x._origEn === orig || x.en === orig);
-      if (p) { p._origEn = p._origEn || orig; p.en = newN; }
-    });
-    
     render(document.getElementById('search').value);
   });
 }
 
 function saveData() {
-  if (!db) return;
   db.ref('attendance').set({
     set17: set17,
-    set19: set19,
-    edits: editedNames
+    set19: set19
   }).then(() => {
     const toast = document.getElementById('toast');
-    if(toast) {
-      toast.textContent = "✓ Збережено в хмарі";
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2000);
-    }
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
   });
 }
 
-function getInitials(name) {
-  const parts = name.trim().split(' ');
-  return (parts[0]?.[0] || '') + (parts[1]?.[0] || '');
+function toggle(name, type) {
+  if (type === '17') {
+    if (set17.includes(name)) {
+      set17 = set17.filter(n => n !== name);
+    } else {
+      set17.push(name);
+      set19 = set19.filter(n => n !== name);
+    }
+  } else {
+    if (set19.includes(name)) {
+      set19 = set19.filter(n => n !== name);
+    } else {
+      set19.push(name);
+      set17 = set17.filter(n => n !== name);
+    }
+  }
+  render(document.getElementById('search').value);
 }
 
-function createCard(person, listType) {
+function createCard(p) {
+  const is17 = set17.includes(p.en);
+  const is19 = set19.includes(p.en);
+  
   const div = document.createElement('div');
-  div.className = 'person' + (listType === '17' ? ' item-17' : listType === '19' ? ' item-19' : '');
-
+  div.className = 'person' + (is17 ? ' item-17' : is19 ? ' item-19' : '');
+  
   div.innerHTML = `
     <div class="avatar-wrap">
-      <img class="avatar" src="${person.photo}" onerror="this.onerror=null; this.outerHTML='<div class="avatar-placeholder">${getInitials(person.en)}</div>'">
-      <div class="flag-below">${person.flag || ''}</div>
+      <img class="avatar" src="${p.photo}" onerror="this.src='https://ui-avatars.com/api/?name=${p.en}&background=222&color=00c896'" onclick="openLightbox('${p.photo}')">
+      <div class="flag-below">${p.flag}</div>
     </div>
     <div class="info">
-      <div class="name-en-wrap">
-        <div class="name-en" onclick="copyToClipboard('${person.en}')">${person.en}</div>
-        <button class="edit-btn" onclick="openEditModal('${person.en}')">✎</button>
-      </div>
-      <div class="name-ua">${person.ua}</div>
-      <div class="viber-name">Viber: ${person.viber}</div>
-      <div class="phone">${person.phone || ''}</div>
+      <div class="name-en" onclick="copyToClipboard('${p.en}')">${p.en}</div>
+      <div class="name-ua">${p.ua}</div>
+      <div class="viber-name">Viber: ${p.viber}</div>
+      <div class="phone">${p.phone}</div>
     </div>
-    <div style="display:flex; flex-direction:column; align-items:center; gap:20px; flex-shrink:0;">
-      <div class="check-btn ${listType === '17' ? 'checked-17' : ''}" onclick="toggleList('${person.en}', '17')">
+    <div class="controls">
+      <div class="check-btn ${is17 ? 'checked-17' : ''}" onclick="toggle('${p.en}', '17')">
         <svg viewBox="0 0 16 16"><polyline points="2,8 6,12 14,4"/></svg>
         <span class="btn-label">17:00</span>
       </div>
-      <div class="check-btn ${listType === '19' ? 'checked-19' : ''}" onclick="toggleList('${person.en}', '19')">
+      <div class="check-btn ${is19 ? 'checked-19' : ''}" onclick="toggle('${p.en}', '19')">
         <svg viewBox="0 0 16 16"><polyline points="2,8 6,12 14,4"/></svg>
         <span class="btn-label">19:00</span>
       </div>
@@ -1178,81 +298,53 @@ function createCard(person, listType) {
   return div;
 }
 
-function copyToClipboard(text) {
-  navigator.clipboard.writeText(text).then(() => {
-    const t = document.getElementById('copy-toast');
-    if(t) {
-      t.textContent = `✓ Скопійовано: ${text}`;
-      t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 2000);
-    }
-  });
-}
-
-function toggleList(name, listType) {
-  const in17 = set17.includes(name);
-  const in19 = set19.includes(name);
-
-  if (listType === '17') {
-    set17 = in17 ? set17.filter(n => n !== name) : [...set17, name];
-    set19 = set19.filter(n => n !== name);
-  } else {
-    set19 = in19 ? set19.filter(n => n !== name) : [...set19, name];
-    set17 = set17.filter(n => n !== name);
-  }
-  
-  render(document.getElementById('search').value);
-}
-
-// Функції для модалки редагування
-window.openEditModal = function(currentName) {
-  const newName = prompt("Введіть нове ім'я:", currentName);
-  if (newName && newName.trim() !== "") {
-    const person = PEOPLE.find(p => p.en === currentName);
-    if (person) {
-      const origKey = person._origEn || currentName;
-      editedNames[origKey] = newName.trim();
-      // Оновимо локально для миттєвого результату
-      person._origEn = origKey;
-      person.en = newName.trim();
-      render(document.getElementById('search').value);
-    }
-  }
-};
-
 function render(query = '') {
   const q = query.toLowerCase().trim();
-  const peopleList = document.getElementById('people-list');
+  const listMain = document.getElementById('list-main');
   const list17 = document.getElementById('list-17');
   const list19 = document.getElementById('list-19');
 
-  if (!peopleList) return;
+  listMain.innerHTML = ''; list17.innerHTML = ''; list19.innerHTML = '';
 
-  peopleList.innerHTML = '';
-  list17.innerHTML = '';
-  list19.innerHTML = '';
+  const filtered = PEOPLE.filter(p => p.en.toLowerCase().includes(q) || p.ua.toLowerCase().includes(q));
 
-  const mainPeople = PEOPLE.filter(p => !set17.includes(p.en) && !set19.includes(p.en));
-  const p17 = set17.map(n => PEOPLE.find(p => p.en === n)).filter(Boolean);
-  const p19 = set19.map(n => PEOPLE.find(p => p.en === n)).filter(Boolean);
+  const mainArr = filtered.filter(p => !set17.includes(p.en) && !set19.includes(p.en));
+  const arr17 = filtered.filter(p => set17.includes(p.en));
+  const arr19 = filtered.filter(p => set19.includes(p.en));
 
-  const match = p => !q || p.en.toLowerCase().includes(q) || p.ua.toLowerCase().includes(q);
+  mainArr.forEach(p => listMain.appendChild(createCard(p)));
+  arr17.forEach(p => list17.appendChild(createCard(p)));
+  arr19.forEach(p => list19.appendChild(createCard(p)));
 
-  mainPeople.filter(match).forEach(p => peopleList.appendChild(createCard(p, 'main')));
-  p17.filter(match).forEach(p => list17.appendChild(createCard(p, '17')));
-  p19.filter(match).forEach(p => list19.appendChild(createCard(p, '19')));
+  document.getElementById('count-all').textContent = mainArr.length;
+  document.getElementById('count-17-top').textContent = set17.length;
+  document.getElementById('count-19-top').textContent = set19.length;
+  document.getElementById('count-17').textContent = arr17.length;
+  document.getElementById('count-19').textContent = arr19.length;
 
-  document.getElementById('count').textContent = mainPeople.filter(match).length;
-  document.getElementById('count-17-top').textContent = p17.length;
-  document.getElementById('count-19-top').textContent = p19.length;
-
-  document.getElementById('section-17').style.display = p17.length ? 'block' : 'none';
-  document.getElementById('section-19').style.display = p19.length ? 'block' : 'none';
+  document.getElementById('section-17').style.display = arr17.length ? 'block' : 'none';
+  document.getElementById('section-19').style.display = arr19.length ? 'block' : 'none';
 }
 
-document.getElementById('search').addEventListener('input', e => render(e.target.value));
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    const t = document.getElementById('toast');
+    const oldText = t.textContent;
+    t.textContent = "✓ Скопійовано: " + text;
+    t.classList.add('show');
+    setTimeout(() => { t.classList.remove('show'); t.textContent = oldText; }, 1500);
+  });
+}
+
+function openLightbox(src) {
+  document.getElementById('lightbox-img').src = src;
+  document.getElementById('lightbox').classList.add('active');
+}
+
+document.getElementById('search').addEventListener('input', (e) => render(e.target.value));
 document.getElementById('save-btn').onclick = saveData;
 
+loadData();
 </script>
 </body>
 </html>
