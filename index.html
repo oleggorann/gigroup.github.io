@@ -1399,19 +1399,24 @@ function render(query = '') {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// JSONBIN + PUSHER REALTIME SYNC
+// JSONBIN + REALTIME SYNC (polling + Pusher subscribe)
 // ═══════════════════════════════════════════════════════════════
 
-// ── JSONBin (сховище даних) ──────────────────────────────────
+// ── JSONBin ──────────────────────────────────────────────────
 const JBIN_ID  = '69ec31bd36566621a8ec44ae';
 const JBIN_KEY = '$2a$10$YDsIKQri9u4UI8GuUJFjTetgHXwy95KY1JqoYSaoaZZILyfiTqKKm';
 const JBIN_URL = 'https://api.jsonbin.io/v3/b/' + JBIN_ID;
 
-// ── Pusher (миттєві сповіщення) ──────────────────────────────
+// ── Pusher ───────────────────────────────────────────────────
 const PUSHER_KEY     = 'a5a9cfe09b7203738c6f';
 const PUSHER_CLUSTER = 'eu';
 const PUSHER_CHANNEL = 'gi-group';
 const PUSHER_EVENT   = 'data-updated';
+
+// ── Стан синхронізації ───────────────────────────────────────
+let lastKnownTs   = 0;   // timestamp останніх відомих даних
+let isMySave      = false; // щоб не перезавантажувати власні зміни
+let pollInterval  = null;
 
 // ── UI кнопки ────────────────────────────────────────────────
 function setBtnState(state) {
@@ -1422,7 +1427,7 @@ function setBtnState(state) {
   if (state === 'error')  { btn.textContent = '✗ Error';   btn.style.opacity = '1';  btn.disabled = false; setTimeout(() => { btn.textContent = 'Save'; }, 3000); }
 }
 
-// ── Застосувати дані з JSONBin до стану ──────────────────────
+// ── Застосувати дані ─────────────────────────────────────────
 function applyRemoteData(data) {
   if (!data) return;
   if (Array.isArray(data.set17)) set17 = data.set17;
@@ -1434,7 +1439,7 @@ function applyRemoteData(data) {
       if (p) { p._origEn = p._origEn || orig; p.en = newN; }
     });
   }
-  // Зберігаємо в localStorage щоб наступний відкриття було миттєвим
+  if (data.ts) lastKnownTs = data.ts;
   try {
     localStorage.setItem('gi_group_17',    JSON.stringify(set17));
     localStorage.setItem('gi_group_19',    JSON.stringify(set19));
@@ -1444,82 +1449,95 @@ function applyRemoteData(data) {
 }
 
 // ── ЧИТАННЯ з JSONBin ─────────────────────────────────────────
-async function loadFromJsonbin() {
+async function loadFromJsonbin(silent = false) {
   try {
     const res = await fetch(JBIN_URL + '/latest', {
       headers: { 'X-Master-Key': JBIN_KEY }
     });
     if (!res.ok) return;
     const json = await res.json();
-    applyRemoteData(json.record);
-  } catch(e) { console.error('JSONBin load error:', e); }
+    const data = json.record;
+    if (!data) return;
+    // Оновлюємо тільки якщо дані новіші
+    if (!silent || (data.ts && data.ts > lastKnownTs)) {
+      applyRemoteData(data);
+    }
+  } catch(e) {}
 }
 
-// ── ЗАПИС у JSONBin + сповіщення через Pusher ─────────────────
+// ── ЗАПИС у JSONBin ───────────────────────────────────────────
 async function syncToJsonbin() {
   setBtnState('saving');
-  const payload = { set17, set19, editedNames, ts: Date.now() };
+  isMySave = true;
+  const ts = Date.now();
+  const payload = { set17, set19, editedNames, ts };
   try {
-    // 1. Зберігаємо дані в JSONBin
     const res = await fetch(JBIN_URL, {
       method: 'PUT',
       headers: {
-        'Content-Type':   'application/json',
-        'X-Master-Key':   JBIN_KEY,
+        'Content-Type':     'application/json',
+        'X-Master-Key':     JBIN_KEY,
         'X-Bin-Versioning': 'false'
       },
       body: JSON.stringify(payload)
     });
-    if (!res.ok) { setBtnState('error'); return; }
-
-    // 2. Сповіщаємо всі інші пристрої через Pusher
-    //    Використовуємо безкоштовний Pusher Beams REST через fetch
-    //    (trigger через HTTP API без серверного коду)
-    await fetch(`https://api.pusherapp.com/apps/2146525/events`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name:     PUSHER_EVENT,
-        channels: [PUSHER_CHANNEL],
-        data:     JSON.stringify({ ts: payload.ts })
-      })
-    }).catch(() => {}); // мовчки — навіть якщо Pusher trigger не пройде, дані збережено
-
-    setBtnState('ok');
-  } catch(e) { console.error('Sync error:', e); setBtnState('error'); }
+    if (res.ok) {
+      lastKnownTs = ts;
+      setBtnState('ok');
+    } else {
+      setBtnState('error');
+    }
+  } catch(e) {
+    setBtnState('error');
+  }
+  setTimeout(() => { isMySave = false; }, 3000);
 }
 
-// ── Ініціалізація Pusher — слухаємо оновлення від інших ───────
+// ── POLLING — перевіряємо зміни кожні 3 сек ──────────────────
+function startPolling() {
+  if (pollInterval) return;
+  pollInterval = setInterval(async () => {
+    if (isMySave) return; // не перезавантажуємо поки самі зберігаємо
+    if (document.hidden) return; // не питаємо коли вкладка прихована
+    await loadFromJsonbin(true); // silent=true — оновлює тільки якщо є нові дані
+  }, 3000);
+}
+
+function stopPolling() {
+  if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
+}
+
+// Зупиняємо polling коли вкладка прихована, відновлюємо при поверненні
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    stopPolling();
+  } else {
+    loadFromJsonbin(true); // одразу перевіряємо при поверненні
+    startPolling();
+  }
+});
+
+// ── Pusher — миттєве сповіщення (якщо Cloudflare Worker підключено) ──
 function initPusher() {
   try {
-    const pusher = new Pusher(PUSHER_KEY, { cluster: PUSHER_CLUSTER });
+    const pusher  = new Pusher(PUSHER_KEY, { cluster: PUSHER_CLUSTER });
     const channel = pusher.subscribe(PUSHER_CHANNEL);
-
-    channel.bind(PUSHER_EVENT, function(data) {
-      // Інший пристрій зберіг зміни → підтягуємо актуальні дані
-      console.log('Pusher: отримано оновлення, завантажуємо...');
-      loadFromJsonbin();
+    channel.bind(PUSHER_EVENT, () => {
+      if (!isMySave) {
+        loadFromJsonbin(false); // миттєво підтягуємо при сповіщенні
+      }
     });
-
-    pusher.connection.bind('connected', () => {
-      console.log('Pusher: підключено ✓');
-    });
-    pusher.connection.bind('error', (err) => {
-      console.warn('Pusher connection error:', err);
-    });
-  } catch(e) {
-    console.warn('Pusher init failed:', e);
-  }
+    pusher.connection.bind('connected', () => console.log('Pusher ✓'));
+  } catch(e) { console.warn('Pusher init failed:', e); }
 }
 
 // ── Перевизначаємо saveData ───────────────────────────────────
 const _localSave = saveData;
 saveData = function() {
-  _localSave();      // localStorage + тост
-  syncToJsonbin();   // JSONBin + Pusher trigger
+  _localSave();
+  syncToJsonbin();
 };
 
-// ── Редагування імені — теж синхронізуємо ────────────────────
 const _origSaveEditModal = saveEditModal;
 saveEditModal = function() {
   _origSaveEditModal();
@@ -1529,14 +1547,14 @@ saveEditModal = function() {
 // ═══════════════════════════════════════════════════════════════
 // Init
 // ═══════════════════════════════════════════════════════════════
-loadData();          // 1. Миттєво з localStorage
-render();            // 2. Миттєво показуємо список
-loadFromJsonbin();   // 3. Фоново підтягуємо актуальні дані з JSONBin
-initPusher();        // 4. Підключаємо Pusher для realtime
+loadData();               // 1. Миттєво з localStorage
+render();                 // 2. Миттєво рендеримо
+loadFromJsonbin(false);   // 3. Завантажуємо актуальні дані
+startPolling();           // 4. Починаємо перевіряти кожні 3 сек
+initPusher();             // 5. Pusher для миттєвих сповіщень
 
 document.getElementById('search').addEventListener('input', e => render(e.target.value));
 
-// Auto-save on page hide
 window.addEventListener('pagehide', saveData);
 window.addEventListener('beforeunload', saveData);
 </script>
