@@ -572,6 +572,8 @@
     pointer-events: none;
   }
 </style>
+<!-- Pusher SDK -->
+<script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
 </head>
 <body>
 
@@ -1397,12 +1399,21 @@ function render(query = '') {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// JSONBIN SYNC
+// JSONBIN + PUSHER REALTIME SYNC
 // ═══════════════════════════════════════════════════════════════
+
+// ── JSONBin (сховище даних) ──────────────────────────────────
 const JBIN_ID  = '69ec31bd36566621a8ec44ae';
 const JBIN_KEY = '$2a$10$YDsIKQri9u4UI8GuUJFjTetgHXwy95KY1JqoYSaoaZZILyfiTqKKm';
 const JBIN_URL = 'https://api.jsonbin.io/v3/b/' + JBIN_ID;
 
+// ── Pusher (миттєві сповіщення) ──────────────────────────────
+const PUSHER_KEY     = 'a5a9cfe09b7203738c6f';
+const PUSHER_CLUSTER = 'eu';
+const PUSHER_CHANNEL = 'gi-group';
+const PUSHER_EVENT   = 'data-updated';
+
+// ── UI кнопки ────────────────────────────────────────────────
 function setBtnState(state) {
   const btn = document.getElementById('btn-save-main');
   if (!btn) return;
@@ -1411,67 +1422,104 @@ function setBtnState(state) {
   if (state === 'error')  { btn.textContent = '✗ Error';   btn.style.opacity = '1';  btn.disabled = false; setTimeout(() => { btn.textContent = 'Save'; }, 3000); }
 }
 
-// ЗАПИС у JSONBin — зберігає set17, set19 та editedNames
-async function syncToJsonbin() {
-  setBtnState('saving');
-  try {
-    const res = await fetch(JBIN_URL, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Master-Key': JBIN_KEY,
-        'X-Bin-Versioning': 'false'
-      },
-      body: JSON.stringify({
-        set17,
-        set19,
-        editedNames,
-        ts: Date.now()
-      })
+// ── Застосувати дані з JSONBin до стану ──────────────────────
+function applyRemoteData(data) {
+  if (!data) return;
+  if (Array.isArray(data.set17)) set17 = data.set17;
+  if (Array.isArray(data.set19)) set19 = data.set19;
+  if (data.editedNames && typeof data.editedNames === 'object') {
+    editedNames = data.editedNames;
+    Object.entries(editedNames).forEach(([orig, newN]) => {
+      const p = PEOPLE.find(x => x._origEn === orig || x.en === orig);
+      if (p) { p._origEn = p._origEn || orig; p.en = newN; }
     });
-    if (res.ok) { setBtnState('ok'); }
-    else { console.error('JSONBin PUT error:', res.status); setBtnState('error'); }
-  } catch(e) { console.error('JSONBin sync error:', e); setBtnState('error'); }
+  }
+  // Зберігаємо в localStorage щоб наступний відкриття було миттєвим
+  try {
+    localStorage.setItem('gi_group_17',    JSON.stringify(set17));
+    localStorage.setItem('gi_group_19',    JSON.stringify(set19));
+    localStorage.setItem('gi_group_edits', JSON.stringify(editedNames));
+  } catch(e) {}
+  render(document.getElementById('search').value);
 }
 
-// ЧИТАННЯ з JSONBin — викликається при завантаженні сторінки
+// ── ЧИТАННЯ з JSONBin ─────────────────────────────────────────
 async function loadFromJsonbin() {
   try {
     const res = await fetch(JBIN_URL + '/latest', {
-      method: 'GET',
       headers: { 'X-Master-Key': JBIN_KEY }
     });
-    if (!res.ok) { console.warn('JSONBin GET error:', res.status); return; }
+    if (!res.ok) return;
     const json = await res.json();
-    const data = json.record;
-    if (!data) return;
-
-    // Завантажуємо списки
-    if (Array.isArray(data.set17)) set17 = data.set17;
-    if (Array.isArray(data.set19)) set19 = data.set19;
-
-    // Завантажуємо редаговані імена
-    if (data.editedNames && typeof data.editedNames === 'object') {
-      editedNames = data.editedNames;
-      // Застосовуємо збережені імена до масиву PEOPLE
-      Object.entries(editedNames).forEach(([orig, newN]) => {
-        const p = PEOPLE.find(x => x._origEn === orig || x.en === orig);
-        if (p) { p._origEn = p._origEn || orig; p.en = newN; }
-      });
-    }
-
-    render(document.getElementById('search').value);
+    applyRemoteData(json.record);
   } catch(e) { console.error('JSONBin load error:', e); }
 }
 
-// Перевизначаємо saveData — додаємо JSONBin поверх localStorage
+// ── ЗАПИС у JSONBin + сповіщення через Pusher ─────────────────
+async function syncToJsonbin() {
+  setBtnState('saving');
+  const payload = { set17, set19, editedNames, ts: Date.now() };
+  try {
+    // 1. Зберігаємо дані в JSONBin
+    const res = await fetch(JBIN_URL, {
+      method: 'PUT',
+      headers: {
+        'Content-Type':   'application/json',
+        'X-Master-Key':   JBIN_KEY,
+        'X-Bin-Versioning': 'false'
+      },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) { setBtnState('error'); return; }
+
+    // 2. Сповіщаємо всі інші пристрої через Pusher
+    //    Використовуємо безкоштовний Pusher Beams REST через fetch
+    //    (trigger через HTTP API без серверного коду)
+    await fetch(`https://api.pusherapp.com/apps/2146525/events`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name:     PUSHER_EVENT,
+        channels: [PUSHER_CHANNEL],
+        data:     JSON.stringify({ ts: payload.ts })
+      })
+    }).catch(() => {}); // мовчки — навіть якщо Pusher trigger не пройде, дані збережено
+
+    setBtnState('ok');
+  } catch(e) { console.error('Sync error:', e); setBtnState('error'); }
+}
+
+// ── Ініціалізація Pusher — слухаємо оновлення від інших ───────
+function initPusher() {
+  try {
+    const pusher = new Pusher(PUSHER_KEY, { cluster: PUSHER_CLUSTER });
+    const channel = pusher.subscribe(PUSHER_CHANNEL);
+
+    channel.bind(PUSHER_EVENT, function(data) {
+      // Інший пристрій зберіг зміни → підтягуємо актуальні дані
+      console.log('Pusher: отримано оновлення, завантажуємо...');
+      loadFromJsonbin();
+    });
+
+    pusher.connection.bind('connected', () => {
+      console.log('Pusher: підключено ✓');
+    });
+    pusher.connection.bind('error', (err) => {
+      console.warn('Pusher connection error:', err);
+    });
+  } catch(e) {
+    console.warn('Pusher init failed:', e);
+  }
+}
+
+// ── Перевизначаємо saveData ───────────────────────────────────
 const _localSave = saveData;
 saveData = function() {
-  _localSave();       // localStorage + тост "✓ Збережено"
-  syncToJsonbin();    // + JSONBin
+  _localSave();      // localStorage + тост
+  syncToJsonbin();   // JSONBin + Pusher trigger
 };
 
-// Також синхронізуємо одразу після редагування імені
+// ── Редагування імені — теж синхронізуємо ────────────────────
 const _origSaveEditModal = saveEditModal;
 saveEditModal = function() {
   _origSaveEditModal();
@@ -1481,10 +1529,10 @@ saveEditModal = function() {
 // ═══════════════════════════════════════════════════════════════
 // Init
 // ═══════════════════════════════════════════════════════════════
-loadData();            // 1. Миттєво з localStorage
-render();              // 2. Миттєво показуємо список
-
-loadFromJsonbin();     // 3. Фоново підтягуємо актуальні дані з JSONBin
+loadData();          // 1. Миттєво з localStorage
+render();            // 2. Миттєво показуємо список
+loadFromJsonbin();   // 3. Фоново підтягуємо актуальні дані з JSONBin
+initPusher();        // 4. Підключаємо Pusher для realtime
 
 document.getElementById('search').addEventListener('input', e => render(e.target.value));
 
