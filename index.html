@@ -1396,9 +1396,9 @@ function render(query = '') {
   }
 }
 
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
 // JSONBIN SYNC
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
 const JBIN_ID  = '69ec31bd36566621a8ec44ae';
 const JBIN_KEY = '$2a$10$YDsIKQri9u4UI8GuUJFjTetgHXwy95KY1JqoYSaoaZZILyfiTqKKm';
 const JBIN_URL = 'https://api.jsonbin.io/v3/b/' + JBIN_ID;
@@ -1409,9 +1409,9 @@ function setBtnState(state) {
   if (state === 'saving') { btn.textContent = '⏳ Sync...'; btn.style.opacity = '.6'; btn.disabled = true; }
   if (state === 'ok')     { btn.textContent = '✓ Saved';   btn.style.opacity = '1';  btn.disabled = false; setTimeout(() => { btn.textContent = 'Save'; }, 2000); }
   if (state === 'error')  { btn.textContent = '✗ Error';   btn.style.opacity = '1';  btn.disabled = false; setTimeout(() => { btn.textContent = 'Save'; }, 3000); }
-  if (state === 'idle')   { btn.textContent = 'Save';       btn.style.opacity = '1';  btn.disabled = false; }
 }
 
+// ЗАПИС у JSONBin — зберігає set17, set19 та editedNames
 async function syncToJsonbin() {
   setBtnState('saving');
   try {
@@ -1422,41 +1422,69 @@ async function syncToJsonbin() {
         'X-Master-Key': JBIN_KEY,
         'X-Bin-Versioning': 'false'
       },
-      body: JSON.stringify({ set17, set19, ts: Date.now() })
+      body: JSON.stringify({
+        set17,
+        set19,
+        editedNames,
+        ts: Date.now()
+      })
     });
     if (res.ok) { setBtnState('ok'); }
-    else        { console.error('JSONBin write error', res.status); setBtnState('error'); }
-  } catch(e)    { console.error('JSONBin fetch error', e); setBtnState('error'); }
+    else { console.error('JSONBin PUT error:', res.status); setBtnState('error'); }
+  } catch(e) { console.error('JSONBin sync error:', e); setBtnState('error'); }
 }
 
+// ЧИТАННЯ з JSONBin — викликається при завантаженні сторінки
 async function loadFromJsonbin() {
   try {
     const res = await fetch(JBIN_URL + '/latest', {
+      method: 'GET',
       headers: { 'X-Master-Key': JBIN_KEY }
     });
-    if (!res.ok) return;
+    if (!res.ok) { console.warn('JSONBin GET error:', res.status); return; }
     const json = await res.json();
     const data = json.record;
-    if (data && Array.isArray(data.set17) && Array.isArray(data.set19)) {
-      set17 = data.set17;
-      set19 = data.set19;
-      render(document.getElementById('search').value);
+    if (!data) return;
+
+    // Завантажуємо списки
+    if (Array.isArray(data.set17)) set17 = data.set17;
+    if (Array.isArray(data.set19)) set19 = data.set19;
+
+    // Завантажуємо редаговані імена
+    if (data.editedNames && typeof data.editedNames === 'object') {
+      editedNames = data.editedNames;
+      // Застосовуємо збережені імена до масиву PEOPLE
+      Object.entries(editedNames).forEach(([orig, newN]) => {
+        const p = PEOPLE.find(x => x._origEn === orig || x.en === orig);
+        if (p) { p._origEn = p._origEn || orig; p.en = newN; }
+      });
     }
-  } catch(e) { /* мовчки — локальні дані вже відображені */ }
+
+    render(document.getElementById('search').value);
+  } catch(e) { console.error('JSONBin load error:', e); }
 }
 
 // Перевизначаємо saveData — додаємо JSONBin поверх localStorage
 const _localSave = saveData;
 saveData = function() {
-  _localSave();        // localStorage + тост "✓ Збережено" — як раніше
-  syncToJsonbin();     // + JSONBin синхронізація
+  _localSave();       // localStorage + тост "✓ Збережено"
+  syncToJsonbin();    // + JSONBin
 };
 
-// Init
-loadData();   // 1. Миттєво з localStorage
-render();     // 2. Миттєво рендеримо список
+// Також синхронізуємо одразу після редагування імені
+const _origSaveEditModal = saveEditModal;
+saveEditModal = function() {
+  _origSaveEditModal();
+  syncToJsonbin();
+};
 
-loadFromJsonbin(); // 3. Фоново оновлюємо з JSONBin
+// ═══════════════════════════════════════════════════════════════
+// Init
+// ═══════════════════════════════════════════════════════════════
+loadData();            // 1. Миттєво з localStorage
+render();              // 2. Миттєво показуємо список
+
+loadFromJsonbin();     // 3. Фоново підтягуємо актуальні дані з JSONBin
 
 document.getElementById('search').addEventListener('input', e => render(e.target.value));
 
