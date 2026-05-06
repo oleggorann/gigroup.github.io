@@ -76,6 +76,23 @@
   #search:focus { border-color: var(--accent); }
   #search::placeholder { color: var(--text-muted); }
 
+  /* ✕ Хрестик очищення пошуку — змінюй font-size щоб збільшити/зменшити */
+  #search::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 16px;       /* ← РОЗМІР — змінюй це число (px) */
+    width: 16px;        /* ← РОЗМІР — змінюй це число (px) */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cline x1='2' y1='2' x2='14' y2='14' stroke='%2300c896' stroke-width='2.2' stroke-linecap='round'/%3E%3Cline x1='14' y1='2' x2='2' y2='14' stroke='%2300c896' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity .15s;
+  }
+  #search::-webkit-search-cancel-button:hover {
+    opacity: 1;
+  }
+
   .search-icon {
     position: absolute;
     left: 9px; top: 50%;
@@ -463,6 +480,67 @@
     width: 100%;
     max-width: 340px;
   }
+  /* Інфо-панель у модальному вікні */
+  .edit-modal-info {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 10px 12px;
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .edit-modal-info-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .edit-modal-info-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .edit-modal-info-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent);
+    text-align: right;
+  }
+  .edit-modal-info-value.empty {
+    color: var(--text-muted);
+    font-weight: 400;
+    font-style: italic;
+  }
+  .edit-modal-info-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 2px 0;
+  }
+
+  /* Секція під кнопками: інфо + Dovolená */
+  .edit-modal-bottom {
+    margin-top: 14px;
+    border-top: 1px solid var(--border);
+    padding-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .edit-modal-section-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 9px;
+    font-weight: 300;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+
   .edit-modal-title {
     font-family: 'Unbounded', sans-serif;
     font-size: 10px;
@@ -622,10 +700,51 @@
 <div class="edit-modal" id="edit-modal">
   <div class="edit-modal-box">
     <div class="edit-modal-title">РЕДАГУВАТИ ІМ'Я (EN)</div>
+
+    <!-- Поле вводу імені -->
     <input type="text" id="edit-input" autocomplete="off">
+
+    <!-- Кнопки -->
     <div class="edit-modal-btns">
       <button onclick="closeEditModal()">Скасувати</button>
       <button class="save" onclick="saveEditModal()">Зберегти</button>
+    </div>
+
+    <!-- Нижня секція: інфо + Dovolená -->
+    <div class="edit-modal-bottom">
+
+      <!-- Dovolená — поле вводу -->
+      <div>
+        <div class="edit-modal-section-title">Dovolená</div>
+        <input type="text" id="dovolena-input" autocomplete="off" placeholder="наприклад: 1.7 - 14.7">
+      </div>
+
+      <!-- Інфо-панель: Viber, Шафка, Диспетчер, Місто -->
+      <div>
+        <div class="edit-modal-section-title">Інформація</div>
+        <div class="edit-modal-info" id="edit-modal-info">
+          <div class="edit-modal-info-row">
+            <span class="edit-modal-info-label">Viber</span>
+            <span class="edit-modal-info-value" id="info-viber">—</span>
+          </div>
+          <div class="edit-modal-info-divider"></div>
+          <div class="edit-modal-info-row">
+            <span class="edit-modal-info-label">Шафка</span>
+            <span class="edit-modal-info-value" id="info-locker">—</span>
+          </div>
+          <div class="edit-modal-info-divider"></div>
+          <div class="edit-modal-info-row">
+            <span class="edit-modal-info-label">Диспетчер</span>
+            <span class="edit-modal-info-value" id="info-dispatcher">—</span>
+          </div>
+          <div class="edit-modal-info-divider"></div>
+          <div class="edit-modal-info-row">
+            <span class="edit-modal-info-label">Місто</span>
+            <span class="edit-modal-info-value" id="info-city">—</span>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -650,6 +769,10 @@ const PEOPLE = [
     phone: "+380 96 751 7530",
     photo: "photos/adashynskyi_kostiantyn.jpg",
     flag:  "🇺🇦",
+    locker: 1,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Anosov Oleksandr",
@@ -658,14 +781,22 @@ const PEOPLE = [
     phone: "+380 99 331 7814",
     photo: "photos/anosov_oleksandr.jpg",
     flag:  "🇺🇦",
+    locker: 2,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
     {
-    en:    "Bokoch Mykhailo HPP",
+    en:    "Bokoch Mykhailo",
     ua:    "Бокоч Михайло",
     viber: "Bokoch Misha",
     phone: "+380 68 229 2395",
     photo: "photos/bokoch_mykhailo.jpg",
     flag:  "🇺🇦",
+    locker: 3,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Chesnokov Pavlo",
@@ -674,6 +805,10 @@ const PEOPLE = [
     phone: "+380 00 000 00",
     photo: "photos/chesnokov_pavlo.jpg",
     flag:  "🇺🇦",
+    locker: 4,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Chonka Ivan",
@@ -682,6 +817,10 @@ const PEOPLE = [
     phone: "+380 68 099 4850",
     photo: "photos/chonka_ivan.jpg",
     flag:  "🇺🇦",
+    locker: 5,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Csaba Ruszó",
@@ -690,6 +829,10 @@ const PEOPLE = [
     phone: "+421 91 109 5906",
     photo: "photos/csaba_ruszo.jpg",
     flag:  "🇨🇿",
+    locker: 6,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Dvornikov Oleksii",
@@ -698,6 +841,10 @@ const PEOPLE = [
     phone: "+380 00 000 00",
     photo: "photos/dvornikov_oleksii.jpg",
     flag:  "🇺🇦",
+    locker: 7,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Dziuba Maksym",
@@ -706,6 +853,10 @@ const PEOPLE = [
     phone: "+420 73 262 6674",
     photo: "photos/dziuba_maksym.jpg",
     flag:  "🇺🇦",
+    locker: 8,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Dzyngel Oleksandr",
@@ -714,6 +865,10 @@ const PEOPLE = [
     phone: "+380 00 000 00",
     photo: "photos/dzyngel_oleksandr.jpg",
     flag:  "🇺🇦",
+    locker: 9,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Furman Tomasz Jan",
@@ -722,6 +877,10 @@ const PEOPLE = [
     phone: "+380 00 000 00",
     photo: "photos/furman_tomasz_jan.jpg",
     flag:  "🇵🇱",
+    locker: 10,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Goran Oleg",
@@ -730,6 +889,10 @@ const PEOPLE = [
     phone: "+380 00 000 00",
     photo: "photos/goran_oleg.jpg",
     flag:  "🇺🇦",
+    locker: 11,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Huk Yaroslav",
@@ -738,6 +901,10 @@ const PEOPLE = [
     phone: "+420 77 654 7561",
     photo: "photos/huk_yaroslav.jpg",
     flag:  "🇺🇦",
+    locker: 12,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Kahramanyan Dmytro",
@@ -746,6 +913,10 @@ const PEOPLE = [
     phone: "+420 73 771 3278",
     photo: "photos/kahramanyan_dmytro.jpg",
     flag:  "🇺🇦",
+    locker: 13,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Kapatsyna Vladyslav",
@@ -754,6 +925,10 @@ const PEOPLE = [
     phone: "+420 79 762 6052",
     photo: "photos/kapatsyna_vladyslav.jpg",
     flag:  "🇺🇦",
+    locker: 14,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Kushnir Ivan",
@@ -762,6 +937,10 @@ const PEOPLE = [
     phone: "+380 96 382 4084",
     photo: "photos/kushnir_ivan.jpg",
     flag:  "🇺🇦",
+    locker: 17,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Kuzyk Rostyslav",
@@ -770,14 +949,22 @@ const PEOPLE = [
     phone: "+380 63 844 8729",
     photo: "photos/kuzyk_rostyslav.jpg",
     flag:  "🇺🇦",
+    locker: 18,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Makieiev Oleksandr",
     ua:    "Макєєв Олександр",
-    viber: "Саша",
-    phone: "+420 77 857 4202",
+    viber: "Name",
+    phone: "+380 00 000 00",
     photo: "photos/makieiev_oleksandr.jpg",
     flag:  "🇺🇦",
+    locker: 19,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Martseniuk Iryna",
@@ -786,6 +973,10 @@ const PEOPLE = [
     phone: "+380 63 982 1417",
     photo: "photos/martseniuk_iryna.jpg",
     flag:  "🇺🇦",
+    locker: 20,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Miroshnichenko Andrii",
@@ -794,6 +985,10 @@ const PEOPLE = [
     phone: "+380 66 014 5135",
     photo: "photos/miroshnichenko_andrii.jpg",
     flag:  "🇺🇦",
+    locker: 21,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Nahorniuk Oleksandr",
@@ -802,6 +997,10 @@ const PEOPLE = [
     phone: "+420 77 067 1326",
     photo: "photos/nahorniuk_oleksandr.jpg",
     flag:  "🇺🇦",
+    locker: 22,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Chetverykov Nikita",
@@ -810,6 +1009,10 @@ const PEOPLE = [
     phone: "+380 99 099 1097",
     photo: "photos/nikita_chetverykov.jpg",
     flag:  "🇺🇦",
+    locker: 23,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Nosov Dmytro",
@@ -823,9 +1026,13 @@ const PEOPLE = [
     en:    "Orel Illia",
     ua:    "Орел Ілля",
     viber: "Ilюша",
-    phone: "+380 97 932 9452",
+    phone: "Орел Ілля",
     photo: "photos/orel_illia.jpg",
     flag:  "🇺🇦",
+    locker: 24,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Orel Vladyslav",
@@ -834,6 +1041,10 @@ const PEOPLE = [
     phone: "+380 68 283 3185",
     photo: "photos/orel_vladyslav.jpg",
     flag:  "🇺🇦",
+    locker: 25,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Orlaniuk Vita",
@@ -842,6 +1053,10 @@ const PEOPLE = [
     phone: "+380 93 793 3926",
     photo: "photos/orlaniuk_vita.jpg",
     flag:  "🇺🇦",
+    locker: 26,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Pavliuk Vladyslav",
@@ -850,6 +1065,10 @@ const PEOPLE = [
     phone: "+380 63 606 9863",
     photo: "photos/pavliuk_vladyslav.jpg",
     flag:  "🇺🇦",
+    locker: 27,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Petriv Mykhailo",
@@ -858,6 +1077,10 @@ const PEOPLE = [
     phone: "+380 97 018 3884",
     photo: "photos/petriv_mykhailo.jpg",
     flag:  "🇺🇦",
+    locker: 28,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Poluianov Denys",
@@ -866,6 +1089,10 @@ const PEOPLE = [
     phone: "+380 00 000 00",
     photo: "photos/poluianov_denys.jpg",
     flag:  "🇺🇦",
+    locker: 29,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Ponomarenko Oleh",
@@ -874,14 +1101,22 @@ const PEOPLE = [
     phone: "+380 96 285 4923",
     photo: "photos/ponomarenko_oleh.jpg",
     flag:  "🇺🇦",
+    locker: 30,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
     {
-    en:    "Popadynets Oleksandr DPČ",
+    en:    "Popadynets Oleksandr",
     ua:    "Попадинець Олександр",
     viber: "Oleksandr Popadynets",
     phone: "+420 60 611 5201",
     photo: "photos/popadynets_oleksandr.jpg",
     flag:  "🇺🇦",
+    locker: 31,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Popovych Stanislav",
@@ -890,6 +1125,10 @@ const PEOPLE = [
     phone: "+380 66 024 2505",
     photo: "photos/popovych_stanislav.jpg",
     flag:  "🇺🇦",
+    locker: 32,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Radouš Jan",
@@ -898,6 +1137,10 @@ const PEOPLE = [
     phone: "+420 77 705 8364",
     photo: "photos/radous_jan.jpg",
     flag:  "🇨🇿",
+    locker: 33,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Robu Artem",
@@ -906,6 +1149,10 @@ const PEOPLE = [
     phone: "+380 97 254 0596",
     photo: "photos/robu_artem.jpg",
     flag:  "🇺🇦",
+    locker: 34,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Shyshkovychev Kyrylo",
@@ -914,6 +1161,10 @@ const PEOPLE = [
     phone: "+380 95 085 5590",
     photo: "photos/shyshkovychev_kyrylo.jpg",
     flag:  "🇺🇦",
+    locker: 35,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Siedov Yehor",
@@ -922,6 +1173,10 @@ const PEOPLE = [
     phone: "+380 00 000 00",
     photo: "photos/siedov_yehor.jpg",
     flag:  "🇺🇦",
+    locker: 36,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Sirenko Vitalii",
@@ -930,6 +1185,10 @@ const PEOPLE = [
     phone: "+380 00 000 00",
     photo: "photos/sirenko_vitalii.jpg",
     flag:  "🇺🇦",
+    locker: 37,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Snarskyi Vasyl",
@@ -938,6 +1197,10 @@ const PEOPLE = [
     phone: "+420 72 803 7814",
     photo: "photos/snarskyi_vasyl.jpg",
     flag:  "🇺🇦",
+    locker: 38,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Srebniuk Denys",
@@ -946,6 +1209,10 @@ const PEOPLE = [
     phone: "+380 98 026 2269",
     photo: "photos/srebniuk_denys.jpg",
     flag:  "🇺🇦",
+    locker: 39,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Stateczny Adam Wojciech",
@@ -954,6 +1221,10 @@ const PEOPLE = [
     phone: "+380 00 000 00",
     photo: "photos/stateczny_adam.jpg",
     flag:  "🇵🇱",
+    locker: 40,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Stefanov Stefan Hristov",
@@ -962,6 +1233,10 @@ const PEOPLE = [
     phone: "+380 00 000 00",
     photo: "photos/stefanov_stefan.jpg",
     flag:  "🇵🇱",
+    locker: 41,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Stetsiuk Oleh - DPČ",
@@ -970,6 +1245,10 @@ const PEOPLE = [
     phone: "+380 00 000 00",
     photo: "photos/stetsiuk_oleh.jpg",
     flag:  "🇺🇦",
+    locker: 42,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Stoliar Yevhenii",
@@ -978,6 +1257,10 @@ const PEOPLE = [
     phone: "+380 68 062 7715",
     photo: "photos/stoliar_yevhenii.jpg",
     flag:  "🇺🇦",
+    locker: 43,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Sviatokha Valentyn",
@@ -986,6 +1269,10 @@ const PEOPLE = [
     phone: "+420 60 648 3082",
     photo: "photos/sviatokha_valentyn.jpg",
     flag:  "🇺🇦",
+    locker: 44,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Šanderová Kristyna",
@@ -994,6 +1281,10 @@ const PEOPLE = [
     phone: "+420 60 701 2823",
     photo: "photos/sanderova_kristyna.jpg",
     flag:  "🇨🇿",
+    locker: 45,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Tsybulko Nataliia",
@@ -1002,6 +1293,10 @@ const PEOPLE = [
     phone: "+420 72 201 2894",
     photo: "photos/tsybulko_nataliia.jpg",
     flag:  "🇺🇦",
+    locker: 46,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
     {
     en:    "Tyshchenko Yurii - DPČ",
@@ -1010,6 +1305,10 @@ const PEOPLE = [
     phone: "+380 95 535 2213",
     photo: "photos/tyshchenko_yurii.jpg",
     flag:  "🇺🇦",
+    locker: 47,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Vagner Michal",
@@ -1018,6 +1317,10 @@ const PEOPLE = [
     phone: "+420 72 126 2136",
     photo: "photos/vagner_michal.jpg",
     flag:  "🇨🇿",
+    locker: 48,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Vraštil Petr",
@@ -1026,6 +1329,10 @@ const PEOPLE = [
     phone: "+420 60 340 0085",
     photo: "photos/vrastil_petr.jpg",
     flag:  "🇨🇿",
+    locker: 49,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Zaňková Markéta",
@@ -1034,6 +1341,10 @@ const PEOPLE = [
     phone: "+380 00 000 00",
     photo: "photos/zankova_marketa.jpg",
     flag:  "🇨🇿",
+    locker: 51,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
     en:    "Zarovnenko Oleksandr",
@@ -1175,6 +1486,16 @@ function createCard(person, listType) {
   viber.className = 'viber-name';
   viber.textContent = `Viber: ${person.viber}`;
 
+  const dovolenaEl = document.createElement('div');
+  dovolenaEl.className = 'viber-name';
+  dovolenaEl.style.cssText = 'color:#f59e0b; font-size:11px;';
+  if (person.dovolena) {
+    dovolenaEl.textContent = `Dovolená: ${person.dovolena}`;
+    dovolenaEl.style.display = 'block';
+  } else {
+    dovolenaEl.style.display = 'none';
+  }
+
   const phone = document.createElement('div');
   phone.className = 'phone';
   phone.textContent = person.phone || '';
@@ -1182,6 +1503,7 @@ function createCard(person, listType) {
   info.appendChild(nameEnWrap);
   info.appendChild(nameUa);
   info.appendChild(viber);
+  info.appendChild(dovolenaEl);
   info.appendChild(phone);
 
   // Галочки вертикально
@@ -1287,6 +1609,31 @@ function toggleList(name, listType, savedScroll) {
 function openEditModal(currentName) {
   editingName = currentName;
   document.getElementById('edit-input').value = currentName;
+
+  // Заповнюємо інфо-панель
+  const person = PEOPLE.find(p => p.en === currentName);
+
+  function setInfoVal(id, val) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (val) {
+      el.textContent = val;
+      el.classList.remove('empty');
+    } else {
+      el.textContent = '—';
+      el.classList.add('empty');
+    }
+  }
+
+  setInfoVal('info-viber',      person?.viber      || '');
+  setInfoVal('info-locker',     person?.locker     ? '#' + person.locker     : '');
+  setInfoVal('info-dispatcher', person?.dispatcher || '');
+  setInfoVal('info-city',       person?.city       || '');
+
+  // Dovolená — заповнюємо поле вводу
+  const dovInput = document.getElementById('dovolena-input');
+  if (dovInput) dovInput.value = person?.dovolena || '';
+
   document.getElementById('edit-modal').classList.add('active');
   setTimeout(() => document.getElementById('edit-input').focus(), 100);
 }
@@ -1297,7 +1644,8 @@ function closeEditModal() {
 }
 
 function saveEditModal() {
-  const newName = document.getElementById('edit-input').value.trim();
+  const newName    = document.getElementById('edit-input').value.trim();
+  const newDovolena = document.getElementById('dovolena-input')?.value.trim() || '';
   if (!newName || !editingName) { closeEditModal(); return; }
 
   const person = PEOPLE.find(p => p.en === editingName);
@@ -1310,18 +1658,26 @@ function saveEditModal() {
     const i19 = set19.indexOf(editingName);
     if (i19 !== -1) set19[i19] = newName;
     person.en = newName;
+    // Зберігаємо dovolena
+    person.dovolena = newDovolena;
     // Зберігаємо в localStorage
     editedNames[origKey] = newName;
     try { localStorage.setItem('gi_group_edits', JSON.stringify(editedNames)); } catch(e) {}
   }
   closeEditModal();
   render(document.getElementById('search').value);
+  // Синхронізуємо з Firebase якщо підключено
+  if (typeof syncToFirebase === 'function') syncToFirebase();
 }
 
 document.getElementById('edit-modal').addEventListener('click', (e) => {
   if (e.target === document.getElementById('edit-modal')) closeEditModal();
 });
 document.getElementById('edit-input').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') saveEditModal();
+  if (e.key === 'Escape') closeEditModal();
+});
+document.getElementById('dovolena-input').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') saveEditModal();
   if (e.key === 'Escape') closeEditModal();
 });
@@ -1374,9 +1730,13 @@ function render(query = '') {
   }
 }
 
+// Init
+loadData();
+render();
+
+
 // ══════════════════════════════════════════════════════════════
 // FIREBASE REALTIME DATABASE
-// Правильний URL з скріншоту: firebaseio.com (US / us-central1)
 // ══════════════════════════════════════════════════════════════
 
 firebase.initializeApp({
@@ -1423,7 +1783,14 @@ function applyRemoteData(data) {
     });
   }
 
-  // Кешуємо в localStorage для миттєвого старту
+  // dovolena — синхронізуємо між пристроями
+  if (data.dovolenaData && typeof data.dovolenaData === 'object') {
+    Object.entries(data.dovolenaData).forEach(([origEn, dov]) => {
+      const p = PEOPLE.find(x => x._origEn === origEn || x.en === origEn);
+      if (p) p.dovolena = dov;
+    });
+  }
+
   try {
     localStorage.setItem('gi_group_17',    JSON.stringify(set17));
     localStorage.setItem('gi_group_19',    JSON.stringify(set19));
@@ -1433,17 +1800,30 @@ function applyRemoteData(data) {
   render(document.getElementById('search').value);
 }
 
+// ── Збираємо dovolena для збереження ─────────────────────────
+function collectDovolenaData() {
+  const result = {};
+  PEOPLE.forEach(p => {
+    if (p.dovolena) result[p._origEn || p.en] = p.dovolena;
+  });
+  return result;
+}
+
 // ── Запис у Firebase ─────────────────────────────────────────
 function syncToFirebase() {
   setBtnState('saving');
-  dbRef.set({ set17, set19, editedNames, ts: Date.now() })
+  dbRef.set({
+    set17,
+    set19,
+    editedNames,
+    dovolenaData: collectDovolenaData(),
+    ts: Date.now()
+  })
     .then(() => { setBtnState('ok'); })
     .catch(err => { console.error('Firebase error:', err); setBtnState('error'); });
 }
 
 // ── Realtime слухач ───────────────────────────────────────────
-// Спрацьовує одразу при підключенні (перше завантаження)
-// і автоматично при кожній зміні з будь-якого пристрою (~100мс)
 let fbReady = false;
 dbRef.on('value', (snapshot) => {
   const data = snapshot.val();
@@ -1454,25 +1834,16 @@ dbRef.on('value', (snapshot) => {
 // ── Перевизначаємо saveData ───────────────────────────────────
 const _localSave = saveData;
 saveData = function() {
-  _localSave();      // localStorage + тост "✓ Збережено"
-  syncToFirebase();  // Firebase → оновить всі пристрої
+  _localSave();
+  syncToFirebase();
 };
 
-// ── Редагування імені — теж синхронізуємо ────────────────────
+// ── saveEditModal теж синхронізує ────────────────────────────
 const _origSaveEditModal = saveEditModal;
 saveEditModal = function() {
   _origSaveEditModal();
   syncToFirebase();
 };
-
-// ══════════════════════════════════════════════════════════════
-// Init
-// ══════════════════════════════════════════════════════════════
-loadData();  // 1. Миттєво з localStorage (0мс)
-render();    // 2. Миттєво показуємо список
-             // 3. dbRef.on('value') вище вже слухає —
-             //    підтягне актуальні дані ~200мс
-             //    і надалі оновлюватиме всі пристрої автоматично
 
 document.getElementById('search').addEventListener('input', e => render(e.target.value));
 
