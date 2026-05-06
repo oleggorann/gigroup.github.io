@@ -716,7 +716,7 @@
       <!-- Dovolená — поле вводу -->
       <div>
         <div class="edit-modal-section-title">Dovolená</div>
-        <input type="text" id="dovolena-input" autocomplete="off" placeholder="наприклад: 1.7 - 14.7">
+        <input type="text" id="dovolena-input" autocomplete="off" placeholder="Datas">
       </div>
 
       <!-- Інфо-панель: Viber, Шафка, Диспетчер, Місто -->
@@ -769,10 +769,10 @@ const PEOPLE = [
     phone: "+380 96 751 7530",
     photo: "photos/adashynskyi_kostiantyn.jpg",
     flag:  "🇺🇦",
-    locker: 1,
-    dispatcher: "",
-    city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    locker: 12,
+    dispatcher: "Kuba",
+    city:       "Hradec",
+    dovolena:   "",
   },
   {
     en:    "Anosov Oleksandr",
@@ -784,7 +784,7 @@ const PEOPLE = [
     locker: 2,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
     {
     en:    "Bokoch Mykhailo",
@@ -796,7 +796,7 @@ const PEOPLE = [
     locker: 3,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Chesnokov Pavlo",
@@ -808,7 +808,7 @@ const PEOPLE = [
     locker: 4,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Chonka Ivan",
@@ -820,7 +820,7 @@ const PEOPLE = [
     locker: 5,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Csaba Ruszó",
@@ -832,7 +832,7 @@ const PEOPLE = [
     locker: 6,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Dvornikov Oleksii",
@@ -844,7 +844,7 @@ const PEOPLE = [
     locker: 7,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Dziuba Maksym",
@@ -856,7 +856,7 @@ const PEOPLE = [
     locker: 8,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Dzyngel Oleksandr",
@@ -868,7 +868,7 @@ const PEOPLE = [
     locker: 9,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Furman Tomasz Jan",
@@ -880,7 +880,7 @@ const PEOPLE = [
     locker: 10,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Goran Oleg",
@@ -892,7 +892,7 @@ const PEOPLE = [
     locker: 11,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Huk Yaroslav",
@@ -904,7 +904,7 @@ const PEOPLE = [
     locker: 12,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Kahramanyan Dmytro",
@@ -916,7 +916,7 @@ const PEOPLE = [
     locker: 13,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Kapatsyna Vladyslav",
@@ -928,31 +928,7 @@ const PEOPLE = [
     locker: 14,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
-  },
-  {
-    en:    "Klymenko Oleksandr",
-    ua:    "Клименко Олександр",
-    viber: "Name",
-    phone: "+380 00 000 00",
-    photo: "photos/klymenko_oleksandr.jpg",
-    flag:  "🇺🇦",
-    locker: 15,
-    dispatcher: "",
-    city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
-  },
-  {
-    en:    "Kovalenko Dmytro",
-    ua:    "Коваленко Дмитро",
-    viber: "Димк коваленко",
-    phone: "+380 93 713 5771",
-    photo: "photos/kovalenko_dmytro.jpg",
-    flag:  "🇺🇦",
-    locker: 16,
-    dispatcher: "",
-    city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Kushnir Ivan",
@@ -964,7 +940,7 @@ const PEOPLE = [
     locker: 17,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Kuzyk Rostyslav",
@@ -976,7 +952,7 @@ const PEOPLE = [
     locker: 18,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Makieiev Oleksandr",
@@ -988,7 +964,7 @@ const PEOPLE = [
     locker: 19,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Martseniuk Iryna",
@@ -1000,7 +976,7 @@ const PEOPLE = [
     locker: 20,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Miroshnichenko Andrii",
@@ -1012,7 +988,7 @@ const PEOPLE = [
     locker: 21,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Nahorniuk Oleksandr",
@@ -1024,7 +1000,7 @@ const PEOPLE = [
     locker: 22,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Chetverykov Nikita",
@@ -1036,7 +1012,7 @@ const PEOPLE = [
     locker: 23,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Nosov Dmytro",
@@ -1056,7 +1032,7 @@ const PEOPLE = [
     locker: 24,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Orel Vladyslav",
@@ -1068,7 +1044,7 @@ const PEOPLE = [
     locker: 25,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Orlaniuk Vita",
@@ -1080,7 +1056,7 @@ const PEOPLE = [
     locker: 26,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Pavliuk Vladyslav",
@@ -1092,7 +1068,7 @@ const PEOPLE = [
     locker: 27,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Petriv Mykhailo",
@@ -1104,7 +1080,7 @@ const PEOPLE = [
     locker: 28,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Poluianov Denys",
@@ -1116,7 +1092,7 @@ const PEOPLE = [
     locker: 29,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Ponomarenko Oleh",
@@ -1128,7 +1104,7 @@ const PEOPLE = [
     locker: 30,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
     {
     en:    "Popadynets Oleksandr",
@@ -1140,7 +1116,7 @@ const PEOPLE = [
     locker: 31,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Popovych Stanislav",
@@ -1152,7 +1128,7 @@ const PEOPLE = [
     locker: 32,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Radouš Jan",
@@ -1164,7 +1140,7 @@ const PEOPLE = [
     locker: 33,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Robu Artem",
@@ -1176,7 +1152,7 @@ const PEOPLE = [
     locker: 34,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Shyshkovychev Kyrylo",
@@ -1188,7 +1164,7 @@ const PEOPLE = [
     locker: 35,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Siedov Yehor",
@@ -1200,7 +1176,7 @@ const PEOPLE = [
     locker: 36,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Sirenko Vitalii",
@@ -1212,7 +1188,7 @@ const PEOPLE = [
     locker: 37,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Snarskyi Vasyl",
@@ -1224,7 +1200,7 @@ const PEOPLE = [
     locker: 38,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Srebniuk Denys",
@@ -1236,7 +1212,7 @@ const PEOPLE = [
     locker: 39,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Stateczny Adam Wojciech",
@@ -1248,7 +1224,7 @@ const PEOPLE = [
     locker: 40,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Stefanov Stefan Hristov",
@@ -1260,7 +1236,7 @@ const PEOPLE = [
     locker: 41,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Stetsiuk Oleh - DPČ",
@@ -1272,7 +1248,7 @@ const PEOPLE = [
     locker: 42,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Stoliar Yevhenii",
@@ -1284,7 +1260,7 @@ const PEOPLE = [
     locker: 43,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Sviatokha Valentyn",
@@ -1296,7 +1272,7 @@ const PEOPLE = [
     locker: 44,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Šanderová Kristyna",
@@ -1308,7 +1284,7 @@ const PEOPLE = [
     locker: 45,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Tsybulko Nataliia",
@@ -1320,7 +1296,7 @@ const PEOPLE = [
     locker: 46,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
     {
     en:    "Tyshchenko Yurii - DPČ",
@@ -1332,7 +1308,7 @@ const PEOPLE = [
     locker: 47,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Vagner Michal",
@@ -1344,7 +1320,7 @@ const PEOPLE = [
     locker: 48,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Vraštil Petr",
@@ -1356,19 +1332,7 @@ const PEOPLE = [
     locker: 49,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
-  },
-  {
-    en:    "Yashnyk Oleksandr",
-    ua:    "Яшник Олександр",
-    viber: "Мультыбрендовый",
-    phone: "+380 98 133 9084",
-    photo: "photos/yashnyk_oleksandr.jpg",
-    flag:  "🇺🇦",
-    locker: 50,
-    dispatcher: "",
-    city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Zaňková Markéta",
@@ -1380,7 +1344,7 @@ const PEOPLE = [
     locker: 51,
     dispatcher: "",
     city:       "",
-    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+    dovolena:   "",
   },
   {
     en:    "Zarovnenko Oleksandr",
