@@ -931,6 +931,30 @@ const PEOPLE = [
     dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
+    en:    "Klymenko Oleksandr",
+    ua:    "Клименко Олександр",
+    viber: "Name",
+    phone: "+380 00 000 00",
+    photo: "photos/klymenko_oleksandr.jpg",
+    flag:  "🇺🇦",
+    locker: 15,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+  },
+  {
+    en:    "Kovalenko Dmytro",
+    ua:    "Коваленко Дмитро",
+    viber: "Димк коваленко",
+    phone: "+380 93 713 5771",
+    photo: "photos/kovalenko_dmytro.jpg",
+    flag:  "🇺🇦",
+    locker: 16,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+  },
+  {
     en:    "Kushnir Ivan",
     ua:    "Кушнір Іван",
     viber: "Іван",
@@ -1335,6 +1359,18 @@ const PEOPLE = [
     dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
   },
   {
+    en:    "Yashnyk Oleksandr",
+    ua:    "Яшник Олександр",
+    viber: "Мультыбрендовый",
+    phone: "+380 98 133 9084",
+    photo: "photos/yashnyk_oleksandr.jpg",
+    flag:  "🇺🇦",
+    locker: 50,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "",  // Дати відпустки, наприклад: "1.7 - 14.7"
+  },
+  {
     en:    "Zaňková Markéta",
     ua:    "Занькова Маркета",
     viber: "Name",
@@ -1644,30 +1680,29 @@ function closeEditModal() {
 }
 
 function saveEditModal() {
-  const newName    = document.getElementById('edit-input').value.trim();
-  const newDovolena = document.getElementById('dovolena-input')?.value.trim() || '';
+  const newName     = document.getElementById('edit-input').value.trim();
+  const newDovolena = document.getElementById('dovolena-input')?.value.trim() ?? '';
   if (!newName || !editingName) { closeEditModal(); return; }
 
   const person = PEOPLE.find(p => p.en === editingName);
   if (person) {
-    const origKey = person._origEn || editingName;
-    person._origEn = origKey;
-    // Оновлюємо в списках
+    const origKey   = person._origEn || editingName;
+    person._origEn  = origKey;
+    // Оновлюємо ім'я в списках 17/19
     const i17 = set17.indexOf(editingName);
     if (i17 !== -1) set17[i17] = newName;
     const i19 = set19.indexOf(editingName);
     if (i19 !== -1) set19[i19] = newName;
-    person.en = newName;
-    // Зберігаємо dovolena
+    person.en       = newName;
+    // Зберігаємо dovolena прямо в об'єкт людини
     person.dovolena = newDovolena;
-    // Зберігаємо в localStorage
+    // Зберігаємо ім'я в localStorage
     editedNames[origKey] = newName;
     try { localStorage.setItem('gi_group_edits', JSON.stringify(editedNames)); } catch(e) {}
   }
   closeEditModal();
   render(document.getElementById('search').value);
-  // Синхронізуємо з Firebase якщо підключено
-  if (typeof syncToFirebase === 'function') syncToFirebase();
+  // syncToFirebase викликається через _origSaveEditModal нижче
 }
 
 document.getElementById('edit-modal').addEventListener('click', (e) => {
@@ -1838,11 +1873,11 @@ saveData = function() {
   syncToFirebase();
 };
 
-// ── saveEditModal теж синхронізує ────────────────────────────
+// ── saveEditModal — після збереження синхронізуємо з Firebase ─
 const _origSaveEditModal = saveEditModal;
 saveEditModal = function() {
-  _origSaveEditModal();
-  syncToFirebase();
+  _origSaveEditModal();  // зберігає ім'я + dovolena в PEOPLE і localStorage
+  syncToFirebase();      // записує все в Firebase (set17, set19, editedNames, dovolenaData)
 };
 
 document.getElementById('search').addEventListener('input', e => render(e.target.value));
