@@ -760,6 +760,7 @@
 // ║  photo — шлях до фото (відносно HTML-файлу)                 ║
 // ╚══════════════════════════════════════════════════════════════╝
 
+
 const PEOPLE = [
 
   {
@@ -1390,15 +1391,7 @@ function loadData() {
         if (p) { p._origEn = p._origEn || orig; p.en = newN; }
       });
     }
-    // ── Відновлюємо dovolena з localStorage ──────────────────
-    const sDov = localStorage.getItem('gi_group_dovolena');
-    if (sDov) {
-      const dovMap = JSON.parse(sDov);
-      Object.entries(dovMap).forEach(([key, val]) => {
-        const p = PEOPLE.find(x => x._origEn === key || x.en === key);
-        if (p) p.dovolena = val;
-      });
-    }
+    // dovolena — завантажується виключно з Firebase (dbRef.on value)
   } catch(e) {}
 }
 
@@ -1671,9 +1664,8 @@ function saveEditModal() {
     // Зберігаємо ім'я в localStorage
     editedNames[origKey] = newName;
     try {
-      localStorage.setItem('gi_group_edits',    JSON.stringify(editedNames));
-      // ── Зберігаємо dovolena одразу при редагуванні ──────────
-      localStorage.setItem('gi_group_dovolena', JSON.stringify(collectDovolenaData()));
+      localStorage.setItem('gi_group_edits', JSON.stringify(editedNames));
+      // dovolena іде тільки в Firebase через syncToFirebase() нижче
     } catch(e) {}
   }
   closeEditModal();
@@ -1807,8 +1799,7 @@ function applyRemoteData(data) {
     localStorage.setItem('gi_group_17',      JSON.stringify(set17));
     localStorage.setItem('gi_group_19',      JSON.stringify(set19));
     localStorage.setItem('gi_group_edits',   JSON.stringify(editedNames));
-    // ── Зберігаємо dovolena окремо щоб відновлювати при старті ──
-    localStorage.setItem('gi_group_dovolena', JSON.stringify(collectDovolenaData()));
+    // dovolena не кешується в localStorage — тільки Firebase
   } catch(e) {}
 
   render(document.getElementById('search').value);
