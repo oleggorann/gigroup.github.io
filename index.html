@@ -716,7 +716,7 @@
       <!-- Dovolená — поле вводу -->
       <div>
         <div class="edit-modal-section-title">Dovolená</div>
-        <input type="text" id="dovolena-input" autocomplete="off" placeholder="Datas">
+        <input type="text" id="dovolena-input" autocomplete="off" placeholder="наприклад: 1.7 - 14.7">
       </div>
 
       <!-- Інфо-панель: Viber, Шафка, Диспетчер, Місто -->
@@ -1385,10 +1385,18 @@ function loadData() {
     const sEdit = localStorage.getItem('gi_group_edits');
     if (sEdit) {
       editedNames = JSON.parse(sEdit);
-      // Застосовуємо збережені імена до масиву PEOPLE
       Object.entries(editedNames).forEach(([orig, newN]) => {
         const p = PEOPLE.find(x => x._origEn === orig || x.en === orig);
         if (p) { p._origEn = p._origEn || orig; p.en = newN; }
+      });
+    }
+    // ── Відновлюємо dovolena з localStorage ──────────────────
+    const sDov = localStorage.getItem('gi_group_dovolena');
+    if (sDov) {
+      const dovMap = JSON.parse(sDov);
+      Object.entries(dovMap).forEach(([key, val]) => {
+        const p = PEOPLE.find(x => x._origEn === key || x.en === key);
+        if (p) p.dovolena = val;
       });
     }
   } catch(e) {}
@@ -1662,11 +1670,16 @@ function saveEditModal() {
     person.dovolena = newDovolena;
     // Зберігаємо ім'я в localStorage
     editedNames[origKey] = newName;
-    try { localStorage.setItem('gi_group_edits', JSON.stringify(editedNames)); } catch(e) {}
+    try {
+      localStorage.setItem('gi_group_edits',    JSON.stringify(editedNames));
+      // ── Зберігаємо dovolena одразу при редагуванні ──────────
+      localStorage.setItem('gi_group_dovolena', JSON.stringify(collectDovolenaData()));
+    } catch(e) {}
   }
   closeEditModal();
   render(document.getElementById('search').value);
-  // syncToFirebase викликається через _origSaveEditModal нижче
+  // Одразу синхронізуємо і ім'я і dovolena з Firebase
+  if (typeof syncToFirebase === 'function') syncToFirebase();
 }
 
 document.getElementById('edit-modal').addEventListener('click', (e) => {
@@ -1791,9 +1804,11 @@ function applyRemoteData(data) {
   }
 
   try {
-    localStorage.setItem('gi_group_17',    JSON.stringify(set17));
-    localStorage.setItem('gi_group_19',    JSON.stringify(set19));
-    localStorage.setItem('gi_group_edits', JSON.stringify(editedNames));
+    localStorage.setItem('gi_group_17',      JSON.stringify(set17));
+    localStorage.setItem('gi_group_19',      JSON.stringify(set19));
+    localStorage.setItem('gi_group_edits',   JSON.stringify(editedNames));
+    // ── Зберігаємо dovolena окремо щоб відновлювати при старті ──
+    localStorage.setItem('gi_group_dovolena', JSON.stringify(collectDovolenaData()));
   } catch(e) {}
 
   render(document.getElementById('search').value);
@@ -1837,12 +1852,7 @@ saveData = function() {
   syncToFirebase();
 };
 
-// ── saveEditModal — після збереження синхронізуємо з Firebase ─
-const _origSaveEditModal = saveEditModal;
-saveEditModal = function() {
-  _origSaveEditModal();  // зберігає ім'я + dovolena в PEOPLE і localStorage
-  syncToFirebase();      // записує все в Firebase (set17, set19, editedNames, dovolenaData)
-};
+// saveEditModal вже викликає syncToFirebase() напряму — окреме перевизначення не потрібне
 
 document.getElementById('search').addEventListener('input', e => render(e.target.value));
 
