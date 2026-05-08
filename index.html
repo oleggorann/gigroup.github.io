@@ -1492,11 +1492,12 @@ function createCard(person, listType) {
   viber.className = 'viber-name';
   viber.textContent = `Viber: ${person.viber}`;
 
+ // Там де персон доволена в фігурних душках перед тим риска і пробіл
   const dovolenaEl = document.createElement('div');
   dovolenaEl.className = 'viber-name';
   dovolenaEl.style.cssText = 'color:#f59e0b; font-size:11px;';
   if (person.dovolena) {
-    dovolenaEl.textContent = `- ${person.dovolena}`;
+    dovolenaEl.textContent = `-  ${person.dovolena}`;
     dovolenaEl.style.display = 'block';
   } else {
     dovolenaEl.style.display = 'none';
