@@ -1383,32 +1383,13 @@ let editingName = null;
 let editedNames = {}; // { originalEn: newName }
 
 function loadData() {
-  try {
-    const s17 = localStorage.getItem('gi_group_17');
-    if (s17) set17 = JSON.parse(s17);
-    const s19 = localStorage.getItem('gi_group_19');
-    if (s19) set19 = JSON.parse(s19);
-    const sEdit = localStorage.getItem('gi_group_edits');
-    if (sEdit) {
-      editedNames = JSON.parse(sEdit);
-      Object.entries(editedNames).forEach(([orig, newN]) => {
-        const p = PEOPLE.find(x => x._origEn === orig || x.en === orig);
-        if (p) { p._origEn = p._origEn || orig; p.en = newN; }
-      });
-    }
-    // dovolena — завантажується виключно з Firebase (dbRef.on value)
-  } catch(e) {}
+  // Всі дані — тільки з Firebase через dbRef.on('value')
 }
 
 function saveData() {
-  try {
-    localStorage.setItem('gi_group_17', JSON.stringify(set17));
-    localStorage.setItem('gi_group_19', JSON.stringify(set19));
-    localStorage.setItem('gi_group_edits', JSON.stringify(editedNames));
-    const toast = document.getElementById('toast');
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2000);
-  } catch(e) {}
+  const toast = document.getElementById('toast');
+  if (toast) { toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 2000); }
+  if (typeof syncToFirebase === 'function') syncToFirebase();
 }
 
 function getInitials(name) {
@@ -1666,12 +1647,8 @@ function saveEditModal() {
     person.en       = newName;
     // Зберігаємо dovolena прямо в об'єкт людини
     person.dovolena = newDovolena;
-    // Зберігаємо ім'я в localStorage
     editedNames[origKey] = newName;
-    try {
-      localStorage.setItem('gi_group_edits', JSON.stringify(editedNames));
-      // dovolena іде тільки в Firebase через syncToFirebase() нижче
-    } catch(e) {}
+    // Все іде тільки в Firebase через syncToFirebase() нижче
   }
   closeEditModal();
   render(document.getElementById('search').value);
@@ -1803,12 +1780,6 @@ function applyRemoteData(data) {
     });
   }
 
-  try {
-    localStorage.setItem('gi_group_17',    JSON.stringify(set17));
-    localStorage.setItem('gi_group_19',    JSON.stringify(set19));
-    localStorage.setItem('gi_group_edits', JSON.stringify(editedNames));
-  } catch(e) {}
-
   render(document.getElementById('search').value);
 }
 
@@ -1844,11 +1815,7 @@ dbRef.on('value', (snapshot) => {
 });
 
 // ── Перевизначаємо saveData ───────────────────────────────────
-const _localSave = saveData;
-saveData = function() {
-  _localSave();
-  syncToFirebase();
-};
+// saveData вже містить syncToFirebase()
 
 // saveEditModal вже викликає syncToFirebase() напряму — окреме перевизначення не потрібне
 
