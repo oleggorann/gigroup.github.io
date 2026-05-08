@@ -1759,16 +1759,9 @@ function applyRemoteData(data) {
   if (!data) return;
 
   // Фільтруємо set17/set19 — залишаємо тільки імена що реально є в PEOPLE
-  // Це прибирає "сміття" (старі/видалені імена) з Firebase
-  const validNames = () => new Set(PEOPLE.map(p => p._origEn || p.en).concat(PEOPLE.map(p => p.en)));
-  if (Array.isArray(data.set17)) {
-    const vn = validNames();
-    set17 = data.set17.filter(n => vn.has(n));
-  }
-  if (Array.isArray(data.set19)) {
-    const vn = validNames();
-    set19 = data.set19.filter(n => vn.has(n));
-  }
+  const validNames = new Set(PEOPLE.flatMap(p => [p.en, p._origEn].filter(Boolean)));
+  if (Array.isArray(data.set17)) set17 = data.set17.filter(n => validNames.has(n));
+  if (Array.isArray(data.set19)) set19 = data.set19.filter(n => validNames.has(n));
 
   if (data.editedNames && typeof data.editedNames === 'object') {
     editedNames = data.editedNames;
