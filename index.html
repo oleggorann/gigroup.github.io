@@ -649,6 +649,31 @@
     animation: cardOut .38s cubic-bezier(.4,0,.6,1) forwards;
     pointer-events: none;
   }
+
+  /* Sync toast — статус збереження */
+  .sync-toast {
+    position: fixed;
+    bottom: 70px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 10px 18px;
+    border-radius: 8px;
+    transition: transform .3s ease, opacity .3s ease;
+    z-index: 250;
+    pointer-events: none;
+    opacity: 0;
+    white-space: nowrap;
+  }
+  .sync-toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+  .sync-toast.ok    { background: #166534; color: #bbf7d0; border: 1px solid #16a34a; }
+  .sync-toast.error { background: #7f1d1d; color: #fecaca; border: 1px solid #ef4444; }
+  .sync-toast.warn  { background: #78350f; color: #fef3c7; border: 1px solid #f59e0b; }
 </style>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -687,6 +712,7 @@
 </main>
 
 <div class="saved-toast" id="toast">✓ Збережено</div>
+<div class="sync-toast" id="sync-toast"></div>
 <div class="copy-toast" id="copy-toast"></div>
 
 <div class="lightbox" id="lightbox">
@@ -1735,25 +1761,51 @@ firebase.initializeApp({
 const dbRef = firebase.database().ref('gigroup');
 
 // ── Стан кнопки Save ─────────────────────────────────────────
-function setBtnState(state) {
+function setBtnState(state, retryFn) {
   const btn = document.getElementById('btn-save-main');
   if (!btn) return;
+
+  // Скидаємо попередній retry-обробник
+  btn.onclick = () => saveData();
+
   if (state === 'saving') {
     btn.textContent = '⏳ Sync...';
     btn.style.opacity = '.6';
+    btn.style.background = 'var(--accent)';
     btn.disabled = true;
   }
   if (state === 'ok') {
     btn.textContent = '✓ Saved';
     btn.style.opacity = '1';
+    btn.style.background = 'var(--accent)';
     btn.disabled = false;
-    setTimeout(() => { btn.textContent = 'Save'; }, 2000);
+    setTimeout(() => {
+      btn.textContent = 'Save';
+      btn.style.background = 'var(--accent)';
+    }, 2000);
   }
   if (state === 'error') {
-    btn.textContent = '✗ Error';
+    btn.textContent = '✗ Retry?';
     btn.style.opacity = '1';
+    btn.style.background = '#ef4444';
     btn.disabled = false;
-    setTimeout(() => { btn.textContent = 'Save'; }, 3000);
+    // Клік на кнопку — повторна спроба
+    if (retryFn) btn.onclick = () => { btn.style.background = 'var(--accent)'; retryFn(); };
+    setTimeout(() => {
+      btn.textContent = 'Save';
+      btn.style.background = 'var(--accent)';
+      btn.onclick = () => saveData();
+    }, 5000);
+  }
+  if (state === 'offline') {
+    btn.textContent = '📵 Offline';
+    btn.style.opacity = '1';
+    btn.style.background = '#6b7280';
+    btn.disabled = false;
+    setTimeout(() => {
+      btn.textContent = 'Save';
+      btn.style.background = 'var(--accent)';
+    }, 4000);
   }
 }
 
@@ -1797,20 +1849,53 @@ function collectDovolenaData() {
 }
 
 // ── Запис у Firebase ─────────────────────────────────────────
-function syncToFirebase() {
+// Показує статус збереження у нижній частині екрану
+let syncToastTimer = null;
+function showSyncToast(msg, type) {
+  const el = document.getElementById('sync-toast');
+  if (!el) return;
+  clearTimeout(syncToastTimer);
+  el.textContent = msg;
+  el.className = 'sync-toast ' + type;
+  el.classList.add('show');
+  syncToastTimer = setTimeout(() => el.classList.remove('show'), 3500);
+}
+
+async function syncToFirebase() {
   // ЗАХИСТ: не записуємо поки Firebase не завантажив актуальні дані
   if (!fbReady) return;
+
+  // Перевіряємо чи є інтернет перед спробою
+  if (!navigator.onLine) {
+    setBtnState('offline');
+    showSyncToast('📵 Немає інтернету. Дані не збережено.', 'warn');
+    return;
+  }
+
   setBtnState('saving');
+
   const dovolenaData = {};
   PEOPLE.forEach(p => {
     const key = p._origEn || p.en;
     if (p.dovolena) dovolenaData[key] = p.dovolena;
   });
-  // .update() замість .set() — оновлює тільки потрібні поля
-  // не затирає дані інших пристроїв при одночасній роботі
-  dbRef.update({ set17, set19, editedNames, dovolenaData, ts: Date.now() })
-    .then(() => { setBtnState('ok'); })
-    .catch(err => { console.error('Firebase error:', err); setBtnState('error'); });
+
+  const payload = { set17, set19, editedNames, dovolenaData, ts: Date.now() };
+
+  try {
+    // .update() — оновлює тільки потрібні поля, не затирає решту
+    await dbRef.update(payload);
+    setBtnState('ok');
+    showSyncToast('✅ Збережено', 'ok');
+  } catch (err) {
+    console.error('Firebase sync error:', err);
+    // Передаємо retry функцію — клік на кнопку повторить спробу
+    setBtnState('error', () => syncToFirebase());
+    const msg = navigator.onLine
+      ? '❌ Помилка збереження. Натисніть кнопку ще раз.'
+      : '📵 Немає інтернету. Спробуйте пізніше.';
+    showSyncToast(msg, 'error');
+  }
 }
 
 // ── Realtime слухач ───────────────────────────────────────────
@@ -1827,6 +1912,14 @@ dbRef.on('value', (snapshot) => {
 // saveEditModal вже викликає syncToFirebase() напряму — окреме перевизначення не потрібне
 
 document.getElementById('search').addEventListener('input', e => render(e.target.value));
+
+// Слухаємо зміну стану інтернету
+window.addEventListener('online', () => {
+  showSyncToast('🟢 Інтернет відновлено', 'ok');
+});
+window.addEventListener('offline', () => {
+  showSyncToast('📵 Інтернет відключено. Зміни не зберігаються.', 'warn');
+});
 
 // pagehide/beforeunload навмисно прибрано:
 // вони викликали запис порожніх даних при закритті сторінки
