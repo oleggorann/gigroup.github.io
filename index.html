@@ -1652,7 +1652,10 @@ function saveEditModal() {
   }
   closeEditModal();
   render(document.getElementById('search').value);
-  // Одразу синхронізуємо і ім'я і dovolena з Firebase
+
+  // Зберігаємо в Firebase:
+  // — ім'я через syncToFirebase (оновлює editedNames + set17/set19)
+  // — dovolena окремо через .update() щоб не зачіпати інші поля
   if (typeof syncToFirebase === 'function') syncToFirebase();
 }
 
@@ -1758,10 +1761,8 @@ function setBtnState(state) {
 function applyRemoteData(data) {
   if (!data) return;
 
-  // Фільтруємо set17/set19 — залишаємо тільки імена що реально є в PEOPLE
-  const validNames = new Set(PEOPLE.flatMap(p => [p.en, p._origEn].filter(Boolean)));
-  if (Array.isArray(data.set17)) set17 = data.set17.filter(n => validNames.has(n));
-  if (Array.isArray(data.set19)) set19 = data.set19.filter(n => validNames.has(n));
+  if (Array.isArray(data.set17)) set17 = data.set17;
+  if (Array.isArray(data.set19)) set19 = data.set19;
 
   if (data.editedNames && typeof data.editedNames === 'object') {
     editedNames = data.editedNames;
@@ -1771,14 +1772,15 @@ function applyRemoteData(data) {
     });
   }
 
-  // Оновлюємо dovolena для кожної людини з Firebase
-  // Спочатку скидаємо всі dovolena до порожніх
-  PEOPLE.forEach(p => { p.dovolena = ''; });
-  // Потім застосовуємо ті що є у Firebase
+  // dovolena — НІКОЛИ не скидаємо масово
+  // Оновлюємо кожну людину окремо тільки якщо є значення в Firebase
+  // Якщо людини немає в dovolenaData — її dovolena НЕ чіпаємо
   if (data.dovolenaData && typeof data.dovolenaData === 'object') {
-    Object.entries(data.dovolenaData).forEach(([key, val]) => {
-      const p = PEOPLE.find(x => (x._origEn || x.en) === key || x.en === key || x._origEn === key);
-      if (p) p.dovolena = val;
+    // Спочатку скидаємо тільки тих чий ключ є в Firebase (включно з порожніми)
+    const fbKeys = new Set(Object.keys(data.dovolenaData));
+    PEOPLE.forEach(p => {
+      const key = p._origEn || p.en;
+      if (fbKeys.has(key)) p.dovolena = data.dovolenaData[key] || '';
     });
   }
 
@@ -1796,19 +1798,17 @@ function collectDovolenaData() {
 
 // ── Запис у Firebase ─────────────────────────────────────────
 function syncToFirebase() {
-  // ЗАХИСТ: не записуємо поки Firebase не завантажив дані
-  // Це запобігає затиранню даних при швидкому закритті сторінки
-  if (!fbReady) {
-    console.warn('syncToFirebase: пропущено — Firebase ще не завантажив дані');
-    return;
-  }
+  // ЗАХИСТ: не записуємо поки Firebase не завантажив актуальні дані
+  if (!fbReady) return;
   setBtnState('saving');
   const dovolenaData = {};
   PEOPLE.forEach(p => {
     const key = p._origEn || p.en;
     if (p.dovolena) dovolenaData[key] = p.dovolena;
   });
-  dbRef.set({ set17, set19, editedNames, dovolenaData, ts: Date.now() })
+  // .update() замість .set() — оновлює тільки потрібні поля
+  // не затирає дані інших пристроїв при одночасній роботі
+  dbRef.update({ set17, set19, editedNames, dovolenaData, ts: Date.now() })
     .then(() => { setBtnState('ok'); })
     .catch(err => { console.error('Firebase error:', err); setBtnState('error'); });
 }
@@ -1828,9 +1828,9 @@ dbRef.on('value', (snapshot) => {
 
 document.getElementById('search').addEventListener('input', e => render(e.target.value));
 
-// pagehide і beforeunload прибрано навмисно —
+// pagehide/beforeunload навмисно прибрано:
 // вони викликали запис порожніх даних при закритті сторінки
-// до того як Firebase встигав завантажити актуальні дані
+// раніше ніж Firebase встигав завантажити актуальні дані
 </script>
 </body>
 </html>
