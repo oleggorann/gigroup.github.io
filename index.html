@@ -1796,8 +1796,13 @@ function collectDovolenaData() {
 
 // ── Запис у Firebase ─────────────────────────────────────────
 function syncToFirebase() {
+  // ЗАХИСТ: не записуємо поки Firebase не завантажив дані
+  // Це запобігає затиранню даних при швидкому закритті сторінки
+  if (!fbReady) {
+    console.warn('syncToFirebase: пропущено — Firebase ще не завантажив дані');
+    return;
+  }
   setBtnState('saving');
-  // Збираємо dovolena з PEOPLE прямо зараз
   const dovolenaData = {};
   PEOPLE.forEach(p => {
     const key = p._origEn || p.en;
@@ -1823,8 +1828,9 @@ dbRef.on('value', (snapshot) => {
 
 document.getElementById('search').addEventListener('input', e => render(e.target.value));
 
-window.addEventListener('pagehide', saveData);
-window.addEventListener('beforeunload', saveData);
+// pagehide і beforeunload прибрано навмисно —
+// вони викликали запис порожніх даних при закритті сторінки
+// до того як Firebase встигав завантажити актуальні дані
 </script>
 </body>
 </html>
