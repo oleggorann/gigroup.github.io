@@ -1503,6 +1503,11 @@ function createCard(person, listType) {
     const ph = document.createElement('div');
     ph.className = 'avatar-placeholder';
     ph.textContent = getInitials(person.en);
+    ph.style.cursor = 'pointer';
+    ph.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openLightbox(person);
+    });
     this.replaceWith(ph);
   };
 
@@ -1614,7 +1619,26 @@ function createCard(person, listType) {
 
 function openLightbox(person) {
   const lb = document.getElementById('lightbox');
-  document.getElementById('lightbox-img').src = person.photo;
+  const lbImg = document.getElementById('lightbox-img');
+
+  // Якщо фото є — показуємо, якщо нема — ховаємо img і показуємо placeholder
+  lbImg.style.display = 'block';
+  lbImg.src = person.photo;
+  lbImg.onerror = function() {
+    this.style.display = 'none';
+    let ph = document.getElementById('lb-photo-placeholder');
+    if (!ph) {
+      ph = document.createElement('div');
+      ph.id = 'lb-photo-placeholder';
+      ph.style.cssText = 'width:120px;height:120px;border-radius:12px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:Unbounded,sans-serif;font-size:32px;font-weight:600;color:var(--accent);flex-shrink:0';
+      lb.insertBefore(ph, lb.querySelector('.lightbox-card'));
+    }
+    ph.textContent = getInitials(person.en);
+    ph.style.display = 'flex';
+  };
+  // Ховаємо старий placeholder якщо є
+  const oldPh = document.getElementById('lb-photo-placeholder');
+  if (oldPh) oldPh.style.display = 'none';
 
   // Заповнюємо картку
   document.getElementById('lb-name-en').textContent = person.en || '';
@@ -1654,7 +1678,14 @@ function openLightbox(person) {
   lb.classList.add('active');
 }
 
-document.getElementById('lightbox').addEventListener('click', () => {
+// Закриваємо тільки при кліку на фото або на темний фон
+// Картка з інформацією НЕ закриває lightbox
+document.getElementById('lightbox').addEventListener('click', (e) => {
+  const card = document.getElementById('lightbox-card');
+  const lbImg = document.getElementById('lightbox-img');
+  const ph = document.getElementById('lb-photo-placeholder');
+  // Якщо клік на картку або її дочірні елементи — не закриваємо
+  if (card && card.contains(e.target)) return;
   document.getElementById('lightbox').classList.remove('active');
 });
 
