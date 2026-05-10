@@ -251,9 +251,14 @@
   }
 
   .flag-below {
-    font-size: 13px;
-    line-height: 1;
+    font-size: 8px;
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 600;
+    letter-spacing: .06em;
+    color: var(--text-muted);
     text-align: center;
+    line-height: 1;
+    margin-top: 1px;
   }
 
   .name-ua {
@@ -745,6 +750,11 @@
     <div class="lb-name-en" id="lb-name-en"></div>
     <div class="lb-name-ua" id="lb-name-ua"></div>
     <div class="lb-divider"></div>
+    <div class="lb-row" id="lb-flag-row">
+      <span class="lb-label">Країна</span>
+      <span class="lb-value" id="lb-flag" style="font-family:'Unbounded',sans-serif;font-size:11px;letter-spacing:.06em;">—</span>
+    </div>
+    <div class="lb-divider"></div>
     <div class="lb-row">
       <span class="lb-label">Viber</span>
       <span class="lb-value" id="lb-viber">—</span>
@@ -784,43 +794,21 @@
     <!-- Поле вводу імені -->
     <input type="text" id="edit-input" autocomplete="off">
 
+    <!-- Dovolená — одразу під іменем -->
+    <div class="edit-modal-section-title" style="margin-bottom:6px">Dovolena</div>
+    <input type="text" id="dovolena-input" autocomplete="off" placeholder="DOV - PN - ABS - NEP - dort">
+
     <!-- Кнопки -->
     <div class="edit-modal-btns">
       <button onclick="closeEditModal()">Cancel</button>
       <button class="save" onclick="saveEditModal()">Save</button>
     </div>
 
-    <!-- Нижня секція: інфо + Dovolená -->
-    <div class="edit-modal-bottom">
+    <!-- Приховані елементи для сумісності з JS (info-locker тощо) -->
+    <span id="info-locker" style="display:none"></span>
+    <span id="info-dispatcher" style="display:none"></span>
+    <span id="info-city" style="display:none"></span>
 
-      <!-- Dovolená — поле вводу -->
-      <div>
-        <div class="edit-modal-section-title">Dovolena</div>
-        <input type="text" id="dovolena-input" autocomplete="off" placeholder="DOV - PN - ABS - NEP - dort">
-      </div>
-
-      <!-- Інфо-панель: Viber, Шафка, Диспетчер, Місто -->
-      <div>
-        <div class="edit-modal-section-title">Informace</div>
-        <div class="edit-modal-info" id="edit-modal-info">
-          <div class="edit-modal-info-row">
-            <span class="edit-modal-info-label">Skříňka</span>
-            <span class="edit-modal-info-value" id="info-locker">—</span>
-          </div>
-          <div class="edit-modal-info-divider"></div>
-          <div class="edit-modal-info-row">
-            <span class="edit-modal-info-label">Dispečer</span>
-            <span class="edit-modal-info-value" id="info-dispatcher">—</span>
-          </div>
-          <div class="edit-modal-info-divider"></div>
-          <div class="edit-modal-info-row">
-            <span class="edit-modal-info-label">Město</span>
-            <span class="edit-modal-info-value" id="info-city">—</span>
-          </div>
-        </div>
-      </div>
-
-    </div>
   </div>
 </div>
 
@@ -1513,7 +1501,13 @@ function createCard(person, listType) {
 
   const flagEl = document.createElement('div');
   flagEl.className = 'flag-below';
-  flagEl.textContent = person.flag || '';
+  // Конвертуємо emoji прапор → текстовий код (UA, CZ, PL тощо)
+  const flagMap = {
+    '🇺🇦': 'UA', '🇨🇿': 'CZ', '🇵🇱': 'PL', '🇸🇰': 'SK',
+    '🇩🇪': 'DE', '🇷🇴': 'RO', '🇭🇺': 'HU', '🇷🇺': 'RU',
+    '🇧🇾': 'BY', '🇲🇩': 'MD', '🇱🇹': 'LT', '🇱🇻': 'LV',
+  };
+  flagEl.textContent = flagMap[person.flag] || person.flag || '';
 
   avatarWrap.appendChild(img);
   avatarWrap.appendChild(flagEl);
@@ -1641,8 +1635,26 @@ function openLightbox(person) {
   if (oldPh) oldPh.style.display = 'none';
 
   // Заповнюємо картку
+  const flagMap2 = {
+    '🇺🇦': 'UA', '🇨🇿': 'CZ', '🇵🇱': 'PL', '🇸🇰': 'SK',
+    '🇩🇪': 'DE', '🇷🇴': 'RO', '🇭🇺': 'HU', '🇷🇺': 'RU',
+    '🇧🇾': 'BY', '🇲🇩': 'MD', '🇱🇹': 'LT', '🇱🇻': 'LV',
+  };
+  const flagCode = flagMap2[person.flag] || person.flag || '';
   document.getElementById('lb-name-en').textContent = person.en || '';
   document.getElementById('lb-name-ua').textContent = person.ua || '';
+
+  // Показуємо прапор в картці
+  const lbFlagRow = document.getElementById('lb-flag-row');
+  const lbFlagEl  = document.getElementById('lb-flag');
+  if (lbFlagEl) {
+    if (flagCode) {
+      lbFlagEl.textContent = flagCode;
+      if (lbFlagRow) lbFlagRow.style.display = 'flex';
+    } else {
+      if (lbFlagRow) lbFlagRow.style.display = 'none';
+    }
+  }
 
   const setLb = (id, val, rowId) => {
     const el = document.getElementById(id);
@@ -1657,9 +1669,27 @@ function openLightbox(person) {
     if (row) row.style.display = val ? 'flex' : 'none';
   };
 
-  setLb('lb-viber',      person.viber && person.viber !== 'Name' ? person.viber : '');
-  setLb('lb-phone',      person.phone && person.phone !== '+380 XX XXX XX XX' ? person.phone : '');
-  document.getElementById('lb-phone').classList.add('phone');
+  setLb('lb-viber', person.viber && person.viber !== 'Name' ? person.viber : '');
+
+  // Телефон — клікабельне посилання tel:
+  const rawPhone = person.phone && person.phone !== '+380 XX XXX XX XX' ? person.phone : '';
+  const lbPhoneEl = document.getElementById('lb-phone');
+  if (lbPhoneEl) {
+    lbPhoneEl.textContent = rawPhone || '—';
+    lbPhoneEl.className = 'lb-value phone';
+    if (rawPhone) {
+      lbPhoneEl.style.cursor = 'pointer';
+      lbPhoneEl.style.textDecoration = 'underline';
+      lbPhoneEl.onclick = (e) => {
+        e.stopPropagation();
+        window.open('tel:' + rawPhone.replace(/\s/g, ''), '_self');
+      };
+    } else {
+      lbPhoneEl.style.cursor = 'default';
+      lbPhoneEl.style.textDecoration = 'none';
+      lbPhoneEl.onclick = null;
+    }
+  }
 
   const locker = person.locker ? '№ ' + (Array.isArray(person.locker) ? person.locker.join(', ') : person.locker) : '';
   setLb('lb-locker',     locker,            'lb-locker-row');
@@ -1917,15 +1947,17 @@ function applyRemoteData(data) {
     });
   }
 
-  // Оновлюємо dovolena для кожної людини з Firebase
-  // Спочатку скидаємо всі dovolena до порожніх
-  PEOPLE.forEach(p => { p.dovolena = ''; });
-  // Потім застосовуємо ті що є у Firebase
+  // dovolena — оновлюємо тільки ті записи що є в Firebase
+  // НІКОЛИ не скидаємо масово — це затирало б дані
   if (data.dovolenaData && typeof data.dovolenaData === 'object') {
-    Object.entries(data.dovolenaData).forEach(([key, val]) => {
-      const p = PEOPLE.find(x => (x._origEn || x.en) === key || x.en === key || x._origEn === key);
-      if (p) p.dovolena = val;
+    const fbKeys = new Set(Object.keys(data.dovolenaData));
+    PEOPLE.forEach(p => {
+      const key = p._origEn || p.en;
+      if (fbKeys.has(key)) p.dovolena = data.dovolenaData[key] || '';
+      else p.dovolena = '';  // немає в Firebase — порожньо
     });
+  } else {
+    // Firebase не містить dovolenaData взагалі — не чіпаємо поточні значення
   }
 
   render(document.getElementById('search').value);
@@ -1941,17 +1973,32 @@ function collectDovolenaData() {
 }
 
 // ── Запис у Firebase ─────────────────────────────────────────
-function syncToFirebase() {
+async function syncToFirebase() {
+  if (!fbReady) return;  // захист: не пишемо до завантаження
+
+  // Перевірка інтернету
+  if (!navigator.onLine) {
+    setBtnState('offline');
+    showSyncToast('📵 Немає інтернету. Дані не збережено.', 'warn');
+    return;
+  }
+
   setBtnState('saving');
-  // Збираємо dovolena з PEOPLE прямо зараз
   const dovolenaData = {};
   PEOPLE.forEach(p => {
     const key = p._origEn || p.en;
     if (p.dovolena) dovolenaData[key] = p.dovolena;
   });
-  dbRef.set({ set17, set19, editedNames, dovolenaData, ts: Date.now() })
-    .then(() => { setBtnState('ok'); })
-    .catch(err => { console.error('Firebase error:', err); setBtnState('error'); });
+
+  try {
+    // update() — не перезаписує всю базу, безпечно при одночасній роботі
+    await dbRef.update({ set17, set19, editedNames, dovolenaData, ts: Date.now() });
+    setBtnState('ok');
+  } catch (err) {
+    console.error('Firebase error:', err);
+    setBtnState('error', () => syncToFirebase());
+    showSyncToast(navigator.onLine ? '❌ Помилка. Натисніть Save ще раз.' : '📵 Немає інтернету.', 'error');
+  }
 }
 
 // ── Realtime слухач ───────────────────────────────────────────
@@ -1968,6 +2015,9 @@ dbRef.on('value', (snapshot) => {
 // saveEditModal вже викликає syncToFirebase() напряму — окреме перевизначення не потрібне
 
 document.getElementById('search').addEventListener('input', e => render(e.target.value));
+
+window.addEventListener('online',  () => showSyncToast('🟢 Інтернет відновлено', 'ok'));
+window.addEventListener('offline', () => showSyncToast('📵 Інтернет відключено. Зміни не збережуться.', 'warn'));
 
 window.addEventListener('pagehide', saveData);
 window.addEventListener('beforeunload', saveData);
