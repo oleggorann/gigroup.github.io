@@ -285,6 +285,7 @@
     background: rgba(0,0,0,0.93);
     z-index: 500;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 20px;
@@ -292,6 +293,7 @@
     opacity: 0;
     pointer-events: none;
     transition: opacity .25s ease;
+    gap: 16px;
   }
   .lightbox.active {
     opacity: 1;
@@ -299,37 +301,83 @@
   }
   .lightbox img {
     max-width: 100%;
-    max-height: 88vh;
+    max-height: 55vh;
     border-radius: 10px;
     object-fit: contain;
     box-shadow: 0 8px 60px rgba(0,0,0,.9);
     transform: scale(0.88);
     transition: transform .28s cubic-bezier(.22,.68,0,1.2);
+    flex-shrink: 0;
   }
   .lightbox.active img {
     transform: scale(1);
   }
-  .lightbox-name {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-family: 'Unbounded', sans-serif;
-    font-size: 11px;
-    color: rgba(255,255,255,0.45);
-    white-space: nowrap;
-    letter-spacing: .05em;
-    text-align: center;
+  /* Картка з інформацією під фото */
+  .lightbox-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    width: 100%;
+    max-width: 340px;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 3px;
+    gap: 6px;
+    cursor: default;
+    transform: translateY(10px);
+    transition: transform .28s cubic-bezier(.22,.68,0,1.2);
   }
-  .lightbox-name-ua {
+  .lightbox.active .lightbox-card {
+    transform: translateY(0);
+  }
+  .lb-name-en {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: .02em;
+  }
+  .lb-name-ua {
     font-family: 'JetBrains Mono', monospace;
     font-size: 11px;
-    color: rgba(255,255,255,0.3);
+    color: var(--text-dim);
+    margin-bottom: 4px;
   }
+  .lb-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 2px 0;
+  }
+  .lb-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .lb-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .lb-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    text-align: right;
+    word-break: break-word;
+  }
+  .lb-value.muted {
+    color: var(--text-muted);
+    font-weight: 400;
+  }
+  .lb-value.yellow { color: #f59e0b; }
+  .lb-value.phone  { color: var(--accent); font-size: 12px; }
+  /* Старий .lightbox-name — залишаємо порожнім для сумісності */
+  .lightbox-name { display: none; }
+  .lightbox-name-ua { display: none; }
 
   /* COPY TOAST */
   .copy-toast {
@@ -567,20 +615,21 @@
     justify-content: flex-end;
   }
   .edit-modal-btns button {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    padding: 7px 14px;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 8px 14px;
     border-radius: 6px;
     cursor: pointer;
-    border: 1px solid var(--border);
+    border: none;
     background: var(--surface2);
-    color: var(--text);
+    color: var(--text-dim);
     transition: opacity .15s;
+    letter-spacing: .02em;
   }
   .edit-modal-btns button.save {
     background: var(--accent);
     color: #000;
-    border-color: var(--accent);
     font-weight: 600;
   }
   .edit-modal-btns button:active { opacity: .7; }
@@ -649,31 +698,6 @@
     animation: cardOut .38s cubic-bezier(.4,0,.6,1) forwards;
     pointer-events: none;
   }
-
-  /* Sync toast — статус збереження */
-  .sync-toast {
-    position: fixed;
-    bottom: 70px;
-    left: 50%;
-    transform: translateX(-50%) translateY(80px);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-    font-weight: 600;
-    padding: 10px 18px;
-    border-radius: 8px;
-    transition: transform .3s ease, opacity .3s ease;
-    z-index: 250;
-    pointer-events: none;
-    opacity: 0;
-    white-space: nowrap;
-  }
-  .sync-toast.show {
-    transform: translateX(-50%) translateY(0);
-    opacity: 1;
-  }
-  .sync-toast.ok    { background: #166534; color: #bbf7d0; border: 1px solid #16a34a; }
-  .sync-toast.error { background: #7f1d1d; color: #fecaca; border: 1px solid #ef4444; }
-  .sync-toast.warn  { background: #78350f; color: #fef3c7; border: 1px solid #f59e0b; }
 </style>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -712,11 +736,42 @@
 </main>
 
 <div class="saved-toast" id="toast">✓ Збережено</div>
-<div class="sync-toast" id="sync-toast"></div>
 <div class="copy-toast" id="copy-toast"></div>
 
 <div class="lightbox" id="lightbox">
   <img id="lightbox-img" src="" alt="">
+  <!-- Картка з інформацією під фото -->
+  <div class="lightbox-card" id="lightbox-card">
+    <div class="lb-name-en" id="lb-name-en"></div>
+    <div class="lb-name-ua" id="lb-name-ua"></div>
+    <div class="lb-divider"></div>
+    <div class="lb-row">
+      <span class="lb-label">Viber</span>
+      <span class="lb-value" id="lb-viber">—</span>
+    </div>
+    <div class="lb-row">
+      <span class="lb-label">Тел.</span>
+      <span class="lb-value phone" id="lb-phone">—</span>
+    </div>
+    <div class="lb-divider"></div>
+    <div class="lb-row" id="lb-locker-row">
+      <span class="lb-label">Skříňka</span>
+      <span class="lb-value" id="lb-locker">—</span>
+    </div>
+    <div class="lb-row" id="lb-dispatcher-row">
+      <span class="lb-label">Dispečer</span>
+      <span class="lb-value" id="lb-dispatcher">—</span>
+    </div>
+    <div class="lb-row" id="lb-city-row">
+      <span class="lb-label">Město</span>
+      <span class="lb-value" id="lb-city">—</span>
+    </div>
+    <div class="lb-row" id="lb-dovolena-row" style="display:none">
+      <span class="lb-label">Dovolená</span>
+      <span class="lb-value yellow" id="lb-dovolena">—</span>
+    </div>
+  </div>
+  <!-- Залишаємо для сумісності -->
   <div class="lightbox-name">
     <span id="lightbox-name-en"></span>
     <span class="lightbox-name-ua" id="lightbox-name-ua"></span>
@@ -1442,7 +1497,7 @@ function createCard(person, listType) {
   img.alt = person.en;
   img.addEventListener('click', (e) => {
     e.stopPropagation();
-    openLightbox(person.photo, person.en, person.ua);
+    openLightbox(person);
   });
   img.onerror = function() {
     const ph = document.createElement('div');
@@ -1557,11 +1612,45 @@ function createCard(person, listType) {
   return div;
 }
 
-function openLightbox(src, nameEn, nameUa) {
+function openLightbox(person) {
   const lb = document.getElementById('lightbox');
-  document.getElementById('lightbox-img').src = src;
-  document.getElementById('lightbox-name-en').textContent = nameEn;
-  document.getElementById('lightbox-name-ua').textContent = nameUa || '';
+  document.getElementById('lightbox-img').src = person.photo;
+
+  // Заповнюємо картку
+  document.getElementById('lb-name-en').textContent = person.en || '';
+  document.getElementById('lb-name-ua').textContent = person.ua || '';
+
+  const setLb = (id, val, rowId) => {
+    const el = document.getElementById(id);
+    const row = rowId ? document.getElementById(rowId) : null;
+    if (!val) {
+      if (el) el.textContent = '—';
+      if (el) el.className = 'lb-value muted';
+    } else {
+      if (el) el.textContent = val;
+      if (el) el.className = 'lb-value';
+    }
+    if (row) row.style.display = val ? 'flex' : 'none';
+  };
+
+  setLb('lb-viber',      person.viber && person.viber !== 'Name' ? person.viber : '');
+  setLb('lb-phone',      person.phone && person.phone !== '+380 XX XXX XX XX' ? person.phone : '');
+  document.getElementById('lb-phone').classList.add('phone');
+
+  const locker = person.locker ? '№ ' + (Array.isArray(person.locker) ? person.locker.join(', ') : person.locker) : '';
+  setLb('lb-locker',     locker,            'lb-locker-row');
+  setLb('lb-dispatcher', person.dispatcher, 'lb-dispatcher-row');
+  setLb('lb-city',       person.city,       'lb-city-row');
+
+  const dovRow = document.getElementById('lb-dovolena-row');
+  const dovEl  = document.getElementById('lb-dovolena');
+  if (person.dovolena) {
+    dovEl.textContent = person.dovolena;
+    dovRow.style.display = 'flex';
+  } else {
+    dovRow.style.display = 'none';
+  }
+
   lb.classList.add('active');
 }
 
@@ -1678,10 +1767,7 @@ function saveEditModal() {
   }
   closeEditModal();
   render(document.getElementById('search').value);
-
-  // Зберігаємо в Firebase:
-  // — ім'я через syncToFirebase (оновлює editedNames + set17/set19)
-  // — dovolena окремо через .update() щоб не зачіпати інші поля
+  // Одразу синхронізуємо і ім'я і dovolena з Firebase
   if (typeof syncToFirebase === 'function') syncToFirebase();
 }
 
@@ -1761,51 +1847,25 @@ firebase.initializeApp({
 const dbRef = firebase.database().ref('gigroup');
 
 // ── Стан кнопки Save ─────────────────────────────────────────
-function setBtnState(state, retryFn) {
+function setBtnState(state) {
   const btn = document.getElementById('btn-save-main');
   if (!btn) return;
-
-  // Скидаємо попередній retry-обробник
-  btn.onclick = () => saveData();
-
   if (state === 'saving') {
     btn.textContent = '⏳ Sync...';
     btn.style.opacity = '.6';
-    btn.style.background = 'var(--accent)';
     btn.disabled = true;
   }
   if (state === 'ok') {
     btn.textContent = '✓ Saved';
     btn.style.opacity = '1';
-    btn.style.background = 'var(--accent)';
     btn.disabled = false;
-    setTimeout(() => {
-      btn.textContent = 'Save';
-      btn.style.background = 'var(--accent)';
-    }, 2000);
+    setTimeout(() => { btn.textContent = 'Save'; }, 2000);
   }
   if (state === 'error') {
-    btn.textContent = '✗ Retry?';
+    btn.textContent = '✗ Error';
     btn.style.opacity = '1';
-    btn.style.background = '#ef4444';
     btn.disabled = false;
-    // Клік на кнопку — повторна спроба
-    if (retryFn) btn.onclick = () => { btn.style.background = 'var(--accent)'; retryFn(); };
-    setTimeout(() => {
-      btn.textContent = 'Save';
-      btn.style.background = 'var(--accent)';
-      btn.onclick = () => saveData();
-    }, 5000);
-  }
-  if (state === 'offline') {
-    btn.textContent = '📵 Offline';
-    btn.style.opacity = '1';
-    btn.style.background = '#6b7280';
-    btn.disabled = false;
-    setTimeout(() => {
-      btn.textContent = 'Save';
-      btn.style.background = 'var(--accent)';
-    }, 4000);
+    setTimeout(() => { btn.textContent = 'Save'; }, 3000);
   }
 }
 
@@ -1813,8 +1873,10 @@ function setBtnState(state, retryFn) {
 function applyRemoteData(data) {
   if (!data) return;
 
-  if (Array.isArray(data.set17)) set17 = data.set17;
-  if (Array.isArray(data.set19)) set19 = data.set19;
+  // Фільтруємо set17/set19 — залишаємо тільки імена що реально є в PEOPLE
+  const validNames = new Set(PEOPLE.flatMap(p => [p.en, p._origEn].filter(Boolean)));
+  if (Array.isArray(data.set17)) set17 = data.set17.filter(n => validNames.has(n));
+  if (Array.isArray(data.set19)) set19 = data.set19.filter(n => validNames.has(n));
 
   if (data.editedNames && typeof data.editedNames === 'object') {
     editedNames = data.editedNames;
@@ -1824,15 +1886,14 @@ function applyRemoteData(data) {
     });
   }
 
-  // dovolena — НІКОЛИ не скидаємо масово
-  // Оновлюємо кожну людину окремо тільки якщо є значення в Firebase
-  // Якщо людини немає в dovolenaData — її dovolena НЕ чіпаємо
+  // Оновлюємо dovolena для кожної людини з Firebase
+  // Спочатку скидаємо всі dovolena до порожніх
+  PEOPLE.forEach(p => { p.dovolena = ''; });
+  // Потім застосовуємо ті що є у Firebase
   if (data.dovolenaData && typeof data.dovolenaData === 'object') {
-    // Спочатку скидаємо тільки тих чий ключ є в Firebase (включно з порожніми)
-    const fbKeys = new Set(Object.keys(data.dovolenaData));
-    PEOPLE.forEach(p => {
-      const key = p._origEn || p.en;
-      if (fbKeys.has(key)) p.dovolena = data.dovolenaData[key] || '';
+    Object.entries(data.dovolenaData).forEach(([key, val]) => {
+      const p = PEOPLE.find(x => (x._origEn || x.en) === key || x.en === key || x._origEn === key);
+      if (p) p.dovolena = val;
     });
   }
 
@@ -1849,53 +1910,17 @@ function collectDovolenaData() {
 }
 
 // ── Запис у Firebase ─────────────────────────────────────────
-// Показує статус збереження у нижній частині екрану
-let syncToastTimer = null;
-function showSyncToast(msg, type) {
-  const el = document.getElementById('sync-toast');
-  if (!el) return;
-  clearTimeout(syncToastTimer);
-  el.textContent = msg;
-  el.className = 'sync-toast ' + type;
-  el.classList.add('show');
-  syncToastTimer = setTimeout(() => el.classList.remove('show'), 3500);
-}
-
-async function syncToFirebase() {
-  // ЗАХИСТ: не записуємо поки Firebase не завантажив актуальні дані
-  if (!fbReady) return;
-
-  // Перевіряємо чи є інтернет перед спробою
-  if (!navigator.onLine) {
-    setBtnState('offline');
-    showSyncToast('📵 Немає інтернету. Дані не збережено.', 'warn');
-    return;
-  }
-
+function syncToFirebase() {
   setBtnState('saving');
-
+  // Збираємо dovolena з PEOPLE прямо зараз
   const dovolenaData = {};
   PEOPLE.forEach(p => {
     const key = p._origEn || p.en;
     if (p.dovolena) dovolenaData[key] = p.dovolena;
   });
-
-  const payload = { set17, set19, editedNames, dovolenaData, ts: Date.now() };
-
-  try {
-    // .update() — оновлює тільки потрібні поля, не затирає решту
-    await dbRef.update(payload);
-    setBtnState('ok');
-    showSyncToast('✅ Збережено', 'ok');
-  } catch (err) {
-    console.error('Firebase sync error:', err);
-    // Передаємо retry функцію — клік на кнопку повторить спробу
-    setBtnState('error', () => syncToFirebase());
-    const msg = navigator.onLine
-      ? '❌ Помилка збереження. Натисніть кнопку ще раз.'
-      : '📵 Немає інтернету. Спробуйте пізніше.';
-    showSyncToast(msg, 'error');
-  }
+  dbRef.set({ set17, set19, editedNames, dovolenaData, ts: Date.now() })
+    .then(() => { setBtnState('ok'); })
+    .catch(err => { console.error('Firebase error:', err); setBtnState('error'); });
 }
 
 // ── Realtime слухач ───────────────────────────────────────────
@@ -1913,17 +1938,8 @@ dbRef.on('value', (snapshot) => {
 
 document.getElementById('search').addEventListener('input', e => render(e.target.value));
 
-// Слухаємо зміну стану інтернету
-window.addEventListener('online', () => {
-  showSyncToast('🟢 Інтернет відновлено', 'ok');
-});
-window.addEventListener('offline', () => {
-  showSyncToast('📵 Інтернет відключено. Зміни не зберігаються.', 'warn');
-});
-
-// pagehide/beforeunload навмисно прибрано:
-// вони викликали запис порожніх даних при закритті сторінки
-// раніше ніж Firebase встигав завантажити актуальні дані
+window.addEventListener('pagehide', saveData);
+window.addEventListener('beforeunload', saveData);
 </script>
 </body>
 </html>
