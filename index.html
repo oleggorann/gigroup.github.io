@@ -754,6 +754,10 @@
       <span class="lb-label">Країна</span>
       <span class="lb-value" id="lb-flag" style="font-family:'Unbounded',sans-serif;font-size:11px;letter-spacing:.06em;">—</span>
     </div>
+    <div class="lb-row" id="lb-city-row">
+      <span class="lb-label">Město ČR</span>
+      <span class="lb-value" id="lb-city">—</span>
+    </div>
     <div class="lb-divider"></div>
     <div class="lb-row">
       <span class="lb-label">Viber</span>
@@ -771,10 +775,6 @@
     <div class="lb-row" id="lb-dispatcher-row">
       <span class="lb-label">Dispečer</span>
       <span class="lb-value" id="lb-dispatcher">—</span>
-    </div>
-    <div class="lb-row" id="lb-city-row">
-      <span class="lb-label">Město</span>
-      <span class="lb-value" id="lb-city">—</span>
     </div>
     <div class="lb-row" id="lb-dovolena-row" style="display:none">
       <span class="lb-label">Dovolená</span>
@@ -1934,30 +1934,35 @@ function setBtnState(state) {
 function applyRemoteData(data) {
   if (!data) return;
 
-  // Фільтруємо set17/set19 — залишаємо тільки імена що реально є в PEOPLE
-  const validNames = new Set(PEOPLE.flatMap(p => [p.en, p._origEn].filter(Boolean)));
-  if (Array.isArray(data.set17)) set17 = data.set17.filter(n => validNames.has(n));
-  if (Array.isArray(data.set19)) set19 = data.set19.filter(n => validNames.has(n));
-
+  // ── КРОК 1: editedNames ПЕРШИМИ — до будь-якої фільтрації ───
+  // КРИТИЧНО: в set17/set19 зберігаються відредаговані імена
+  // ('Goran Oleg 1'), тому спочатку оновлюємо p.en в PEOPLE,
+  // а вже потім перевіряємо чи є ці імена в validNames
   if (data.editedNames && typeof data.editedNames === 'object') {
     editedNames = data.editedNames;
+    // Прибираємо незмінені записи (orig === new)
+    Object.keys(editedNames).forEach(k => {
+      if (editedNames[k] === k) delete editedNames[k];
+    });
     Object.entries(editedNames).forEach(([orig, newN]) => {
       const p = PEOPLE.find(x => x._origEn === orig || x.en === orig);
       if (p) { p._origEn = p._origEn || orig; p.en = newN; }
     });
   }
 
-  // dovolena — оновлюємо тільки ті записи що є в Firebase
-  // НІКОЛИ не скидаємо масово — це затирало б дані
+  // ── КРОК 2: validNames — тепер враховує відредаговані імена ─
+  const validNames = new Set(PEOPLE.flatMap(p => [p.en, p._origEn].filter(Boolean)));
+  if (Array.isArray(data.set17)) set17 = data.set17.filter(n => validNames.has(n));
+  if (Array.isArray(data.set19)) set19 = data.set19.filter(n => validNames.has(n));
+
+  // ── КРОК 3: dovolena — точкове оновлення ────────────────────
   if (data.dovolenaData && typeof data.dovolenaData === 'object') {
     const fbKeys = new Set(Object.keys(data.dovolenaData));
     PEOPLE.forEach(p => {
       const key = p._origEn || p.en;
       if (fbKeys.has(key)) p.dovolena = data.dovolenaData[key] || '';
-      else p.dovolena = '';  // немає в Firebase — порожньо
+      else p.dovolena = '';
     });
-  } else {
-    // Firebase не містить dovolenaData взагалі — не чіпаємо поточні значення
   }
 
   render(document.getElementById('search').value);
