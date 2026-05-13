@@ -1984,7 +1984,7 @@ async function syncToFirebase() {
   // Перевірка інтернету
   if (!navigator.onLine) {
     setBtnState('offline');
-    showSyncToast('📵 Немає інтернету. Дані не збережено.', 'warn');
+    showSyncToast('📵 Bez internetu. Data nebyla uložena.', 'warn');
     return;
   }
 
@@ -2002,7 +2002,7 @@ async function syncToFirebase() {
   } catch (err) {
     console.error('Firebase error:', err);
     setBtnState('error', () => syncToFirebase());
-    showSyncToast(navigator.onLine ? '❌ Помилка. Натисніть Save ще раз.' : '📵 Немає інтернету.', 'error');
+    showSyncToast(navigator.onLine ? '❌ Chyba. Klikněte znovu na Save.' : '📵 Bez internetu.', 'error');
   }
 }
 
@@ -2021,8 +2021,8 @@ dbRef.on('value', (snapshot) => {
 
 document.getElementById('search').addEventListener('input', e => render(e.target.value));
 
-window.addEventListener('online',  () => showSyncToast('🟢 Інтернет відновлено', 'ok'));
-window.addEventListener('offline', () => showSyncToast('📵 Інтернет відключено. Зміни не збережуться.', 'warn'));
+window.addEventListener('online',  () => showSyncToast('🟢 Připojení obnoveno', 'ok'));
+window.addEventListener('offline', () => showSyncToast('📵 Internet odpojen. Změny se neuloží.', 'warn'));
 
 window.addEventListener('pagehide', saveData);
 window.addEventListener('beforeunload', saveData);
