@@ -703,6 +703,110 @@
     animation: cardOut .38s cubic-bezier(.4,0,.6,1) forwards;
     pointer-events: none;
   }
+
+  /* ── Кнопка експорту ── */
+  .export-bottom-btn {
+    display: block;
+    width: calc(100% - 24px);
+    margin: 20px 12px 8px;
+    padding: 12px 16px;
+    background: var(--surface2);
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-align: center;
+    transition: background .15s, border-color .15s, color .15s;
+  }
+  .export-bottom-btn:hover {
+    background: var(--surface);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .export-bottom-btn:active {
+    opacity: .7;
+  }
+
+  /* ── Export toast ── */
+  .export-toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(60px);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--accent);
+    font-family: 'Unbounded', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 9px 18px;
+    border-radius: 8px;
+    transition: transform .3s ease, opacity .3s ease;
+    z-index: 210;
+    pointer-events: none;
+    opacity: 0;
+    white-space: nowrap;
+  }
+  .export-toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+
+  /* Sync toast — статус збереження */
+  .sync-toast {
+    position: fixed;
+    bottom: 70px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 10px 18px;
+    border-radius: 8px;
+    transition: transform .3s ease, opacity .3s ease;
+    z-index: 250;
+    pointer-events: none;
+    opacity: 0;
+    white-space: nowrap;
+  }
+  .sync-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  .sync-toast.ok    { background: #166534; color: #bbf7d0; border: 1px solid #16a34a; }
+  .sync-toast.error { background: #7f1d1d; color: #fecaca; border: 1px solid #ef4444; }
+  .sync-toast.warn  { background: #78350f; color: #fef3c7; border: 1px solid #f59e0b; }
+
+  /* Скелетон завантаження */
+  .skeleton-item {
+    display: flex; align-items: center; gap: 11px;
+    padding: 10px 12px; border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .skeleton-avatar {
+    width: 52px; height: 52px; border-radius: 7px;
+    background: var(--surface2); flex-shrink: 0;
+    position: relative; overflow: hidden;
+  }
+  .skeleton-lines { flex: 1; display: flex; flex-direction: column; gap: 7px; }
+  .skeleton-line {
+    height: 10px; border-radius: 4px; background: var(--surface2);
+    position: relative; overflow: hidden;
+  }
+  .skeleton-line.w80 { width: 80%; }
+  .skeleton-line.w55 { width: 55%; }
+  .skeleton-line.w40 { width: 40%; }
+  @keyframes shimmer {
+    0%   { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+  .skeleton-avatar::after, .skeleton-line::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.04) 50%, transparent 100%);
+    animation: shimmer 1.4s infinite;
+  }
 </style>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -725,7 +829,16 @@
 
 <main>
   <div id="main-section">
-    <div id="people-list"></div>
+    <div id="people-list">
+      <div id="skeleton-list">
+        <div class="skeleton-item"><div class="skeleton-avatar"></div><div class="skeleton-lines"><div class="skeleton-line w80"></div><div class="skeleton-line w55"></div><div class="skeleton-line w40"></div></div></div>
+        <div class="skeleton-item"><div class="skeleton-avatar"></div><div class="skeleton-lines"><div class="skeleton-line w80"></div><div class="skeleton-line w55"></div><div class="skeleton-line w40"></div></div></div>
+        <div class="skeleton-item"><div class="skeleton-avatar"></div><div class="skeleton-lines"><div class="skeleton-line w80"></div><div class="skeleton-line w55"></div><div class="skeleton-line w40"></div></div></div>
+        <div class="skeleton-item"><div class="skeleton-avatar"></div><div class="skeleton-lines"><div class="skeleton-line w80"></div><div class="skeleton-line w55"></div><div class="skeleton-line w40"></div></div></div>
+        <div class="skeleton-item"><div class="skeleton-avatar"></div><div class="skeleton-lines"><div class="skeleton-line w80"></div><div class="skeleton-line w55"></div><div class="skeleton-line w40"></div></div></div>
+        <div class="skeleton-item"><div class="skeleton-avatar"></div><div class="skeleton-lines"><div class="skeleton-line w80"></div><div class="skeleton-line w55"></div><div class="skeleton-line w40"></div></div></div>
+      </div>
+    </div>
     <div id="no-results">Нікого не знайдено</div>
   </div>
 
@@ -738,10 +851,15 @@
     <div class="section-label" style="color:#8b5cf6; border-bottom-color:#8b5cf640">Люди від 19:00 · <span id="count-19">0</span></div>
     <div id="list-19"></div>
   </div>
+  <!-- Кнопка експорту — в самому низу після всіх списків -->
+  <button class="export-bottom-btn" onclick="exportToCSV()">↓ Експорт списку</button>
+
 </main>
 
 <div class="saved-toast" id="toast">✓ Збережено</div>
+<div class="export-toast" id="export-toast">✓ Експортовано</div>
 <div class="copy-toast" id="copy-toast"></div>
+<div class="sync-toast" id="sync-toast"></div>
 
 <div class="lightbox" id="lightbox">
   <img id="lightbox-img" src="" alt="">
@@ -755,7 +873,7 @@
       <span class="lb-value" id="lb-flag" style="font-family:'Unbounded',sans-serif;font-size:11px;letter-spacing:.06em;">—</span>
     </div>
     <div class="lb-row" id="lb-city-row">
-      <span class="lb-label">Město ČR</span>
+      <span class="lb-label">Město cz.</span>
       <span class="lb-value" id="lb-city">—</span>
     </div>
     <div class="lb-divider"></div>
@@ -850,7 +968,7 @@ const PEOPLE = [
     dovolena:   "", 
   },
     {
-    en:    "Bokoch Mykhailo",
+    en:    "Bokoch Mykhailo HPP",
     ua:    "Бокоч Михайло",
     viber: "Bokoch Misha",
     phone: "+380 68 229 2395",
@@ -955,18 +1073,6 @@ const PEOPLE = [
     locker: 78,
     dispatcher: "Kuba",
     city:       "",
-    dovolena:   "Test", 
-  },
-  {
-    en:    "Huk Yaroslav",
-    ua:    "Гук Ярослав",
-    viber: "Yaroslav",
-    phone: "+420 77 654 7561",
-    photo: "photos/huk_yaroslav.jpg",
-    flag:  "🇺🇦",
-    locker: 107,
-    dispatcher: "",
-    city:       "",
     dovolena:   "", 
   },
   {
@@ -978,7 +1084,7 @@ const PEOPLE = [
     flag:  "🇺🇦",
     locker: 74,
     dispatcher: "Matěj - 1 Hala",
-    city:       "Hradec Králové",
+    city:       "Hradec Králové - Ubytovna",
     dovolena:   "", 
   },
   {
@@ -1026,7 +1132,7 @@ const PEOPLE = [
     flag:  "🇺🇦",
     locker: 99,
     dispatcher: "Matěj - 1 Hala",
-    city:       "Hradec Králové",
+    city:       "",
     dovolena:   "", 
   },
   {
@@ -1098,7 +1204,7 @@ const PEOPLE = [
     flag:  "🇺🇦",
     locker: 99,
     dispatcher: "Kuba - 1 Hala",
-    city:       "Hradec Králové",
+    city:       "Hradec Králové - Ubytovna",
     dovolena:   "", 
   },
   {
@@ -1110,7 +1216,7 @@ const PEOPLE = [
     flag:  "🇺🇦",
     locker: 99,
     dispatcher: "Matěj - 1 Hala",
-    city:       "Hradec Králové",
+    city:       "Hradec Králové - Ubytovna",
     dovolena:   "", 
   },
   {
@@ -1134,7 +1240,7 @@ const PEOPLE = [
     flag:  "🇺🇦",
     locker: 114,
     dispatcher: "Kuba - 1 Hala",
-    city:       "Hradec Králové",
+    city:       "Hradec Králové - Ubytovna",
     dovolena:   "", 
   },
   {
@@ -1192,9 +1298,9 @@ const PEOPLE = [
     phone: "+380 66 024 2505",
     photo: "photos/popovych_stanislav.jpg",
     flag:  "🇺🇦",
-    locker: 95,
+    locker: 0,
     dispatcher: "Kuba - 1 Hala",
-    city:       "Hradec Králové",
+    city:       "",
     dovolena:   "", 
   },
   {
@@ -1277,8 +1383,8 @@ const PEOPLE = [
     photo: "photos/srebniuk_denys.jpg",
     flag:  "🇺🇦",
     locker: 87,
-    dispatcher: "Matěj - 1 Hala",
-    city:       "Hradec Králové",
+    dispatcher: "",
+    city:       "",
     dovolena:   "", 
   },
   {
@@ -1745,6 +1851,21 @@ function copyToClipboard(text) {
   });
 }
 
+// showSyncToast — показує статус збереження
+let syncToastTimer = null;
+function showSyncToast(msg, type) {
+  const el = document.getElementById('sync-toast');
+  if (!el) return;
+  clearTimeout(syncToastTimer);
+  el.textContent = msg;
+  el.className = 'sync-toast ' + type;
+  el.classList.add('show');
+  syncToastTimer = setTimeout(() => el.classList.remove('show'), 3500);
+}
+
+// Дебаунс — один запит в Firebase після серії кліків
+let toggleSyncTimer = null;
+
 function toggleList(name, listType, savedScroll) {
   const isRemoving17 = set17.includes(name);
   const isRemoving19 = set19.includes(name);
@@ -1767,6 +1888,12 @@ function toggleList(name, listType, savedScroll) {
       window.scrollTo({ top: savedScroll, behavior: 'instant' });
     });
   }
+
+  // Дебаунс: один запит в Firebase після серії кліків (600мс)
+  clearTimeout(toggleSyncTimer);
+  toggleSyncTimer = setTimeout(() => {
+    if (typeof syncToFirebase === 'function') syncToFirebase();
+  }, 600);
 }
 
 // Edit modal
@@ -1823,7 +1950,12 @@ function saveEditModal() {
     person.en       = newName;
     // Зберігаємо dovolena прямо в об'єкт людини
     person.dovolena = newDovolena;
-    editedNames[origKey] = newName;
+    // Зберігаємо тільки якщо ім'я реально змінилось
+    if (origKey !== newName) {
+      editedNames[origKey] = newName;
+    } else {
+      delete editedNames[origKey];
+    }
     // Все іде тільки в Firebase через syncToFirebase() нижче
   }
   closeEditModal();
@@ -1868,6 +2000,8 @@ function render(query = '') {
   const filtered17 = people17.filter(match);
   const filtered19 = people19.filter(match);
 
+  const sk = document.getElementById('skeleton-list');
+  if (sk) sk.style.display = 'none';
   filtered.forEach(p => peopleList.appendChild(createCard(p, 'main')));
   document.getElementById('count').textContent = filtered.length;
   noResults.style.display = filtered.length === 0 && mainPeople.length > 0 ? 'block' : 'none';
@@ -1908,25 +2042,37 @@ firebase.initializeApp({
 const dbRef = firebase.database().ref('gigroup');
 
 // ── Стан кнопки Save ─────────────────────────────────────────
-function setBtnState(state) {
+function setBtnState(state, retryFn) {
   const btn = document.getElementById('btn-save-main');
   if (!btn) return;
+  btn.onclick = () => saveData();
   if (state === 'saving') {
     btn.textContent = '⏳ Sync...';
     btn.style.opacity = '.6';
+    btn.style.background = 'var(--accent)';
     btn.disabled = true;
   }
   if (state === 'ok') {
     btn.textContent = '✓ Saved';
     btn.style.opacity = '1';
+    btn.style.background = 'var(--accent)';
     btn.disabled = false;
-    setTimeout(() => { btn.textContent = 'Save'; }, 2000);
+    setTimeout(() => { btn.textContent = 'Save'; btn.style.background = 'var(--accent)'; }, 2000);
   }
   if (state === 'error') {
-    btn.textContent = '✗ Error';
+    btn.textContent = '✗ Retry?';
     btn.style.opacity = '1';
+    btn.style.background = '#ef4444';
     btn.disabled = false;
-    setTimeout(() => { btn.textContent = 'Save'; }, 3000);
+    if (retryFn) btn.onclick = () => { btn.style.background = 'var(--accent)'; retryFn(); };
+    setTimeout(() => { btn.textContent = 'Save'; btn.style.background = 'var(--accent)'; btn.onclick = () => saveData(); }, 5000);
+  }
+  if (state === 'offline') {
+    btn.textContent = '📵 Offline';
+    btn.style.opacity = '1';
+    btn.style.background = '#6b7280';
+    btn.disabled = false;
+    setTimeout(() => { btn.textContent = 'Save'; btn.style.background = 'var(--accent)'; }, 4000);
   }
 }
 
@@ -2002,7 +2148,7 @@ async function syncToFirebase() {
   } catch (err) {
     console.error('Firebase error:', err);
     setBtnState('error', () => syncToFirebase());
-    showSyncToast(navigator.onLine ? '❌ Chyba. Klikněte znovu na Save.' : '📵 Bez internetu.', 'error');
+	showSyncToast(navigator.onLine ? '❌ Chyba. Klikněte znovu na Save.' : '📵 Bez internetu.', 'error');
   }
 }
 
@@ -2021,11 +2167,56 @@ dbRef.on('value', (snapshot) => {
 
 document.getElementById('search').addEventListener('input', e => render(e.target.value));
 
+// ── Експорт у CSV ─────────────────────────────────────────────
+function exportToCSV() {
+  const rows = [];
+
+  // Спочатку всі з 17:00, потім всі з 19:00
+  set17.forEach(name => rows.push(`${name} - (17:00)`));
+  set19.forEach(name => rows.push(`${name} - (19:00)`));
+
+  if (rows.length === 0) {
+    showExportToast('⚠️ Списки порожні');
+    return;
+  }
+
+  // Формат імені файлу: GiGroup_DDMMYYYY.csv
+  const now   = new Date();
+  const dd    = String(now.getDate()).padStart(2, '0');
+  const mm    = String(now.getMonth() + 1).padStart(2, '0');
+  const yyyy  = now.getFullYear();
+  const fname = `GiGroup_${dd}${mm}${yyyy}.csv`;
+
+  // UTF-8 BOM для коректного відображення кирилиці в Excel
+  const BOM = '\uFEFF';
+  const csv = rows.join('\n') + '\n';
+
+  const blob = new Blob([BOM + csv], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = fname;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  showExportToast('✓ Exportováno');
+}
+
+function showExportToast(msg) {
+  const el = document.getElementById('export-toast');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+
 window.addEventListener('online',  () => showSyncToast('🟢 Připojení obnoveno', 'ok'));
 window.addEventListener('offline', () => showSyncToast('📵 Internet odpojen. Změny se neuloží.', 'warn'));
 
-window.addEventListener('pagehide', saveData);
-window.addEventListener('beforeunload', saveData);
+// pagehide/beforeunload прибрано — вони затирали дані
+// при закритті сторінки до завантаження Firebase
 </script>
 </body>
 </html>
