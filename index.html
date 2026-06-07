@@ -292,13 +292,14 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: 20px;
+    justify-content: flex-start;
+    padding: 16px 16px 24px;
+    overflow-y: auto;
     cursor: zoom-out;
     opacity: 0;
     pointer-events: none;
     transition: opacity .25s ease;
-    gap: 16px;
+    gap: 12px;
   }
   .lightbox.active {
     opacity: 1;
@@ -306,13 +307,15 @@
   }
   .lightbox img {
     max-width: 100%;
-    max-height: 55vh;
+    max-height: 50vh;
+    min-height: 80px;
     border-radius: 10px;
     object-fit: contain;
     box-shadow: 0 8px 60px rgba(0,0,0,.9);
     transform: scale(0.88);
     transition: transform .28s cubic-bezier(.22,.68,0,1.2);
     flex-shrink: 0;
+    margin-top: auto;
   }
   .lightbox.active img {
     transform: scale(1);
@@ -331,6 +334,7 @@
     cursor: default;
     transform: translateY(10px);
     transition: transform .28s cubic-bezier(.22,.68,0,1.2);
+    margin-bottom: auto;
   }
   .lightbox.active .lightbox-card {
     transform: translateY(0);
@@ -380,6 +384,8 @@
   }
   .lb-value.yellow { color: #f59e0b; }
   .lb-value.phone  { color: var(--accent); font-size: 12px; }
+  /* Мітки для обладнання — трохи менший шрифт */
+  .lb-label.equip  { font-size: 9px; }
   /* Старий .lightbox-name — залишаємо порожнім для сумісності */
   .lightbox-name { display: none; }
   .lightbox-name-ua { display: none; }
@@ -695,12 +701,12 @@
 
   @keyframes cardOut {
     0%   { opacity: 1; transform: translateX(0) scaleY(1); max-height: 100px; }
-    40%  { opacity: .4; transform: translateX(18px) scaleY(1); }
-    100% { opacity: 0; transform: translateX(40px) scaleY(0.6); max-height: 0; padding-top: 0; padding-bottom: 0; }
+    35%  { opacity: .5; transform: translateX(32px) scaleY(1); }
+    100% { opacity: 0; transform: translateX(90px) scaleY(0.5); max-height: 0; padding-top: 0; padding-bottom: 0; }
   }
   .card-removing {
     overflow: hidden;
-    animation: cardOut .38s cubic-bezier(.4,0,.6,1) forwards;
+    animation: cardOut .30s cubic-bezier(.25,0,.5,1) forwards;
     pointer-events: none;
   }
 
@@ -807,6 +813,118 @@
     background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.04) 50%, transparent 100%);
     animation: shimmer 1.4s infinite;
   }
+  /* ── STOCK MODAL (Gi Group logo click) ── */
+  .stock-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.88);
+    z-index: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .22s ease;
+  }
+  .stock-modal.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+  .stock-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 18px 18px;
+    width: 100%;
+    max-width: 320px;
+    transform: translateY(12px);
+    transition: transform .25s cubic-bezier(.22,.68,0,1.2);
+  }
+  .stock-modal.active .stock-box {
+    transform: translateY(0);
+  }
+  .stock-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    text-align: center;
+  }
+  .stock-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 11px 14px;
+    margin-bottom: 8px;
+  }
+  .stock-item:last-child { margin-bottom: 0; }
+  .stock-item-name {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: .04em;
+    margin-bottom: 6px;
+  }
+  .stock-qty {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .stock-qty span {
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .stock-sizes {
+    margin-top: 5px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .stock-size-chip {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 3px 7px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+  .stock-size-chip span {
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .stock-close {
+    display: block;
+    width: 100%;
+    margin-top: 14px;
+    padding: 9px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-dim);
+    cursor: pointer;
+    text-align: center;
+    letter-spacing: .04em;
+    transition: border-color .15s, color .15s;
+  }
+  .stock-close:hover { border-color: var(--accent); color: var(--accent); }
+  .stock-close:active { opacity: .7; }
+  /* ── Кастомна полоса прокрутки ── */
+  ::-webkit-scrollbar               { width: 4px; }
+  ::-webkit-scrollbar-track         { background: transparent; }
+  ::-webkit-scrollbar-thumb         { background: var(--accent); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover   { background: #00ff8855; }
+  /* Firefox */
+  * { scrollbar-width: thin; scrollbar-color: var(--accent) transparent; }
+
 </style>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -814,7 +932,7 @@
 <body>
 
 <header>
-  <span class="logo">Gi Group</span>
+  <span class="logo" id="logo-btn" onclick="openStockModal()" style="cursor:pointer;user-select:none;">Gi Group</span>
   <div class="search-wrap">
     <span class="search-icon">⌕</span>
     <input type="search" id="search" placeholder="Пошук..." autocomplete="off">
@@ -894,6 +1012,19 @@
       <span class="lb-label">Dispečer</span>
       <span class="lb-value" id="lb-dispatcher">—</span>
     </div>
+    <div class="lb-divider" id="lb-equip-divider"></div>
+    <div class="lb-row">
+      <span class="lb-label equip">Helma <span style="color:var(--accent);font-weight:600">×1</span></span>
+      <span class="lb-value muted" id="lb-helma">—</span>
+    </div>
+    <div class="lb-row">
+      <span class="lb-label equip">Boty <span style="color:var(--accent);font-weight:600">×1</span></span>
+      <span class="lb-value muted" id="lb-boty">—</span>
+    </div>
+    <div class="lb-row">
+      <span class="lb-label equip">Vesta <span style="color:var(--accent);font-weight:600">×1</span></span>
+      <span class="lb-value muted" id="lb-vesta">—</span>
+    </div>
     <div class="lb-row" id="lb-dovolena-row" style="display:none">
       <span class="lb-label">Dovolená</span>
       <span class="lb-value yellow" id="lb-dovolena">—</span>
@@ -930,6 +1061,76 @@
   </div>
 </div>
 
+<!-- ══ STOCK MODAL ══ -->
+<div class="stock-modal" id="stock-modal" onclick="if(event.target===this)closeStockModal()">
+  <div class="stock-box" onclick="event.stopPropagation()" style="max-height:88vh;overflow-y:auto;">
+    <div style="position:relative;display:flex;align-items:center;justify-content:center;margin-bottom:14px;">
+      <div class="stock-title" style="margin-bottom:0">Skladové zásoby</div>
+      <button onclick="closeStockModal()" style="position:absolute;right:0;background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer;line-height:1;padding:2px 6px;">✕</button>
+    </div>
+
+    <!-- ── Nové kusy ── -->
+    <div style="font-family:'Unbounded',sans-serif;font-size:8px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:7px;text-align:center;">Nové</div>
+
+    <!-- Helma nová -->
+    <div class="stock-item" style="padding:10px 14px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div class="stock-item-name" style="margin-bottom:0">⛑ Přilba (Helma)</div>
+        <span id="stock-helma-count" style="font-family:JetBrains Mono,monospace;font-size:13px;font-weight:600;color:var(--accent);">5 ks</span>
+      </div>
+    </div>
+
+    <!-- Vesta nová -->
+    <div class="stock-item" style="padding:10px 14px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div class="stock-item-name" style="margin-bottom:0">🦺 Reflexní vesta (Vesta)</div>
+        <span id="stock-vesta-count" style="font-family:JetBrains Mono,monospace;font-size:13px;font-weight:600;color:var(--accent);">0 ks</span>
+      </div>
+    </div>
+
+    <!-- Boty nová -->
+    <div class="stock-item">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+        <div class="stock-item-name" style="margin-bottom:0">👟 Pracovní obuv (Boty)</div>
+        <span style="font-family:JetBrains Mono,monospace;font-size:11px;color:var(--text-muted);">Celkem: <span id="stock-boty-count" style="color:var(--accent);font-weight:600;">0</span> ks</span>
+      </div>
+      <div style="height:1px;background:var(--border);margin:8px 0;"></div>
+      <div id="stock-boty-detail" style="font-family:JetBrains Mono,monospace;font-size:11px;color:var(--text-dim);line-height:1.7;"></div>
+    </div>
+
+    <!-- ── Použité kusy ── -->
+    <div style="font-family:'Unbounded',sans-serif;font-size:8px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin:14px 0 7px;text-align:center;">Použité</div>
+
+    <!-- Helma použitá -->
+    <div class="stock-item" style="padding:10px 14px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div class="stock-item-name" style="margin-bottom:0;color:var(--text-dim);">⛑ Přilba (Helma)</div>
+        <span id="stock-helma-used-count" style="font-family:JetBrains Mono,monospace;font-size:13px;font-weight:600;color:var(--text-dim);">0 ks</span>
+      </div>
+    </div>
+
+    <!-- Vesta použitá -->
+    <div class="stock-item" style="padding:10px 14px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div class="stock-item-name" style="margin-bottom:0;color:var(--text-dim);">🦺 Reflexní vesta (Vesta)</div>
+        <span id="stock-vesta-used-count" style="font-family:JetBrains Mono,monospace;font-size:13px;font-weight:600;color:var(--text-dim);">0 ks</span>
+      </div>
+    </div>
+
+    <!-- Boty použité -->
+    <div class="stock-item">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+        <div class="stock-item-name" style="margin-bottom:0;color:var(--text-dim);">👟 Pracovní obuv (Boty)</div>
+        <span style="font-family:JetBrains Mono,monospace;font-size:11px;color:var(--text-muted);">Celkem: <span id="stock-boty-used-count" style="color:var(--text-dim);font-weight:600;">0</span> ks</span>
+      </div>
+      <div style="height:1px;background:var(--border);margin:8px 0;"></div>
+      <div id="stock-boty-used-detail" style="font-family:JetBrains Mono,monospace;font-size:11px;color:var(--text-dim);line-height:1.7;"></div>
+    </div>
+
+    <div style="font-family:JetBrains Mono,monospace;font-size:9px;color:var(--text-muted);text-align:center;letter-spacing:.05em;margin-top:10px;">Upravte hodnoty přímo v kódu · STOCK_DATA</div>
+  </div>
+</div>
+
 <script>
 // ╔══════════════════════════════════════════════════════════════╗
 // ║           СПИСОК ЛЮДЕЙ — редагуй тут                       ║
@@ -953,7 +1154,9 @@ const PEOPLE = [
     locker: 85,
     dispatcher: "Kuba - 1 Hala",
     city:       "Hradec Králové",
-    dovolena:   "", 
+    dovolena:   "",
+    helma:  "",
+    boty:   "",
   },
   {
     en:    "Anosov Oleksandr",
@@ -966,6 +1169,8 @@ const PEOPLE = [
     dispatcher: "Kuba - 1 Hala",
     city:       "",
     dovolena:   "", 
+    helma:  "",
+    boty:   "",
   },
     {
     en:    "Artem Lutsenko",
@@ -978,6 +1183,8 @@ const PEOPLE = [
     dispatcher: "3 Hala",
     city:       "Hradec Králové",
     dovolena:   "", 
+    helma:  "",
+    boty:   "",
   },
     {
     en:    "Bokoch Mykhailo",
@@ -990,6 +1197,8 @@ const PEOPLE = [
     dispatcher: "Kuba - 1 Hala",
     city:       "",
     dovolena:   "", 
+    helma:  "",
+    boty:   "",
   },
   {
     en:    "Chesnokov Pavlo",
@@ -1002,6 +1211,8 @@ const PEOPLE = [
     dispatcher: "",
     city:       "",
     dovolena:   "", 
+    helma:  "",
+    boty:   "",
   },
   {
     en:    "Chonka Ivan",
@@ -1014,6 +1225,8 @@ const PEOPLE = [
     dispatcher: "Matěj - 1 Hala",
     city:       "Hradec Králové",
     dovolena:   "", 
+    helma:  "",
+    boty:   "",
   },
   {
     en:    "Dvornikov Oleksii",
@@ -1026,6 +1239,8 @@ const PEOPLE = [
     dispatcher: "Matěj - 1 Hala",
     city:       "",
     dovolena:   "", 
+    helma:  "",
+    boty:   "",
   },
   {
     en:    "Dziuba Maksym",
@@ -1038,6 +1253,8 @@ const PEOPLE = [
     dispatcher: "Matěj - 1 Hala",
     city:       "Hradec Králové",
     dovolena:   "", 
+    helma:  "",
+    boty:   "",
   },
   {
     en:    "Dzyngel Oleksandr",
@@ -1050,6 +1267,8 @@ const PEOPLE = [
     dispatcher: "3 Hala",
     city:       "Pardubice",
     dovolena:   "", 
+    helma:  "",
+    boty:   "",
   },
   {
     en:    "Furman Tomasz Jan",
@@ -1062,6 +1281,8 @@ const PEOPLE = [
     dispatcher: "",
     city:       "",
     dovolena:   "", 
+    helma:  "",
+    boty:   "",
   },
   {
     en:    "Goran Oleg",
@@ -1074,6 +1295,8 @@ const PEOPLE = [
     dispatcher: "Kuba",
     city:       "",
     dovolena:   "", 
+    helma:  "",
+    boty:   "",
   },
   {
     en:    "Kahramanyan Dmytro",
@@ -1086,6 +1309,8 @@ const PEOPLE = [
     dispatcher: "Matěj - 1 Hala",
     city:       "Hradec Králové - Ubytovna",
     dovolena:   "", 
+    helma:  "",
+    boty:   "",
   },
   {
     en:    "Kapatsyna Vladyslav",
@@ -1098,6 +1323,8 @@ const PEOPLE = [
     dispatcher: "Kuba - 1 Hala",
     city:       "",
     dovolena:   "", 
+    helma:  "",
+    boty:   "",
   },
   {
     en:    "Kushnir Ivan",
@@ -1110,6 +1337,8 @@ const PEOPLE = [
     dispatcher: "",
     city:       "",
     dovolena:   "", 
+    helma:  "",
+    boty:   "",
   },
   {
     en:    "Kuzyk Rostyslav",
@@ -1122,18 +1351,8 @@ const PEOPLE = [
     dispatcher: "",
     city:       "Hradec Králové",
     dovolena:   "", 
-  },
-  {
-    en:    "Makieiev Oleksandr",
-    ua:    "Макєєв Олександр",
-    viber: "Саша",
-    phone: "+420 79 247 0486",
-    photo: "photos/makieiev_oleksandr.jpg",
-    flag:  "🇺🇦",
-    locker: 99,
-    dispatcher: "Matěj - 1 Hala",
-    city:       "",
-    dovolena:   "", 
+    helma:  "",
+    boty:   "",
   },
   {
     en:    "Martseniuk Iryna",
@@ -1146,6 +1365,8 @@ const PEOPLE = [
     dispatcher: "3 Hala",
     city:       "",
     dovolena:   "", 
+    helma:  "",
+    boty:   "",
   },
   {
     en:    "Miroshnichenko Andrii",
@@ -1158,6 +1379,8 @@ const PEOPLE = [
     dispatcher: "Matěj - 1 Hala",
     city:       "Hradec Králové",
     dovolena:   "", 
+    helma:  "",
+    boty:   "",
   },
   {
     en:    "Chetverykov Nikita",
@@ -1170,6 +1393,8 @@ const PEOPLE = [
     dispatcher: "Matěj - 1 Hala",
     city:       "",
     dovolena:   "", 
+    helma:  "",
+    boty:   "",
   },
   {
     en:    "Nosov Dmytro",
@@ -1182,6 +1407,8 @@ const PEOPLE = [
     dispatcher: "Matěj - 1 Hala",
     city:       "Hradec Králové",
     dovolena:   "", 
+    helma:  "",
+    boty:   "",
 	},
     {
     en:    "Orel Illia",
@@ -1194,6 +1421,8 @@ const PEOPLE = [
     dispatcher: "Kuba - 1 Hala",
     city:       "Hradec Králové - Ubytovna",
     dovolena:   "", 
+    helma:  "",
+    boty:   "",
   },
   {
     en:    "Orel Vladyslav",
@@ -1206,6 +1435,8 @@ const PEOPLE = [
     dispatcher: "Matěj - 1 Hala",
     city:       "Hradec Králové - Ubytovna",
     dovolena:   "", 
+    helma:  "",
+    boty:   "",
   },
   {
     en:    "Orlaniuk Vita",
@@ -1218,6 +1449,8 @@ const PEOPLE = [
     dispatcher: "Michal - 1 Hala",
     city:       "Hradec Králové",
     dovolena:   "", 
+    helma:  "",
+    boty:   "",
   },
   {
     en:    "Pavliuk Vladyslav",
@@ -1230,6 +1463,8 @@ const PEOPLE = [
     dispatcher: "Kuba - 1 Hala",
     city:       "Hradec Králové - Ubytovna",
     dovolena:   "", 
+    helma:  "",
+    boty:   "",
   },
   {
     en:    "Petriv Mykhailo",
@@ -1242,6 +1477,8 @@ const PEOPLE = [
     dispatcher: "Kuba - 1 Hala",
     city:       "Nechanice",
     dovolena:   "", 
+    helma:  "",
+    boty:   "",
   },
   {
     en:    "Poluianov Denys",
@@ -1254,6 +1491,8 @@ const PEOPLE = [
     dispatcher: "Matěj - 1 Hala",
     city:       "Nový Bydžov",
     dovolena:   "", 
+    helma:  "",
+    boty:   "",
   },
   {
     en:    "Ponomarenko Oleh",
@@ -1266,6 +1505,8 @@ const PEOPLE = [
     dispatcher: "Matěj - 1 Hala",
     city:       "Hradec Králové",
     dovolena:   "", 
+    helma:  "",
+    boty:   "",
   },
   {
     en:    "Popovych Stanislav",
@@ -1278,6 +1519,8 @@ const PEOPLE = [
     dispatcher: "Kuba - 1 Hala",
     city:       "",
     dovolena:   "", 
+    helma:  "",
+    boty:   "",
   },
 	{
     en:    "Ruszó Csaba",
@@ -1290,6 +1533,8 @@ const PEOPLE = [
     dispatcher: "Kuba - 1 Hala",
     city:       "Jaroměř",
     dovolena:   "", 
+    helma:  "",
+    boty:   "",
   },
   {
     en:    "Robu Artem",
@@ -1302,6 +1547,8 @@ const PEOPLE = [
     dispatcher: "2 Hala",
     city:       "",
     dovolena:   "", 
+    helma:  "",
+    boty:   "",
   },
   {
     en:    "Siedov Yehor",
@@ -1314,6 +1561,8 @@ const PEOPLE = [
     dispatcher: "Matěj - 1 Hala",
     city:       "",
     dovolena:   "", 
+    helma:  "",
+    boty:   "",
   },
   {
     en:    "Sirenko Vitalii",
@@ -1326,6 +1575,8 @@ const PEOPLE = [
     dispatcher: "Kuba - 1 Hala",
     city:       "",
     dovolena:   "", 
+    helma:  "",
+    boty:   "",
   },
   {
     en:    "Snarskyi Vasyl",
@@ -1338,6 +1589,8 @@ const PEOPLE = [
     dispatcher: "Matěj - 1 Hala",
     city:       "Nový Bydžov",
     dovolena:   "", 
+    helma:  "",
+    boty:   "",
   },
   {
     en:    "Srebniuk Denys",
@@ -1350,6 +1603,8 @@ const PEOPLE = [
     dispatcher: "",
     city:       "",
     dovolena:   "", 
+    helma:  "",
+    boty:   "",
   },
   {
     en:    "Stateczny Adam Wojciech",
@@ -1362,6 +1617,8 @@ const PEOPLE = [
     dispatcher: "",
     city:       "Hradec Králové",
     dovolena:   "", 
+    helma:  "",
+    boty:   "",
   },
   {
     en:    "Stefanov Stefan Hristov",
@@ -1374,6 +1631,8 @@ const PEOPLE = [
     dispatcher: "3 Hala",
     city:       "Pardubice",
     dovolena:   "", 
+    helma:  "",
+    boty:   "",
   },
   {
     en:    "Stetsiuk Oleh - DPČ",
@@ -1386,6 +1645,8 @@ const PEOPLE = [
     dispatcher: "",
     city:       "",
     dovolena:   "", 
+    helma:  "",
+    boty:   "",
   },
   {
     en:    "Stoliar Yevhenii",
@@ -1398,6 +1659,8 @@ const PEOPLE = [
     dispatcher: "Matěj - 1 Hala",
     city:       "",
     dovolena:   "", 
+    helma:  "",
+    boty:   "",
   },
   {
     en:    "Sviatokha Valentyn",
@@ -1410,6 +1673,22 @@ const PEOPLE = [
     dispatcher: "",
     city:       "",
     dovolena:   "", 
+    helma:  "",
+    boty:   "",
+  },
+  {
+    en:    "Šanderová Kristyna",
+    ua:    "Шандерова Крістіна",
+    viber: "Kristýnka",
+    phone: "+420 60 701 2823",
+    photo: "photos/sanderova_kristyna.jpg",
+    flag:  "🇨🇿",
+    locker: 40,
+    dispatcher: "",
+    city:       "",
+    dovolena:   "", 
+    helma:  "",
+    boty:   "",
   },
   {
     en:    "Tsybulko Nataliia",
@@ -1422,6 +1701,8 @@ const PEOPLE = [
     dispatcher: "Michal - 1 Hala",
     city:       "",
     dovolena:   "", 
+    helma:  "",
+    boty:   "",
   },
   	{
     en:    "Tymofeyev Serhiy",
@@ -1434,6 +1715,8 @@ const PEOPLE = [
     dispatcher: "Michal - 2 Hala",
     city:       "Pardubice",
     dovolena:   "", 
+    helma:  "",
+    boty:   "",
   },
   {
     en:    "Vagner Michal",
@@ -1446,6 +1729,8 @@ const PEOPLE = [
     dispatcher: "Michal - 1 Hala",
     city:       "",
     dovolena:   "", 
+    helma:  "",
+    boty:   "",
   },
   {
     en:    "Vraštil Petr",
@@ -1458,6 +1743,8 @@ const PEOPLE = [
     dispatcher: "Matěj - 1 Hala",
     city:       "",
     dovolena:   "", 
+    helma:  "",
+    boty:   "",
   },
   {
     en:    "Zaňková Markéta",
@@ -1470,6 +1757,8 @@ const PEOPLE = [
     dispatcher: "3 Hala",
     city:       "",
     dovolena:   "", 
+    helma:  "",
+    boty:   "",
   },
   {
     en:    "Zarovnenko Oleksandr",
@@ -1482,6 +1771,8 @@ const PEOPLE = [
     dispatcher: "Kuba - 1 Hala",
     city:       "",
     dovolena:   "", 
+    helma:  "",
+    boty:   "",
   },
   {
     en:    "Zieniewicz Arkadiusz Sebastian",
@@ -1494,6 +1785,8 @@ const PEOPLE = [
     dispatcher: "",
     city:       "",
     dovolena:   "", 
+    helma:  "",
+    boty:   "",
   },
 
 ];
@@ -1645,7 +1938,8 @@ function createCard(person, listType) {
     btn17.classList.toggle('checked-17');
     div.classList.add('card-removing');
     const savedScroll = window.scrollY;
-    setTimeout(() => toggleList(person.en, '17', savedScroll), 360);
+    const capturedName = person.en; // capture at click time
+    setTimeout(() => toggleList(capturedName, '17', savedScroll), 310);
   });
 
   // Галочка "19:00"
@@ -1657,7 +1951,8 @@ function createCard(person, listType) {
     btn19.classList.toggle('checked-19');
     div.classList.add('card-removing');
     const savedScroll = window.scrollY;
-    setTimeout(() => toggleList(person.en, '19', savedScroll), 360);
+    const capturedName = person.en; // capture at click time
+    setTimeout(() => toggleList(capturedName, '19', savedScroll), 310);
   });
 
   rightCol.appendChild(btn17);
@@ -1753,6 +2048,27 @@ function openLightbox(person) {
   setLb('lb-locker',     locker,            'lb-locker-row');
   setLb('lb-dispatcher', person.dispatcher, 'lb-dispatcher-row');
   setLb('lb-city',       person.city,       'lb-city-row');
+
+  // Helma / Boty / Vesta — дати видачі (завжди показуємо)
+  const setLbEquip = (id, val) => {
+    const el  = document.getElementById(id);
+    if (!el) return;
+    const row = el.closest('.lb-row');
+    if (val) {
+      el.textContent = val;
+      el.className = 'lb-value';
+    } else {
+      el.textContent = '—';
+      el.className = 'lb-value muted';
+    }
+    if (row) row.style.display = 'flex';
+  };
+  setLbEquip('lb-helma', person.helma || '');
+  setLbEquip('lb-boty',  person.boty  || '');
+  setLbEquip('lb-vesta', person.vesta || '');
+  // Роздільник — завжди показуємо
+  const equipDivider = document.getElementById('lb-equip-divider');
+  if (equipDivider) equipDivider.style.display = '';
 
   const dovRow = document.getElementById('lb-dovolena-row');
   const dovEl  = document.getElementById('lb-dovolena');
@@ -2033,12 +2349,8 @@ function applyRemoteData(data) {
   if (!data) return;
 
   // ── КРОК 1: editedNames ПЕРШИМИ — до будь-якої фільтрації ───
-  // КРИТИЧНО: в set17/set19 зберігаються відредаговані імена
-  // ('Goran Oleg 1'), тому спочатку оновлюємо p.en в PEOPLE,
-  // а вже потім перевіряємо чи є ці імена в validNames
   if (data.editedNames && typeof data.editedNames === 'object') {
     editedNames = data.editedNames;
-    // Прибираємо незмінені записи (orig === new)
     Object.keys(editedNames).forEach(k => {
       if (editedNames[k] === k) delete editedNames[k];
     });
@@ -2048,12 +2360,21 @@ function applyRemoteData(data) {
     });
   }
 
-  // ── КРОК 2: validNames — тепер враховує відредаговані імена ─
-  const validNames = new Set(PEOPLE.flatMap(p => [p.en, p._origEn].filter(Boolean)));
-  if (Array.isArray(data.set17)) set17 = data.set17.filter(n => validNames.has(n));
-  if (Array.isArray(data.set19)) set19 = data.set19.filter(n => validNames.has(n));
+  // ── КРОК 2: validNames — включає імена з PEOPLE + поточні set17/set19
+  // як fallback щоб ніхто не випав через timing редагування імен
+  const validNames = new Set([
+    ...PEOPLE.flatMap(p => [p.en, p._origEn].filter(Boolean)),
+    ...set17, ...set19  // захист від race condition
+  ]);
 
-  // ── КРОК 3: dovolena — точкове оновлення ────────────────────
+  // Якщо зараз іде локальний запис — не перезаписуємо sets з Firebase,
+  // щоб не затерти щойно зроблений клік
+  if (!isSyncing) {
+    if (Array.isArray(data.set17)) set17 = data.set17.filter(n => validNames.has(n));
+    if (Array.isArray(data.set19)) set19 = data.set19.filter(n => validNames.has(n));
+  }
+
+  // ── КРОК 3: dovolena ────────────────────────────────────────
   if (data.dovolenaData && typeof data.dovolenaData === 'object') {
     const fbKeys = new Set(Object.keys(data.dovolenaData));
     PEOPLE.forEach(p => {
@@ -2076,6 +2397,8 @@ function collectDovolenaData() {
 }
 
 // ── Запис у Firebase ─────────────────────────────────────────
+let isSyncing = false;
+
 async function syncToFirebase() {
   if (!fbReady) return;  // захист: не пишемо до завантаження
 
@@ -2086,6 +2409,7 @@ async function syncToFirebase() {
     return;
   }
 
+  isSyncing = true;
   setBtnState('saving');
   const dovolenaData = {};
   PEOPLE.forEach(p => {
@@ -2093,23 +2417,41 @@ async function syncToFirebase() {
     if (p.dovolena) dovolenaData[key] = p.dovolena;
   });
 
+  // Знімаємо знімок списків у момент запису
+  const snapshot17 = [...set17];
+  const snapshot19 = [...set19];
+  const writeTs = Date.now();
+
   try {
-    // update() — не перезаписує всю базу, безпечно при одночасній роботі
-    await dbRef.update({ set17, set19, editedNames, dovolenaData, ts: Date.now() });
+    await dbRef.update({ set17: snapshot17, set19: snapshot19, editedNames, dovolenaData, ts: writeTs });
+    lastWrittenTs = writeTs;
     setBtnState('ok');
   } catch (err) {
     console.error('Firebase error:', err);
     setBtnState('error', () => syncToFirebase());
-	showSyncToast(navigator.onLine ? '❌ Chyba. Klikněte znovu na Save.' : '📵 Bez internetu.', 'error');
+    showSyncToast(navigator.onLine ? '❌ Chyba. Klikněte znovu na Save.' : '📵 Bez internetu.', 'error');
+  } finally {
+    isSyncing = false;
   }
 }
 
 // ── Realtime слухач ───────────────────────────────────────────
 let fbReady = false;
+let lastWrittenTs = 0;
+
 dbRef.on('value', (snapshot) => {
   const data = snapshot.val();
   fbReady = true;
-  if (data) applyRemoteData(data);
+  if (!data) return;
+
+  // Якщо це відлуння нашого ж запису — пропускаємо sets, але dovolena/editedNames оновлюємо
+  const isOwnEcho = data.ts && data.ts === lastWrittenTs;
+  if (isOwnEcho) {
+    // тільки dovolena і editedNames, sets не чіпаємо
+    applyRemoteData({ ...data, set17: set17, set19: set19 });
+  } else {
+    applyRemoteData(data);
+  }
 });
 
 // ── Перевизначаємо saveData ───────────────────────────────────
@@ -2169,6 +2511,111 @@ window.addEventListener('offline', () => showSyncToast('📵 Internet odpojen. Z
 
 // pagehide/beforeunload прибрано — вони затирали дані
 // при закритті сторінки до завантаження Firebase
+
+// ══════════════════════════════════════════════════════════════
+// ╔══════════════════════════════════════════════════════════════╗
+// ║              SKLADOVÉ ZÁSOBY — редагуй тут                  ║
+// ╠══════════════════════════════════════════════════════════════╣
+// ║  Přilba / Vesta  →  змінюй тільки число після "count:"      ║
+// ║  Boty            →  пиши тільки розміри що є в наявності,   ║
+// ║                     решту просто не включай або став 0       ║
+// ╚══════════════════════════════════════════════════════════════╝
+
+const STOCK_DATA = {
+
+  // ┌─────────────────────────────────────────────────────────┐
+  // │  NOVÉ (нові)                                            │
+  // └─────────────────────────────────────────────────────────┘
+
+  helma: {
+    count: 5,                // ← Přilba (Helma) — кількість штук
+  },
+
+  vesta: {
+    count: 0,                // ← Reflexní vesta — кількість штук
+  },
+
+  boty: {
+    sizes: {                 // ← Pracovní obuv — розмір: кількість
+    //  розмір  кількість
+      "40":     2,
+      "41":     1,
+      "42":     3,
+      "43":     2,
+      "44":     1,
+    // "45":    0,           // ← розміри з 0 можна просто не писати
+    },
+  },
+
+  // ┌─────────────────────────────────────────────────────────┐
+  // │  POUŽITÉ (б/у)                                          │
+  // └─────────────────────────────────────────────────────────┘
+
+  helmaUsed: {
+    count: 0,                // ← Přilba б/у — кількість штук
+  },
+
+  vestaUsed: {
+    count: 0,                // ← Reflexní vesta б/у — кількість штук
+  },
+
+  botyUsed: {
+    sizes: {                 // ← Pracovní obuv б/у — розмір: кількість
+    //  розмір  кількість
+      "40":     2,
+      "41":     1,
+      "42":     3,
+      "43":     2,
+      "44":     1,
+    },
+  },
+
+};
+
+function openStockModal() {
+  // helper: рендер розмірів boty (підтримує розріджені об'єкти — нулі не обов'язкові)
+  function renderSizes(sizes, detailEl, countEl, accentColor) {
+    const entries = Object.entries(sizes || {})
+      .filter(([, v]) => Number(v) > 0)
+      .sort(([a], [b]) => Number(a) - Number(b));
+    const total = entries.reduce((s, [, v]) => s + Number(v), 0);
+    countEl.textContent = total;
+    detailEl.innerHTML = entries.length
+      ? entries.map(([size, qty]) =>
+          `<div style="display:flex;justify-content:space-between;">` +
+          `<span>Velikost <span style="color:var(--text)">${size}</span></span>` +
+          `<span style="color:${accentColor};font-weight:600">${qty} ks</span></div>`
+        ).join('')
+      : `<div style="color:var(--text-muted)">Žádné velikosti skladem</div>`;
+  }
+
+  // ── Nové ──
+  document.getElementById('stock-helma-count').textContent = STOCK_DATA.helma.count + ' ks';
+  document.getElementById('stock-vesta-count').textContent = STOCK_DATA.vesta.count + ' ks';
+  renderSizes(
+    STOCK_DATA.boty.sizes,
+    document.getElementById('stock-boty-detail'),
+    document.getElementById('stock-boty-count'),
+    'var(--accent)'
+  );
+
+  // ── Použité ──
+  document.getElementById('stock-helma-used-count').textContent = STOCK_DATA.helmaUsed.count + ' ks';
+  document.getElementById('stock-vesta-used-count').textContent = STOCK_DATA.vestaUsed.count + ' ks';
+  renderSizes(
+    STOCK_DATA.botyUsed.sizes,
+    document.getElementById('stock-boty-used-detail'),
+    document.getElementById('stock-boty-used-count'),
+    'var(--text-dim)'
+  );
+
+  document.getElementById('stock-modal').classList.add('active');
+}
+
+function closeStockModal() {
+  document.getElementById('stock-modal').classList.remove('active');
+}
+
 </script>
 </body>
 </html>
