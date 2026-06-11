@@ -1075,7 +1075,7 @@
     <!-- Helma nová -->
     <div class="stock-item" style="padding:10px 14px;">
       <div style="display:flex;align-items:center;justify-content:space-between;">
-        <div class="stock-item-name" style="margin-bottom:0">⛑ Přilba (Helma)</div>
+        <div class="stock-item-name" style="margin-bottom:0">⛑ Helma</div>
         <span id="stock-helma-count" style="font-family:JetBrains Mono,monospace;font-size:13px;font-weight:600;color:var(--accent);">5 ks</span>
       </div>
     </div>
@@ -1083,7 +1083,7 @@
     <!-- Vesta nová -->
     <div class="stock-item" style="padding:10px 14px;">
       <div style="display:flex;align-items:center;justify-content:space-between;">
-        <div class="stock-item-name" style="margin-bottom:0">🦺 Reflexní vesta (Vesta)</div>
+        <div class="stock-item-name" style="margin-bottom:0">🦺 Reflexní Vesta</div>
         <span id="stock-vesta-count" style="font-family:JetBrains Mono,monospace;font-size:13px;font-weight:600;color:var(--accent);">0 ks</span>
       </div>
     </div>
@@ -1091,7 +1091,7 @@
     <!-- Boty nová -->
     <div class="stock-item">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-        <div class="stock-item-name" style="margin-bottom:0">👟 Pracovní obuv (Boty)</div>
+        <div class="stock-item-name" style="margin-bottom:0">👟 Pracovní Boty</div>
         <span style="font-family:JetBrains Mono,monospace;font-size:11px;color:var(--text-muted);">Celkem: <span id="stock-boty-count" style="color:var(--accent);font-weight:600;">0</span> ks</span>
       </div>
       <div style="height:1px;background:var(--border);margin:8px 0;"></div>
@@ -1104,7 +1104,7 @@
     <!-- Helma použitá -->
     <div class="stock-item" style="padding:10px 14px;">
       <div style="display:flex;align-items:center;justify-content:space-between;">
-        <div class="stock-item-name" style="margin-bottom:0;color:var(--text-dim);">⛑ Přilba (Helma)</div>
+        <div class="stock-item-name" style="margin-bottom:0;color:var(--text-dim);">⛑ Helma</div>
         <span id="stock-helma-used-count" style="font-family:JetBrains Mono,monospace;font-size:13px;font-weight:600;color:var(--text-dim);">0 ks</span>
       </div>
     </div>
@@ -1112,7 +1112,7 @@
     <!-- Vesta použitá -->
     <div class="stock-item" style="padding:10px 14px;">
       <div style="display:flex;align-items:center;justify-content:space-between;">
-        <div class="stock-item-name" style="margin-bottom:0;color:var(--text-dim);">🦺 Reflexní vesta (Vesta)</div>
+        <div class="stock-item-name" style="margin-bottom:0;color:var(--text-dim);">🦺 Reflexní Vesta</div>
         <span id="stock-vesta-used-count" style="font-family:JetBrains Mono,monospace;font-size:13px;font-weight:600;color:var(--text-dim);">0 ks</span>
       </div>
     </div>
@@ -1120,14 +1120,14 @@
     <!-- Boty použité -->
     <div class="stock-item">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-        <div class="stock-item-name" style="margin-bottom:0;color:var(--text-dim);">👟 Pracovní obuv (Boty)</div>
+        <div class="stock-item-name" style="margin-bottom:0;color:var(--text-dim);">👟 Pracovní Boty</div>
         <span style="font-family:JetBrains Mono,monospace;font-size:11px;color:var(--text-muted);">Celkem: <span id="stock-boty-used-count" style="color:var(--text-dim);font-weight:600;">0</span> ks</span>
       </div>
       <div style="height:1px;background:var(--border);margin:8px 0;"></div>
       <div id="stock-boty-used-detail" style="font-family:JetBrains Mono,monospace;font-size:11px;color:var(--text-dim);line-height:1.7;"></div>
     </div>
 
-    <div style="font-family:JetBrains Mono,monospace;font-size:9px;color:var(--text-muted);text-align:center;letter-spacing:.05em;margin-top:10px;">Upravte hodnoty přímo v kódu · STOCK_DATA</div>
+    <div style="font-family:JetBrains Mono,monospace;font-size:9px;color:var(--text-muted);text-align:center;letter-spacing:.05em;margin-top:10px;"> </div>
   </div>
 </div>
 
@@ -1391,7 +1391,7 @@ const PEOPLE = [
     flag:  "🇺🇦",
     locker: 101,
     dispatcher: "Matěj - 1 Hala",
-    city:       "",
+    city:       "Lukavec u Hořic",
     dovolena:   "", 
     helma:  "",
     boty:   "",
@@ -1513,7 +1513,7 @@ const PEOPLE = [
     ua:    "Пономаренко Нікіта",
     viber: "Пономаренко Нікіта",
     phone: "+380 95 607 1494",
-    photo: "photos/ponomarenko_nikita.jpg",
+    photo: "photos/ponomarenko_nikita.png",
     flag:  "🇺🇦",
     locker: 111,
     dispatcher: "Kuba - 1 Hala",
@@ -2528,7 +2528,7 @@ const STOCK_DATA = {
   // └─────────────────────────────────────────────────────────┘
 
   helma: {
-    count: 5,                // ← Přilba (Helma) — кількість штук
+    count: 5,                // ← Helma — кількість штук
   },
 
   vesta: {
@@ -2536,7 +2536,7 @@ const STOCK_DATA = {
   },
 
   boty: {
-    sizes: {                 // ← Pracovní obuv — розмір: кількість
+    sizes: {                 // ← Pracovní Boty — розмір: кількість
     //  розмір  кількість
       "40":     1,
       "41":     1,
@@ -2552,7 +2552,7 @@ const STOCK_DATA = {
   // └─────────────────────────────────────────────────────────┘
 
   helmaUsed: {
-    count: 1,                // ← Přilba б/у — кількість штук
+    count: 1,                // ← Helma б/у — кількість штук
   },
 
   vestaUsed: {
@@ -2560,11 +2560,8 @@ const STOCK_DATA = {
   },
 
   botyUsed: {
-    sizes: {                 // ← Pracovní obuv б/у — розмір: кількість
+    sizes: {                 // ← Pracovní Boty б/у — розмір: кількість
     //  розмір  кількість
-      "40":     1,
-      "41":     1,
-      "43":     1,
       "44":     1,
     },
   },
