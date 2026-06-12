@@ -935,7 +935,7 @@
   <span class="logo" id="logo-btn" onclick="openStockModal()" style="cursor:pointer;user-select:none;">Gi Group</span>
   <div class="search-wrap">
     <span class="search-icon">⌕</span>
-    <input type="search" id="search" placeholder="Пошук..." autocomplete="off">
+    <input type="search" id="search" placeholder="Hledání..." autocomplete="off">
   </div>
   <div class="header-counts">
     <span class="hc-item">· <span id="count">0</span></span>
@@ -957,7 +957,7 @@
         <div class="skeleton-item"><div class="skeleton-avatar"></div><div class="skeleton-lines"><div class="skeleton-line w80"></div><div class="skeleton-line w55"></div><div class="skeleton-line w40"></div></div></div>
       </div>
     </div>
-    <div id="no-results">Нікого не знайдено</div>
+    <div id="no-results">Snažil jsem se, ale nikoho jsem nenašel ＼(〇_ｏ)／ Zkuste zadat jiné jméno. </div>
   </div>
 
   <div id="section-17" style="display:none">
@@ -1013,18 +1013,22 @@
       <span class="lb-value" id="lb-dispatcher">—</span>
     </div>
     <div class="lb-divider" id="lb-equip-divider"></div>
-    <div class="lb-row">
-      <span class="lb-label equip">Helma <span style="color:var(--accent);font-weight:600">×1</span></span>
-      <span class="lb-value muted" id="lb-helma">—</span>
-    </div>
-    <div class="lb-row">
-      <span class="lb-label equip">Boty <span style="color:var(--accent);font-weight:600">×1</span></span>
+	    <div class="lb-row">
+      <span class="lb-label equip">Boty</span>
       <span class="lb-value muted" id="lb-boty">—</span>
     </div>
     <div class="lb-row">
-      <span class="lb-label equip">Vesta <span style="color:var(--accent);font-weight:600">×1</span></span>
+      <span class="lb-label equip">Helma</span>
+      <span class="lb-value muted" id="lb-helma">—</span>
+    </div>
+    <div class="lb-row">
+      <span class="lb-label equip">Vesta</span>
       <span class="lb-value muted" id="lb-vesta">—</span>
     </div>
+	<div class="lb-row" id="lb-zamek-row">
+  <span class="lb-label equip">Zámek</span>
+  <span class="lb-value muted" id="lb-zamek">—</span>
+</div>
     <div class="lb-row" id="lb-dovolena-row" style="display:none">
       <span class="lb-label">Dovolená</span>
       <span class="lb-value yellow" id="lb-dovolena">—</span>
@@ -1098,6 +1102,14 @@
       <div id="stock-boty-detail" style="font-family:JetBrains Mono,monospace;font-size:11px;color:var(--text-dim);line-height:1.7;"></div>
     </div>
 
+    <!-- Zámek nový -->
+    <div class="stock-item" style="padding:10px 14px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div class="stock-item-name" style="margin-bottom:0">🔒 Zámek</div>
+        <span id="stock-zamek-count" style="font-family:JetBrains Mono,monospace;font-size:13px;font-weight:600;color:var(--accent);">0 ks</span>
+      </div>
+    </div>
+
     <!-- ── Použité kusy ── -->
     <div style="font-family:'Unbounded',sans-serif;font-size:8px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin:14px 0 7px;text-align:center;">Použité</div>
 
@@ -1140,6 +1152,10 @@
 // ║  viber — нікнейм у Viber                                    ║
 // ║  phone — номер телефону                                     ║
 // ║  photo — шлях до фото (відносно HTML-файлу)                 ║
+// ║  helma — кількість шоломів:  helma: 1   або helma: ""       ║
+// ║  boty  — розмір взуття:      boty: "42" або boty: ""        ║
+// ║  vesta — кількість жилетів:  vesta: 2   або vesta: ""       ║
+// ║  zamek — номер замка:        zamek: "A3" або zamek: ""      ║
 // ╚══════════════════════════════════════════════════════════════╝
 
 const PEOPLE = [
@@ -1155,8 +1171,10 @@ const PEOPLE = [
     dispatcher: "Kuba - 1 Hala",
     city:       "Hradec Králové",
     dovolena:   "",
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: ",
+    zamek:  "",
   },
   {
     en:    "Anosov Oleksandr",
@@ -1169,8 +1187,10 @@ const PEOPLE = [
     dispatcher: "Kuba - 1 Hala",
     city:       "",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: ",
+    zamek:  "",
   },
     {
     en:    "Artem Lutsenko",
@@ -1183,8 +1203,10 @@ const PEOPLE = [
     dispatcher: "3 Hala",
     city:       "Hradec Králové",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: ",
+    zamek:  "",
   },
     {
     en:    "Bokoch Mykhailo",
@@ -1197,8 +1219,10 @@ const PEOPLE = [
     dispatcher: "Kuba - 1 Hala",
     city:       "",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: ",
+    zamek:  "",
   },
   {
     en:    "Chesnokov Pavlo",
@@ -1211,8 +1235,10 @@ const PEOPLE = [
     dispatcher: "",
     city:       "",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: ",
+    zamek:  "",
   },
   {
     en:    "Chonka Ivan",
@@ -1225,8 +1251,10 @@ const PEOPLE = [
     dispatcher: "Matěj - 1 Hala",
     city:       "Hradec Králové",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: ",
+    zamek:  "",
   },
   {
     en:    "Dvornikov Oleksii",
@@ -1239,8 +1267,10 @@ const PEOPLE = [
     dispatcher: "Matěj - 1 Hala",
     city:       "",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: ",
+    zamek:  "",
   },
   {
     en:    "Dziuba Maksym",
@@ -1253,8 +1283,10 @@ const PEOPLE = [
     dispatcher: "Matěj - 1 Hala",
     city:       "Hradec Králové",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: ",
+    zamek:  "",
   },
   {
     en:    "Dzyngel Oleksandr",
@@ -1267,22 +1299,26 @@ const PEOPLE = [
     dispatcher: "3 Hala",
     city:       "Pardubice",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: ",
+    zamek:  "",
   },
   {
     en:    "Furman Tomasz Jan",
     ua:    "Фурман Томаш Ян",
-    viber: "Name",
-    phone: "+380 XX XXX XX XX",
+    viber: "Tomasz Furman",
+    phone: "+486 60 743 011",
     photo: "photos/furman_tomasz_jan.jpg",
     flag:  "🇵🇱",
     locker: 80,
     dispatcher: "",
     city:       "",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: ",
+    zamek:  "",
   },
   {
     en:    "Goran Oleg",
@@ -1295,8 +1331,10 @@ const PEOPLE = [
     dispatcher: "Kuba",
     city:       "",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: 42",
+    zamek:  "1",
   },
   {
     en:    "Kahramanyan Dmytro",
@@ -1309,8 +1347,10 @@ const PEOPLE = [
     dispatcher: "Matěj - 1 Hala",
     city:       "Hradec Králové - Ubytovna",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: ",
+    zamek:  "",
   },
   {
     en:    "Kapatsyna Vladyslav",
@@ -1323,8 +1363,10 @@ const PEOPLE = [
     dispatcher: "Kuba - 1 Hala",
     city:       "",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: ",
+    zamek:  "",
   },
   {
     en:    "Kushnir Ivan",
@@ -1337,8 +1379,10 @@ const PEOPLE = [
     dispatcher: "",
     city:       "",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: ",
+    zamek:  "",
   },
   {
     en:    "Kuzyk Rostyslav",
@@ -1351,8 +1395,10 @@ const PEOPLE = [
     dispatcher: "",
     city:       "Hradec Králové",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: ",
+    zamek:  "",
   },
   {
     en:    "Martseniuk Iryna",
@@ -1365,8 +1411,10 @@ const PEOPLE = [
     dispatcher: "3 Hala",
     city:       "",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: ",
+    zamek:  "",
   },
   {
     en:    "Miroshnichenko Andrii",
@@ -1379,8 +1427,22 @@ const PEOPLE = [
     dispatcher: "Matěj - 1 Hala",
     city:       "Hradec Králové",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: ",
+    zamek:  "",
+  },
+  {
+    en:    "Nahorniuk Oleksandr",
+    ua:    "Нагорнюк Олександр",
+    viber: "Саша",
+    phone: "+420 77 067 1326",
+    photo: "photos/nahorniuk_oleksandr.jpg",
+    flag:  "🇺🇦",
+    locker: 83,
+    dispatcher: "",
+    city:       "Hradec Králové",
+    dovolena:   "", 
   },
   {
     en:    "Chetverykov Nikita",
@@ -1393,8 +1455,10 @@ const PEOPLE = [
     dispatcher: "Matěj - 1 Hala",
     city:       "Lukavec u Hořic",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: ",
+    zamek:  "",
   },
   {
     en:    "Nosov Dmytro",
@@ -1407,10 +1471,12 @@ const PEOPLE = [
     dispatcher: "Matěj - 1 Hala",
     city:       "Hradec Králové",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
-	},
-    {
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: ",
+    zamek:  "",
+  },
+  {
     en:    "Orel Illia",
     ua:    "Орел Ілля",
     viber: "Ilюша",
@@ -1421,8 +1487,10 @@ const PEOPLE = [
     dispatcher: "Kuba - 1 Hala",
     city:       "Hradec Králové - Ubytovna",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: ",
+    zamek:  "",
   },
   {
     en:    "Orel Vladyslav",
@@ -1435,8 +1503,10 @@ const PEOPLE = [
     dispatcher: "Matěj - 1 Hala",
     city:       "Hradec Králové - Ubytovna",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: ",
+    zamek:  "",
   },
   {
     en:    "Orlaniuk Vita",
@@ -1449,8 +1519,10 @@ const PEOPLE = [
     dispatcher: "Michal - 1 Hala",
     city:       "Hradec Králové",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: ",
+    zamek:  "",
   },
   {
     en:    "Pavliuk Vladyslav",
@@ -1463,8 +1535,10 @@ const PEOPLE = [
     dispatcher: "Kuba - 1 Hala",
     city:       "Hradec Králové - Ubytovna",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: ",
+    zamek:  "",
   },
   {
     en:    "Petriv Mykhailo",
@@ -1477,8 +1551,10 @@ const PEOPLE = [
     dispatcher: "Kuba - 1 Hala",
     city:       "Nechanice",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: ",
+    zamek:  "",
   },
     {
     en:    "Poluianov Denys",
@@ -1491,8 +1567,10 @@ const PEOPLE = [
     dispatcher: "Matěj - 1 Hala",
     city:       "Nový Bydžov",
     dovolena:   "", 
-	helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: ",
+    zamek:  "",
   },
   {
     en:    "Ponomarenko Oleh",
@@ -1505,8 +1583,10 @@ const PEOPLE = [
     dispatcher: "Matěj - 1 Hala",
     city:       "Hradec Králové",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: ",
+    zamek:  "",
   },
   {
     en:    "Ponomarenko Nikita",
@@ -1519,8 +1599,10 @@ const PEOPLE = [
     dispatcher: "Kuba - 1 Hala",
     city:       "",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: 43 (8.6.26)",
+    zamek:  "1",
   },
   {
     en:    "Popovych Stanislav",
@@ -1533,8 +1615,10 @@ const PEOPLE = [
     dispatcher: "Kuba - 1 Hala",
     city:       "",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",	
+    boty:   "1x vel: ",
+    zamek:  "",
   },
 	{
     en:    "Ruszó Csaba",
@@ -1547,8 +1631,10 @@ const PEOPLE = [
     dispatcher: "Kuba - 1 Hala",
     city:       "Jaroměř",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: ",
+    zamek:  "",
   },
   {
     en:    "Robu Artem",
@@ -1561,8 +1647,10 @@ const PEOPLE = [
     dispatcher: "2 Hala",
     city:       "",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: ",
+    zamek:  "",
   },
   {
     en:    "Siedov Yehor",
@@ -1575,8 +1663,10 @@ const PEOPLE = [
     dispatcher: "Matěj - 1 Hala",
     city:       "",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: ",
+    zamek:  "",
   },
   {
     en:    "Sirenko Vitalii",
@@ -1589,8 +1679,10 @@ const PEOPLE = [
     dispatcher: "Kuba - 1 Hala",
     city:       "",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: ",
+    zamek:  "",
   },
   {
     en:    "Snarskyi Vasyl",
@@ -1603,8 +1695,10 @@ const PEOPLE = [
     dispatcher: "Matěj - 1 Hala",
     city:       "Nový Bydžov",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: ",
+    zamek:  "",
   },
   {
     en:    "Srebniuk Denys",
@@ -1617,8 +1711,10 @@ const PEOPLE = [
     dispatcher: "",
     city:       "",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: ",
+    zamek:  "",
   },
   {
     en:    "Stateczny Adam Wojciech",
@@ -1631,8 +1727,10 @@ const PEOPLE = [
     dispatcher: "",
     city:       "Hradec Králové",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: ",
+    zamek:  "",
   },
   {
     en:    "Stefanov Stefan Hristov",
@@ -1645,8 +1743,10 @@ const PEOPLE = [
     dispatcher: "3 Hala",
     city:       "Pardubice",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: ",
+    zamek:  "",
   },
   {
     en:    "Stetsiuk Oleh - DPČ",
@@ -1659,8 +1759,10 @@ const PEOPLE = [
     dispatcher: "",
     city:       "",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: ",
+    zamek:  "",
   },
   {
     en:    "Stoliar Yevhenii",
@@ -1673,8 +1775,10 @@ const PEOPLE = [
     dispatcher: "Matěj - 1 Hala",
     city:       "",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: ",
+    zamek:  "",
   },
   {
     en:    "Sviatokha Valentyn",
@@ -1687,8 +1791,10 @@ const PEOPLE = [
     dispatcher: "",
     city:       "",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: ",
+    zamek:  "",
   },
   {
     en:    "Tsybulko Nataliia",
@@ -1701,8 +1807,10 @@ const PEOPLE = [
     dispatcher: "Michal - 1 Hala",
     city:       "",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: ",
+    zamek:  "",
   },
   	{
     en:    "Tymofeyev Serhiy",
@@ -1715,8 +1823,10 @@ const PEOPLE = [
     dispatcher: "Michal - 2 Hala",
     city:       "Pardubice",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: ",
+    zamek:  "",
   },
   {
     en:    "Vagner Michal",
@@ -1729,8 +1839,10 @@ const PEOPLE = [
     dispatcher: "Michal - 1 Hala",
     city:       "",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel:46 | 1x vel:46 (7.4.26)",
+    zamek:  "",
   },
   {
     en:    "Vraštil Petr",
@@ -1743,22 +1855,26 @@ const PEOPLE = [
     dispatcher: "Matěj - 1 Hala",
     city:       "",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: ",
+    zamek:  "",
   },
   {
     en:    "Zaňková Markéta",
     ua:    "Занькова Маркета",
-    viber: "Name",
-    phone: "+380 XX XXX XX XX",
+    viber: "Buldok Dog Dog",
+    phone: "+420 79 249 5097",
     photo: "photos/zankova_marketa.jpg",
     flag:  "🇨🇿",
     locker: [27, 28, 39, 30],
     dispatcher: "3 Hala",
     city:       "",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: ",
+    zamek:  "",
   },
   {
     en:    "Zarovnenko Oleksandr",
@@ -1771,8 +1887,10 @@ const PEOPLE = [
     dispatcher: "Kuba - 1 Hala",
     city:       "",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: ",
+    zamek:  "",
   },
   {
     en:    "Zieniewicz Arkadiusz Sebastian",
@@ -1785,8 +1903,10 @@ const PEOPLE = [
     dispatcher: "",
     city:       "",
     dovolena:   "", 
-    helma:  "",
-    boty:   "",
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: ",
+    zamek:  "",
   },
 
 ];
@@ -2049,23 +2169,36 @@ function openLightbox(person) {
   setLb('lb-dispatcher', person.dispatcher, 'lb-dispatcher-row');
   setLb('lb-city',       person.city,       'lb-city-row');
 
-  // Helma / Boty / Vesta — дати видачі (завжди показуємо)
-  const setLbEquip = (id, val) => {
+  // Helma / Boty / Vesta / Zámek — видача (завжди показуємо)
+    const setLbEquip = (id, val) => {
     const el  = document.getElementById(id);
     if (!el) return;
     const row = el.closest('.lb-row');
-    if (val) {
+    if (val !== '' && val !== null && val !== undefined) {
       el.textContent = val;
       el.className = 'lb-value';
+      if (row) row.style.display = 'flex';
     } else {
-      el.textContent = '—';
-      el.className = 'lb-value muted';
+      if (row) row.style.display = 'none';
     }
-    if (row) row.style.display = 'flex';
   };
-  setLbEquip('lb-helma', person.helma || '');
-  setLbEquip('lb-boty',  person.boty  || '');
-  setLbEquip('lb-vesta', person.vesta || '');
+
+  // helma — кількість (число: "×2", або рядок як є)
+  const helmaVal = person.helma !== '' && person.helma !== null && person.helma !== undefined
+    ? (typeof person.helma === 'number' ? '×' + person.helma : person.helma) : '';
+  // boty — розмір (рядок)
+  const botyVal = person.boty !== '' && person.boty !== null && person.boty !== undefined ? person.boty : '';
+  // vesta — кількість (число: "×2", або рядок як є)
+  const vestaVal = person.vesta !== '' && person.vesta !== null && person.vesta !== undefined
+    ? (typeof person.vesta === 'number' ? '×' + person.vesta : person.vesta) : '';
+  // zamek — номер замка
+  const zamekVal = person.zamek !== '' && person.zamek !== null && person.zamek !== undefined ? person.zamek : '';
+
+  // zamek — не показуємо в lightbox (він у Skladové zásoby)
+  setLbEquip('lb-helma', helmaVal);
+  setLbEquip('lb-boty',  botyVal);
+  setLbEquip('lb-vesta', vestaVal);
+  setLbEquip('lb-zamek', zamekVal);
   // Роздільник — завжди показуємо
   const equipDivider = document.getElementById('lb-equip-divider');
   if (equipDivider) equipDivider.style.display = '';
@@ -2528,23 +2661,24 @@ const STOCK_DATA = {
   // └─────────────────────────────────────────────────────────┘
 
   helma: {
-    count: 5,                // ← Helma — кількість штук
+    count: 2,                // ← Helma — кількість штук
   },
 
   vesta: {
-    count: 5,                // ← Reflexní vesta — кількість штук
+    count: 6,                // ← Reflexní vesta — кількість штук
   },
 
   boty: {
     sizes: {                 // ← Pracovní Boty — розмір: кількість
     //  розмір  кількість
-      "40":     1,
-      "41":     1,
-      "42":     1,
-      "43":     1,
-      "44":     1,
+      "42":     2,
+      "43":     2,
     // "45":    0,           // ← розміри з 0 можна просто не писати
     },
+  },
+
+  zamek: {
+    count: 4,                // ← Zámek — кількість штук
   },
 
   // ┌─────────────────────────────────────────────────────────┐
@@ -2588,6 +2722,7 @@ function openStockModal() {
   // ── Nové ──
   document.getElementById('stock-helma-count').textContent = STOCK_DATA.helma.count + ' ks';
   document.getElementById('stock-vesta-count').textContent = STOCK_DATA.vesta.count + ' ks';
+  document.getElementById('stock-zamek-count').textContent = STOCK_DATA.zamek.count + ' ks';
   renderSizes(
     STOCK_DATA.boty.sizes,
     document.getElementById('stock-boty-detail'),
