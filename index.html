@@ -384,6 +384,30 @@
   }
   .lb-value.yellow { color: #f59e0b; }
   .lb-value.phone  { color: var(--accent); font-size: 12px; }
+  .lb-nastup-smlouva-half {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+  }
+  .lb-nastup-smlouva-half .lb-label {
+    font-size: 9px;
+  }
+  .lb-nastup-smlouva-half .lb-value {
+    font-size: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .lb-nastup-smlouva-sep {
+    color: var(--text-muted);
+    font-size: 11px;
+    flex-shrink: 0;
+  }
+  #lb-nastup-smlouva-row {
+    justify-content: space-between;
+    gap: 8px;
+  }
   /* Мітки для обладнання — трохи менший шрифт */
   .lb-label.equip  { font-size: 9px; }
   /* Старий .lightbox-name — залишаємо порожнім для сумісності */
@@ -925,6 +949,86 @@
   /* Firefox */
   * { scrollbar-width: thin; scrollbar-color: var(--accent) transparent; }
 
+  /* ── Stock edit button + edit modal ── */
+  .stock-section-head {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 7px;
+  }
+  .stock-edit-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-muted);
+    font-size: 10px;
+    padding: 1px 6px;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    transition: color .15s, border-color .15s;
+  }
+  .stock-edit-btn:hover, .stock-edit-btn:active { color: var(--accent); border-color: var(--accent); }
+
+  .stock-edit-box { max-width: 320px; }
+  .stock-edit-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .stock-edit-row label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    flex-shrink: 0;
+  }
+  .stock-edit-row input[type="number"] {
+    width: 80px;
+    margin-bottom: 0;
+    text-align: center;
+  }
+  .stock-boty-edit-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .stock-boty-edit-row input[type="text"],
+  .stock-boty-edit-row input[type="number"] {
+    margin-bottom: 0;
+  }
+  .stock-boty-edit-row input.boty-size-input { width: 70px; text-align: center; }
+  .stock-boty-edit-row input.boty-qty-input { width: 70px; text-align: center; }
+  .stock-boty-remove-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-muted);
+    font-size: 12px;
+    padding: 6px 9px;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    flex-shrink: 0;
+  }
+  .stock-boty-remove-btn:hover { color: #ef4444; border-color: #ef4444; }
+  .stock-boty-add-btn {
+    display: block;
+    width: 100%;
+    margin: 4px 0 14px;
+    padding: 8px;
+    background: var(--surface2);
+    border: 1px dashed var(--border);
+    border-radius: 6px;
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    cursor: pointer;
+    text-align: center;
+  }
+  .stock-boty-add-btn:hover { border-color: var(--accent); color: var(--accent); }
+
 </style>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -1012,6 +1116,17 @@
       <span class="lb-label">Dispečer</span>
       <span class="lb-value" id="lb-dispatcher">—</span>
     </div>
+    <div class="lb-row" id="lb-nastup-smlouva-row">
+      <span class="lb-nastup-smlouva-half">
+        <span class="lb-label">Nástup</span>
+        <span class="lb-value" id="lb-nastup">—</span>
+      </span>
+      <span class="lb-nastup-smlouva-sep">|</span>
+      <span class="lb-nastup-smlouva-half" style="justify-content:flex-end;">
+        <span class="lb-label">Smlouva do</span>
+        <span class="lb-value" id="lb-smlouva-do">—</span>
+      </span>
+    </div>
     <div class="lb-divider" id="lb-equip-divider"></div>
 	    <div class="lb-row">
       <span class="lb-label equip">Boty</span>
@@ -1074,7 +1189,10 @@
     </div>
 
     <!-- ── Nové kusy ── -->
-    <div style="font-family:'Unbounded',sans-serif;font-size:8px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:7px;text-align:center;">Nové</div>
+    <div class="stock-section-head">
+      <div style="font-family:'Unbounded',sans-serif;font-size:8px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);text-align:center;">Nové</div>
+      <button class="stock-edit-btn" onclick="openStockEditModal()" title="Upravit kusy">✎ Upravit</button>
+    </div>
 
     <!-- Helma nová -->
     <div class="stock-item" style="padding:10px 14px;">
@@ -1143,6 +1261,35 @@
   </div>
 </div>
 
+<!-- ══ STOCK EDIT MODAL (тільки Nové) ══ -->
+<div class="edit-modal" id="stock-edit-modal">
+  <div class="edit-modal-box stock-edit-box">
+    <div class="edit-modal-title">Upravit skladové zásoby (Nové)</div>
+
+    <div class="stock-edit-row">
+      <label>⛑ Helma (ks)</label>
+      <input type="number" id="stock-edit-helma" min="0" step="1">
+    </div>
+    <div class="stock-edit-row">
+      <label>🦺 Vesta (ks)</label>
+      <input type="number" id="stock-edit-vesta" min="0" step="1">
+    </div>
+    <div class="stock-edit-row">
+      <label>🔒 Zámek (ks)</label>
+      <input type="number" id="stock-edit-zamek" min="0" step="1">
+    </div>
+
+    <div class="edit-modal-section-title">👟 Boty — velikost / počet</div>
+    <div id="stock-edit-boty-list"></div>
+    <div class="stock-boty-add-btn" onclick="addBotySizeRow('', '')">+ Přidat velikost</div>
+
+    <div class="edit-modal-btns">
+      <button onclick="closeStockEditModal()">Cancel</button>
+      <button class="save" onclick="saveStockEdit()">Save</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ╔══════════════════════════════════════════════════════════════╗
 // ║           СПИСОК ЛЮДЕЙ — редагуй тут                       ║
@@ -1171,6 +1318,8 @@ const PEOPLE = [
     dispatcher: "Kuba - 1 Hala",
     city:       "Hradec Králové",
     dovolena:   "",
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
@@ -1187,6 +1336,8 @@ const PEOPLE = [
     dispatcher: "Kuba - 1 Hala",
     city:       "",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
@@ -1203,6 +1354,8 @@ const PEOPLE = [
     dispatcher: "Kuba - 1 Hala",
     city:       "",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
@@ -1219,6 +1372,8 @@ const PEOPLE = [
     dispatcher: "",
     city:       "",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
@@ -1235,6 +1390,8 @@ const PEOPLE = [
     dispatcher: "Matěj - 1 Hala",
     city:       "Hradec Králové",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
@@ -1251,6 +1408,8 @@ const PEOPLE = [
     dispatcher: "Matěj - 1 Hala",
     city:       "",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
@@ -1267,6 +1426,8 @@ const PEOPLE = [
     dispatcher: "Matěj - 1 Hala",
     city:       "Hradec Králové",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
@@ -1283,6 +1444,8 @@ const PEOPLE = [
     dispatcher: "3 Hala",
     city:       "Pardubice",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
@@ -1299,6 +1462,8 @@ const PEOPLE = [
     dispatcher: "",
     city:       "",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
@@ -1315,6 +1480,8 @@ const PEOPLE = [
     dispatcher: "Kuba",
     city:       "",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: 42",
@@ -1331,6 +1498,8 @@ const PEOPLE = [
     dispatcher: "Matěj - 1 Hala",
     city:       "Hradec Králové - Ubytovna",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
@@ -1347,6 +1516,8 @@ const PEOPLE = [
     dispatcher: "Kuba - 1 Hala",
     city:       "",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
@@ -1363,6 +1534,8 @@ const PEOPLE = [
     dispatcher: "",
     city:       "",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
@@ -1379,6 +1552,8 @@ const PEOPLE = [
     dispatcher: "",
     city:       "Hradec Králové",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
@@ -1395,6 +1570,8 @@ const PEOPLE = [
     dispatcher: "3 Hala",
     city:       "Hradec Králové",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
@@ -1411,6 +1588,8 @@ const PEOPLE = [
     dispatcher: "3 Hala",
     city:       "",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
@@ -1427,6 +1606,8 @@ const PEOPLE = [
     dispatcher: "Matěj - 1 Hala",
     city:       "Hradec Králové",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
@@ -1443,6 +1624,8 @@ const PEOPLE = [
     dispatcher: "",
     city:       "Hradec Králové",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
   },
   {
     en:    "Chetverykov Nikita",
@@ -1455,6 +1638,8 @@ const PEOPLE = [
     dispatcher: "Matěj - 1 Hala",
     city:       "Lukavec u Hořic",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
@@ -1471,6 +1656,8 @@ const PEOPLE = [
     dispatcher: "Matěj - 1 Hala",
     city:       "Hradec Králové",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
@@ -1487,6 +1674,8 @@ const PEOPLE = [
     dispatcher: "Kuba - 1 Hala",
     city:       "Hradec Králové - Ubytovna",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
@@ -1503,6 +1692,8 @@ const PEOPLE = [
     dispatcher: "Matěj - 1 Hala",
     city:       "Hradec Králové - Ubytovna",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
@@ -1519,6 +1710,8 @@ const PEOPLE = [
     dispatcher: "Michal - 1 Hala",
     city:       "Hradec Králové",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
@@ -1535,6 +1728,8 @@ const PEOPLE = [
     dispatcher: "Kuba - 1 Hala",
     city:       "Hradec Králové - Ubytovna",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
@@ -1551,6 +1746,8 @@ const PEOPLE = [
     dispatcher: "Kuba - 1 Hala",
     city:       "Nechanice",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
@@ -1567,6 +1764,8 @@ const PEOPLE = [
     dispatcher: "Matěj - 1 Hala",
     city:       "Nový Bydžov",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
@@ -1583,6 +1782,8 @@ const PEOPLE = [
     dispatcher: "Matěj - 1 Hala",
     city:       "Hradec Králové",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
@@ -1599,6 +1800,8 @@ const PEOPLE = [
     dispatcher: "Kuba - 1 Hala",
     city:       "",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: 43 (8.6.26)",
@@ -1615,6 +1818,8 @@ const PEOPLE = [
     dispatcher: "Kuba - 1 Hala",
     city:       "",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",	
     boty:   "1x vel: ",
@@ -1631,6 +1836,8 @@ const PEOPLE = [
     dispatcher: "Kuba - 1 Hala",
     city:       "Jaroměř",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
@@ -1647,6 +1854,8 @@ const PEOPLE = [
     dispatcher: "2 Hala",
     city:       "",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
@@ -1663,6 +1872,8 @@ const PEOPLE = [
     dispatcher: "Matěj - 1 Hala",
     city:       "",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
@@ -1679,6 +1890,8 @@ const PEOPLE = [
     dispatcher: "Kuba - 1 Hala",
     city:       "",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
@@ -1695,6 +1908,8 @@ const PEOPLE = [
     dispatcher: "Matěj - 1 Hala",
     city:       "Nový Bydžov",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
@@ -1711,6 +1926,8 @@ const PEOPLE = [
     dispatcher: "",
     city:       "",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
@@ -1727,6 +1944,8 @@ const PEOPLE = [
     dispatcher: "",
     city:       "Hradec Králové",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
@@ -1743,6 +1962,8 @@ const PEOPLE = [
     dispatcher: "3 Hala",
     city:       "Pardubice",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
@@ -1759,6 +1980,8 @@ const PEOPLE = [
     dispatcher: "",
     city:       "",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
@@ -1775,6 +1998,8 @@ const PEOPLE = [
     dispatcher: "Matěj - 1 Hala",
     city:       "",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
@@ -1791,26 +2016,12 @@ const PEOPLE = [
     dispatcher: "",
     city:       "",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
     zamek:  "",
-  },
-  {
-    en:    "Tabachnyi Artur",
-    ua:    "Табачний Артур",
-    viber: "neme",
-    phone: "+420 XX XXX XX XX",
-    photo: "photos/tabachnyi_artur.jpg",
-    flag:  "🇺🇦",
-    locker: 94,
-    dispatcher: "Matěj - 1 Hala",
-    city:       "",
-    dovolena:   "", 
-    helma:  "1",
-    vesta:  "1",
-    boty:   "1x vel: 44",
-    zamek:  "1",
   },
   {
     en:    "Tsybulko Nataliia",
@@ -1823,26 +2034,30 @@ const PEOPLE = [
     dispatcher: "Michal - 1 Hala",
     city:       "",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
     zamek:  "",
   },
-    {
-    en:    "Tyshchenko Yurii - DPČ",
-    ua:    "Тищенко Юрій",
-    viber: "Юра Тищенко",
-    phone: "+380 95 535 2213",
-    photo: "photos/tyshchenko_yurii.jpg",
+  {
+    en:    "Urski Mykola",
+    ua:    "Урські Микола",
+    viber: "neme",
+    phone: "+420 ",
+    photo: "photos/urski_mykola.jpg",
     flag:  "🇺🇦",
-    locker: 111,
-    dispatcher: "",
-    city:       "",
+    locker: 94,
+    dispatcher: "Matěj - 1 Hala",
+    city:       "Pardubice",
     dovolena:   "", 
-	helma:  "1",
+    nastup:     "",
+    smlouvaDo:  "",
+    helma:  "1",
     vesta:  "1",
-    boty:   "1x vel: ",
-    zamek:  "",
+    boty:   "1x vel: 43",
+    zamek:  "1",
   },
   	{
     en:    "Tymofeyev Serhiy",
@@ -1855,6 +2070,8 @@ const PEOPLE = [
     dispatcher: "Michal - 2 Hala",
     city:       "Pardubice",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
@@ -1871,6 +2088,8 @@ const PEOPLE = [
     dispatcher: "Michal - 1 Hala",
     city:       "",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel:46 | 1x vel:46 (7.4.26)",
@@ -1887,6 +2106,8 @@ const PEOPLE = [
     dispatcher: "Matěj - 1 Hala",
     city:       "",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
@@ -1903,6 +2124,8 @@ const PEOPLE = [
     dispatcher: "3 Hala",
     city:       "",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
@@ -1919,6 +2142,8 @@ const PEOPLE = [
     dispatcher: "Kuba - 1 Hala",
     city:       "",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
@@ -1935,6 +2160,8 @@ const PEOPLE = [
     dispatcher: "",
     city:       "",
     dovolena:   "", 
+    nastup:     "",
+    smlouvaDo:  "",
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
@@ -2198,6 +2425,8 @@ function openLightbox(person) {
 
   const locker = person.locker ? '№ ' + (Array.isArray(person.locker) ? person.locker.join(', ') : person.locker) : '';
   setLb('lb-locker',     locker,            'lb-locker-row');
+  document.getElementById('lb-nastup').textContent = person.nastup || '—';
+  document.getElementById('lb-smlouva-do').textContent = person.smlouvaDo || '—';
   setLb('lb-dispatcher', person.dispatcher, 'lb-dispatcher-row');
   setLb('lb-city',       person.city,       'lb-city-row');
 
@@ -2549,6 +2778,11 @@ function applyRemoteData(data) {
     });
   }
 
+  // ── КРОК 4: stockData (Nové) ──────────────────────────────
+  if (data.stockData && typeof data.stockData === 'object') {
+    applyStockData(data.stockData);
+  }
+
   render(document.getElementById('search').value);
 }
 
@@ -2685,6 +2919,10 @@ window.addEventListener('offline', () => showSyncToast('📵 Internet odpojen. Z
 // ║  Boty            →  пиши тільки розміри що є в наявності,   ║
 // ║                     решту просто не включай або став 0       ║
 // ╚══════════════════════════════════════════════════════════════╝
+// Примітка: ці значення — лише ПОЧАТКОВІ (дефолтні) для розділу "Nové".
+// Реальні поточні значення зберігаються у Firebase (stockData) і
+// редагуються через кнопку "✎ Upravit" у вікні Skladové zásoby.
+// Розділ "Použité" залишається статичним (як і раніше) — без редагування.
 
 const STOCK_DATA = {
 
@@ -2703,7 +2941,7 @@ const STOCK_DATA = {
   boty: {
     sizes: {                 // ← Pracovní Boty — розмір: кількість
       "42":     2,
-      "43":     2,
+      "43":     1,
     },
   },
 
@@ -2732,7 +2970,57 @@ const STOCK_DATA = {
 
 };
 
-function openStockModal() {
+// ── Живий (поточний, редагований) стан розділу "Nové" ────────
+// Початково = дефолти з STOCK_DATA, потім перезаписується даними з Firebase (stockData)
+let stockLive = {
+  helma: STOCK_DATA.helma.count,
+  vesta: STOCK_DATA.vesta.count,
+  zamek: STOCK_DATA.zamek.count,
+  boty:  { ...STOCK_DATA.boty.sizes },
+};
+
+// Застосовуємо stockData, що прийшли з Firebase, до stockLive
+function applyStockData(stockData) {
+  if (typeof stockData.helma === 'number') stockLive.helma = stockData.helma;
+  if (typeof stockData.vesta === 'number') stockLive.vesta = stockData.vesta;
+  if (typeof stockData.zamek === 'number') stockLive.zamek = stockData.zamek;
+  if (stockData.boty && typeof stockData.boty === 'object') {
+    stockLive.boty = { ...stockData.boty };
+  }
+  // Якщо модальне вікно зі складом зараз відкрите — оновлюємо відображення одразу
+  const stockModal = document.getElementById('stock-modal');
+  if (stockModal && stockModal.classList.contains('active')) {
+    renderStockModal();
+  }
+}
+
+// ── Запис stockData (тільки Nové) у Firebase ──────────────────
+async function syncStockToFirebase() {
+  if (!fbReady) return;
+  if (!navigator.onLine) {
+    showSyncToast('📵 Bez internetu. Data nebyla uložena.', 'warn');
+    return;
+  }
+  const writeTs = Date.now();
+  try {
+    await dbRef.update({
+      stockData: {
+        helma: stockLive.helma,
+        vesta: stockLive.vesta,
+        zamek: stockLive.zamek,
+        boty:  stockLive.boty,
+      },
+      ts: writeTs,
+    });
+    lastWrittenTs = writeTs;
+    showSyncToast('✓ Sklad uložen', 'ok');
+  } catch (err) {
+    console.error('Firebase error (stock):', err);
+    showSyncToast(navigator.onLine ? '❌ Chyba uložení skladu.' : '📵 Bez internetu.', 'error');
+  }
+}
+
+function renderStockModal() {
   // helper: рендер розмірів boty (підтримує розріджені об'єкти — нулі не обов'язкові)
   function renderSizes(sizes, detailEl, countEl, accentColor) {
     const entries = Object.entries(sizes || {})
@@ -2749,18 +3037,18 @@ function openStockModal() {
       : `<div style="color:var(--text-muted)">Žádné velikosti skladem</div>`;
   }
 
-  // ── Nové ──
-  document.getElementById('stock-helma-count').textContent = STOCK_DATA.helma.count + ' ks';
-  document.getElementById('stock-vesta-count').textContent = STOCK_DATA.vesta.count + ' ks';
-  document.getElementById('stock-zamek-count').textContent = STOCK_DATA.zamek.count + ' ks';
+  // ── Nové (з stockLive — редагований стан) ──
+  document.getElementById('stock-helma-count').textContent = stockLive.helma + ' ks';
+  document.getElementById('stock-vesta-count').textContent = stockLive.vesta + ' ks';
+  document.getElementById('stock-zamek-count').textContent = stockLive.zamek + ' ks';
   renderSizes(
-    STOCK_DATA.boty.sizes,
+    stockLive.boty,
     document.getElementById('stock-boty-detail'),
     document.getElementById('stock-boty-count'),
     'var(--accent)'
   );
 
-  // ── Použité ──
+  // ── Použité (статичні, як і раніше) ──
   document.getElementById('stock-helma-used-count').textContent = STOCK_DATA.helmaUsed.count + ' ks';
   document.getElementById('stock-vesta-used-count').textContent = STOCK_DATA.vestaUsed.count + ' ks';
   renderSizes(
@@ -2769,13 +3057,80 @@ function openStockModal() {
     document.getElementById('stock-boty-used-count'),
     'var(--text-dim)'
   );
+}
 
+function openStockModal() {
+  renderStockModal();
   document.getElementById('stock-modal').classList.add('active');
 }
 
 function closeStockModal() {
   document.getElementById('stock-modal').classList.remove('active');
 }
+
+// ── STOCK EDIT MODAL (редагування лише "Nové") ────────────────
+function addBotySizeRow(size, qty) {
+  const list = document.getElementById('stock-edit-boty-list');
+  const row = document.createElement('div');
+  row.className = 'stock-boty-edit-row';
+  row.innerHTML = `
+    <input type="text" class="boty-size-input" placeholder="vel." value="${size ?? ''}">
+    <input type="number" class="boty-qty-input" placeholder="ks" min="0" step="1" value="${qty ?? ''}">
+    <button type="button" class="stock-boty-remove-btn" onclick="this.parentElement.remove()">✕</button>
+  `;
+  list.appendChild(row);
+}
+
+function openStockEditModal() {
+  document.getElementById('stock-edit-helma').value = stockLive.helma ?? 0;
+  document.getElementById('stock-edit-vesta').value = stockLive.vesta ?? 0;
+  document.getElementById('stock-edit-zamek').value = stockLive.zamek ?? 0;
+
+  const list = document.getElementById('stock-edit-boty-list');
+  list.innerHTML = '';
+  const entries = Object.entries(stockLive.boty || {}).sort(([a], [b]) => Number(a) - Number(b));
+  if (entries.length === 0) {
+    addBotySizeRow('', '');
+  } else {
+    entries.forEach(([size, qty]) => addBotySizeRow(size, qty));
+  }
+
+  document.getElementById('stock-edit-modal').classList.add('active');
+}
+
+function closeStockEditModal() {
+  document.getElementById('stock-edit-modal').classList.remove('active');
+}
+
+function saveStockEdit() {
+  const helmaVal = parseInt(document.getElementById('stock-edit-helma').value, 10);
+  const vestaVal = parseInt(document.getElementById('stock-edit-vesta').value, 10);
+  const zamekVal = parseInt(document.getElementById('stock-edit-zamek').value, 10);
+
+  stockLive.helma = isNaN(helmaVal) ? 0 : Math.max(0, helmaVal);
+  stockLive.vesta = isNaN(vestaVal) ? 0 : Math.max(0, vestaVal);
+  stockLive.zamek = isNaN(zamekVal) ? 0 : Math.max(0, zamekVal);
+
+  const newBoty = {};
+  document.querySelectorAll('#stock-edit-boty-list .stock-boty-edit-row').forEach(row => {
+    const sizeInput = row.querySelector('.boty-size-input');
+    const qtyInput  = row.querySelector('.boty-qty-input');
+    const size = sizeInput.value.trim();
+    const qty  = parseInt(qtyInput.value, 10);
+    if (size && !isNaN(qty) && qty > 0) {
+      newBoty[size] = qty;
+    }
+  });
+  stockLive.boty = newBoty;
+
+  closeStockEditModal();
+  renderStockModal();
+  syncStockToFirebase();
+}
+
+document.getElementById('stock-edit-modal').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('stock-edit-modal')) closeStockEditModal();
+});
 
 </script>
 </body>
