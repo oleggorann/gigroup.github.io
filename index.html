@@ -2433,8 +2433,14 @@ function openLightbox(person) {
 
   const locker = person.locker ? '№ ' + (Array.isArray(person.locker) ? person.locker.join(', ') : person.locker) : '';
   setLb('lb-locker',     locker,            'lb-locker-row');
+  const nastupSmlouvaRow = document.getElementById('lb-nastup-smlouva-row');
+if (person.nastup || person.smlouvaDo) {
   document.getElementById('lb-nastup').textContent = person.nastup || '—';
   document.getElementById('lb-smlouva-do').textContent = person.smlouvaDo || '—';
+  nastupSmlouvaRow.style.display = 'flex';
+} else {
+  nastupSmlouvaRow.style.display = 'none';
+}
   setLb('lb-dispatcher', person.dispatcher, 'lb-dispatcher-row');
   setLb('lb-city',       person.city,       'lb-city-row');
 
