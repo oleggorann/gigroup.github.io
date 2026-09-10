@@ -1553,7 +1553,7 @@ const PEOPLE = [
     flag:  "🇺🇦",
     locker: 109,
     dispatcher: "",
-    city:       "",
+    city:       "Hradec Králové",
     dovolena:   "", 
 	car:    true, 
     helma:  "1",
@@ -1596,7 +1596,7 @@ const PEOPLE = [
   },
     {
     en:    "Michalovič Matěj",
-    ua:    "Михалович Матей",
+    ua:    "Міхаловіч Матєй",
     viber: "Matěj Michalovič",
     phone: "+420 77 783 4626",
     photo: "photos/michalovic_matej.jpg",
@@ -2373,7 +2373,7 @@ let copyTimer = null;
 function copyToClipboard(text) {
   navigator.clipboard.writeText(text).then(() => {
     const t = document.getElementById('copy-toast');
-    t.textContent = `✓ Скопійовано: ${text}`;
+    t.textContent = `✓ Zkopírováno: ${text}`;
     t.classList.add('show');
     clearTimeout(copyTimer);
     copyTimer = setTimeout(() => t.classList.remove('show'), 2000);
@@ -2388,7 +2388,7 @@ function copyToClipboard(text) {
     document.execCommand('copy');
     document.body.removeChild(ta);
     const t = document.getElementById('copy-toast');
-    t.textContent = `✓ Скопійовано: ${text}`;
+    t.textContent = `✓ Zkopírováno: ${text}`;
     t.classList.add('show');
     clearTimeout(copyTimer);
     copyTimer = setTimeout(() => t.classList.remove('show'), 2000);
