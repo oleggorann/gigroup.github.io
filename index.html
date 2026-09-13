@@ -780,6 +780,34 @@
     opacity: .7;
   }
 
+  /* ── Кнопка очищення списків 17:00 / 19:00 ── */
+  .clear-lists-btn {
+    display: block;
+    width: calc(100% - 24px);
+    margin: 8px 12px 20px;
+    padding: 12px 16px;
+    background: var(--surface2);
+    color: #ef4444;
+    border: 1px solid #ef444440;
+    border-radius: 8px;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-align: center;
+    transition: background .15s, border-color .15s, color .15s;
+  }
+  .clear-lists-btn:hover {
+    background: #ef444418;
+    border-color: #ef4444;
+    color: #ef4444;
+  }
+  .clear-lists-btn:active {
+    opacity: .7;
+  }
+
   /* ── Export toast ── */
   .export-toast {
     position: fixed;
@@ -1093,6 +1121,9 @@
   </div>
   <!-- Кнопка експорту — в самому низу після всіх списків -->
   <button class="export-bottom-btn" onclick="exportToCSV()">↓ Export seznamu</button>
+
+  <!-- Кнопка очищення списків 17:00 / 19:00 -->
+  <button class="clear-lists-btn" onclick="clearLists()">🗑 Vymazat seznamy 17:00 / 19:00</button>
 
 </main>
 
@@ -1922,7 +1953,7 @@ const PEOPLE = [
     dovolena:   "", 
     helma:  "1",
     vesta:  "1",
-    boty:   "1x vel: ",
+    boty:   "1x vel: 42",
     zamek:  "",
   },
   {
@@ -2777,6 +2808,27 @@ function exportToCSV() {
   URL.revokeObjectURL(url);
 
   showExportToast('✓ Exportováno');
+}
+
+// Очищення обох списків (17:00 та 19:00)
+function clearLists() {
+  if (set17.length === 0 && set19.length === 0) {
+    showExportToast('⚠️ Seznamy jsou už prázdné');
+    return;
+  }
+
+  const ok = confirm('Opravdu vymazat seznamy 17:00 a 19:00? Tuto akci nelze vrátit zpět.');
+  if (!ok) return;
+
+  set17 = [];
+  set19 = [];
+
+  render(document.getElementById('search').value);
+
+  clearTimeout(toggleSyncTimer);
+  if (typeof syncToFirebase === 'function') syncToFirebase();
+
+  showExportToast('🗑 Seznamy vymazány');
 }
 
 function showExportToast(msg) {
