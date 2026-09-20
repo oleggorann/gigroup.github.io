@@ -36,6 +36,7 @@
     -webkit-tap-highlight-color: transparent;
   }
 
+  /* HEADER */
   header {
     position: fixed;
     top: 0; left: 0; right: 0;
@@ -58,7 +59,10 @@
     flex-shrink: 0;
   }
 
-  .search-wrap { flex: 1; position: relative; }
+  .search-wrap {
+    flex: 1;
+    position: relative;
+  }
 
   #search {
     width: 100%;
@@ -75,11 +79,12 @@
   #search:focus { border-color: var(--accent); }
   #search::placeholder { color: var(--text-muted); }
 
+  /* ✕ Хрестик очищення пошуку — змінюй font-size щоб збільшити/зменшити */
   #search::-webkit-search-cancel-button {
     -webkit-appearance: none;
     appearance: none;
-    height: 16px;
-    width: 16px;
+    height: 16px;       /* ← РОЗМІР — змінюй це число (px) */
+    width: 16px;        /* ← РОЗМІР — змінюй це число (px) */
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cline x1='2' y1='2' x2='14' y2='14' stroke='%2300c896' stroke-width='2.2' stroke-linecap='round'/%3E%3Cline x1='14' y1='2' x2='2' y2='14' stroke='%2300c896' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E");
     background-size: contain;
     background-repeat: no-repeat;
@@ -87,7 +92,9 @@
     opacity: 0.8;
     transition: opacity .15s;
   }
-  #search::-webkit-search-cancel-button:hover { opacity: 1; }
+  #search::-webkit-search-cancel-button:hover {
+    opacity: 1;
+  }
 
   .search-icon {
     position: absolute;
@@ -113,10 +120,15 @@
     white-space: nowrap;
   }
 
-  .hc-item::before { font-size: 9px; margin-right: 2px; }
+  .hc-item::before {
+    font-size: 9px;
+    margin-right: 2px;
+  }
+
   .hc-item:nth-child(1)::before { content: "Список"; color: var(--text-muted); }
   .hc-item:nth-child(2)::before { content: "17:00"; }
   .hc-item:nth-child(3)::before { content: "19:00"; }
+
   .hc-present { color: var(--accent); }
 
   .btn-save {
@@ -135,26 +147,13 @@
   }
   .btn-save:active { opacity: .7; }
 
-  .btn-add {
-    background: var(--surface2);
-    color: var(--accent);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    font-family: 'Unbounded', sans-serif;
-    font-size: 15px;
-    font-weight: 600;
-    width: 34px;
-    height: 34px;
-    cursor: pointer;
-    flex-shrink: 0;
-    line-height: 1;
-    transition: border-color .15s, opacity .15s;
+  /* MAIN */
+  main {
+    padding-top: calc(var(--header-h) + 8px);
+    padding-bottom: 24px;
   }
-  .btn-add:hover { border-color: var(--accent); }
-  .btn-add:active { opacity: .7; }
 
-  main { padding-top: calc(var(--header-h) + 8px); padding-bottom: 24px; }
-
+  /* SECTION LABEL */
   .section-label {
     font-family: 'Unbounded', sans-serif;
     font-size: 9px;
@@ -174,11 +173,12 @@
   .hc-item:nth-child(1) { color: var(--text-muted); }
   .hc-item:nth-child(1) span { color: var(--accent); }
 
+  /* PERSON CARD */
   .person {
     display: flex;
     align-items: center;
     gap: 11px;
-    padding: 7px 12px;
+    padding: 7px 12px; /* ← ВІДСТУПИ РЯДКА — змінюй тут (верх/низ горизонт) */
     border-bottom: 1px solid var(--border);
     background: var(--surface);
     transition: background .15s;
@@ -193,6 +193,7 @@
   .person:active { background: var(--surface); }
   .person.present-item:active { background: var(--present-bg); }
 
+  /* AVATAR */
   .avatar {
     width: 52px;
     height: 52px;
@@ -223,7 +224,12 @@
     color: var(--accent);
   }
 
-  .info { flex: 1; min-width: 0; line-height: 1.3; }
+  /* INFO */
+  .info {
+    flex: 1;
+    min-width: 0;
+    line-height: 1.3;
+  }
 
   .name-en {
     font-weight: 600;
@@ -245,18 +251,21 @@
     align-items: center;
     gap: 3px;
     flex-shrink: 0;
-    position: relative;
   }
 
-  .avatar-car-badge {
-    position: absolute;
-    bottom: 14px;
-    right: -4px;
-    font-size: 14px;
-    line-height: 1;
-    pointer-events: none;
-    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.8));
-  }
+.avatar-wrap {
+  position: relative;   /* ← додайте цей рядок якщо його немає */
+}
+
+.avatar-car-badge {
+  position: absolute;
+  bottom: 14px;
+  right: -4px;
+  font-size: 14px;
+  line-height: 1;
+  pointer-events: none;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.8));
+}
 
   .flag-below {
     font-size: 8px;
@@ -291,6 +300,7 @@
     min-height: 16px;
   }
 
+  /* LIGHTBOX */
   .lightbox {
     position: fixed;
     inset: 0;
@@ -308,7 +318,10 @@
     transition: opacity .25s ease;
     gap: 12px;
   }
-  .lightbox.active { opacity: 1; pointer-events: all; }
+  .lightbox.active {
+    opacity: 1;
+    pointer-events: all;
+  }
   .lightbox img {
     max-width: 100%;
     max-height: 50vh;
@@ -321,8 +334,10 @@
     flex-shrink: 0;
     margin-top: auto;
   }
-  .lightbox.active img { transform: scale(1); }
-
+  .lightbox.active img {
+    transform: scale(1);
+  }
+  /* Картка з інформацією під фото */
   .lightbox-card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -338,7 +353,9 @@
     transition: transform .28s cubic-bezier(.22,.68,0,1.2);
     margin-bottom: auto;
   }
-  .lightbox.active .lightbox-card { transform: translateY(0); }
+  .lightbox.active .lightbox-card {
+    transform: translateY(0);
+  }
   .lb-name-en {
     font-family: 'Unbounded', sans-serif;
     font-size: 13px;
@@ -352,7 +369,11 @@
     color: var(--text-dim);
     margin-bottom: 4px;
   }
-  .lb-divider { height: 1px; background: var(--border); margin: 2px 0; }
+  .lb-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 2px 0;
+  }
   .lb-row {
     display: flex;
     align-items: center;
@@ -374,7 +395,10 @@
     text-align: right;
     word-break: break-word;
   }
-  .lb-value.muted { color: var(--text-muted); font-weight: 400; }
+  .lb-value.muted {
+    color: var(--text-muted);
+    font-weight: 400;
+  }
   .lb-value.yellow { color: #f59e0b; }
   .lb-value.phone  { color: var(--accent); font-size: 12px; }
   .lb-nastup-smlouva-half {
@@ -383,19 +407,31 @@
     gap: 4px;
     min-width: 0;
   }
-  .lb-nastup-smlouva-half .lb-label { font-size: 9px; }
+  .lb-nastup-smlouva-half .lb-label {
+    font-size: 9px;
+  }
   .lb-nastup-smlouva-half .lb-value {
     font-size: 10px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  .lb-nastup-smlouva-sep { color: var(--text-muted); font-size: 11px; flex-shrink: 0; }
-  #lb-nastup-smlouva-row { justify-content: space-between; gap: 8px; }
+  .lb-nastup-smlouva-sep {
+    color: var(--text-muted);
+    font-size: 11px;
+    flex-shrink: 0;
+  }
+  #lb-nastup-smlouva-row {
+    justify-content: space-between;
+    gap: 8px;
+  }
+  /* Мітки для обладнання — трохи менший шрифт */
   .lb-label.equip  { font-size: 9px; }
+  /* Старий .lightbox-name — залишаємо порожнім для сумісності */
   .lightbox-name { display: none; }
   .lightbox-name-ua { display: none; }
 
+  /* COPY TOAST */
   .copy-toast {
     position: fixed;
     bottom: 20px;
@@ -415,6 +451,7 @@
   }
   .copy-toast.show { transform: translateX(-50%) translateY(0); }
 
+  /* BUTTONS COLUMN */
   .btn-col {
     display: flex;
     flex-direction: column;
@@ -423,6 +460,7 @@
     flex-shrink: 0;
   }
 
+  /* CHECKBOX */
   .check-btn {
     width: 24px;
     height: 24px;
@@ -439,10 +477,22 @@
     user-select: none;
     position: relative;
   }
+
   .check-btn:active { opacity: .7; }
-  .check-btn.checked-present { background: var(--accent); border-color: var(--accent); }
-  .check-btn.checked-17 { background: #f59e0b; border-color: #f59e0b; }
-  .check-btn.checked-19 { background: #8b5cf6; border-color: #8b5cf6; }
+
+  .check-btn.checked-present {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .check-btn.checked-17 {
+    background: #f59e0b;
+    border-color: #f59e0b;
+  }
+  .check-btn.checked-19 {
+    background: #8b5cf6;
+    border-color: #8b5cf6;
+  }
+
   .check-btn svg {
     width: 12px;
     height: 12px;
@@ -455,6 +505,7 @@
   .check-btn.checked-present svg,
   .check-btn.checked-17 svg,
   .check-btn.checked-19 svg { opacity: 1; }
+
   .check-btn .btn-label {
     position: absolute;
     bottom: -9px;
@@ -467,8 +518,14 @@
     pointer-events: none;
   }
 
-  .name-en-wrap { display: flex; align-items: flex-start; gap: 5px; }
+  /* NAME EN WRAP */
+  .name-en-wrap {
+    display: flex;
+    align-items: flex-start;
+    gap: 5px;
+  }
 
+  /* EDIT BUTTON — прихована, появляється при наведенні */
   .edit-btn {
     background: none;
     border: 1px solid var(--border);
@@ -485,12 +542,20 @@
     pointer-events: all;
   }
   .name-en-wrap:hover .edit-btn,
-  .name-en-wrap:focus-within .edit-btn { opacity: 1; pointer-events: all; }
+  .name-en-wrap:focus-within .edit-btn {
+    opacity: 1;
+    pointer-events: all;
+  }
+  /* На мобільних — показуємо при активному стані картки */
   .person:active .edit-btn,
-  .edit-btn-visible { opacity: 1; pointer-events: all; }
+  .edit-btn-visible {
+    opacity: 1;
+    pointer-events: all;
+  }
   .edit-btn:active { color: var(--accent); border-color: var(--accent); }
   #stock-edit-modal { z-index: 800; }
 
+  /* EDIT MODAL */
   .edit-modal {
     position: fixed;
     inset: 0;
@@ -504,7 +569,10 @@
     pointer-events: none;
     transition: opacity .2s;
   }
-  .edit-modal.active { opacity: 1; pointer-events: all; }
+  .edit-modal.active {
+    opacity: 1;
+    pointer-events: all;
+  }
   .edit-modal-box {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -513,6 +581,7 @@
     width: 100%;
     max-width: 340px;
   }
+  /* Інфо-панель у модальному вікні */
   .edit-modal-info {
     background: var(--surface2);
     border: 1px solid var(--border);
@@ -548,8 +617,13 @@
     font-weight: 400;
     font-style: italic;
   }
-  .edit-modal-info-divider { height: 1px; background: var(--border); margin: 2px 0; }
+  .edit-modal-info-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 2px 0;
+  }
 
+  /* Секція під кнопками: інфо + Dovolená */
   .edit-modal-bottom {
     margin-top: 14px;
     border-top: 1px solid var(--border);
@@ -588,39 +662,10 @@
     margin-bottom: 12px;
   }
   .edit-modal input:focus { border-color: var(--accent); }
-  .edit-modal select {
-    width: 100%;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    color: var(--text);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-    padding: 9px 10px;
-    outline: none;
-    margin-bottom: 12px;
-  }
-  .edit-modal select:focus { border-color: var(--accent); }
-  .check-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 12px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-    color: var(--text-dim);
-  }
-  .check-row input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-    accent-color: var(--accent);
-    cursor: pointer;
-  }
   .edit-modal-btns {
     display: flex;
     gap: 8px;
     justify-content: flex-end;
-    flex-wrap: wrap;
   }
   .edit-modal-btns button {
     font-family: 'Unbounded', sans-serif;
@@ -635,10 +680,14 @@
     transition: opacity .15s;
     letter-spacing: .02em;
   }
-  .edit-modal-btns button.save { background: var(--accent); color: #000; font-weight: 600; }
-  .edit-modal-btns button.delete { color: #ef4444; }
+  .edit-modal-btns button.save {
+    background: var(--accent);
+    color: #000;
+    font-weight: 600;
+  }
   .edit-modal-btns button:active { opacity: .7; }
 
+  /* EMPTY STATE */
   .empty-state {
     text-align: center;
     padding: 32px 16px;
@@ -647,6 +696,7 @@
     display: none;
   }
 
+  /* SAVED BADGE */
   .saved-toast {
     position: fixed;
     bottom: 20px;
@@ -675,12 +725,21 @@
 
   #section-17, #section-19 { display: none; }
 
-  .person.item-17 { background: #1a1200; border-bottom-color: #f59e0b30; }
+  .person.item-17 {
+    background: #1a1200;
+    border-bottom-color: #f59e0b30;
+  }
   .person.item-17:active { background: #1a1200; }
-  .person.item-19 { background: #110d1a; border-bottom-color: #8b5cf630; }
+
+  .person.item-19 {
+    background: #110d1a;
+    border-bottom-color: #8b5cf630;
+  }
   .person.item-19:active { background: #110d1a; }
 
-  .btn-col { padding-bottom: 4px; }
+  .btn-col {
+    padding-bottom: 4px;
+  }
 
   @keyframes cardOut {
     0%   { opacity: 1; transform: translateX(0) scaleY(1); max-height: 100px; }
@@ -693,6 +752,7 @@
     pointer-events: none;
   }
 
+  /* ── Кнопка експорту ── */
   .export-bottom-btn {
     display: block;
     width: calc(100% - 24px);
@@ -711,10 +771,16 @@
     text-align: center;
     transition: background .15s, border-color .15s, color .15s;
   }
-  .export-bottom-btn:hover { background: var(--surface); border-color: var(--accent); color: var(--accent); }
-  .export-bottom-btn:active { opacity: .7; }
-  .export-bottom-btn.danger:hover { border-color: #ef4444; color: #ef4444; }
+  .export-bottom-btn:hover {
+    background: var(--surface);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .export-bottom-btn:active {
+    opacity: .7;
+  }
 
+  /* ── Export toast ── */
   .export-toast {
     position: fixed;
     bottom: 20px;
@@ -734,8 +800,12 @@
     opacity: 0;
     white-space: nowrap;
   }
-  .export-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  .export-toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
 
+  /* Sync toast — статус збереження */
   .sync-toast {
     position: fixed;
     bottom: 70px;
@@ -757,6 +827,7 @@
   .sync-toast.error { background: #7f1d1d; color: #fecaca; border: 1px solid #ef4444; }
   .sync-toast.warn  { background: #78350f; color: #fef3c7; border: 1px solid #f59e0b; }
 
+  /* Скелетон завантаження */
   .skeleton-item {
     display: flex; align-items: center; gap: 11px;
     padding: 10px 12px; border-bottom: 1px solid var(--border);
@@ -784,7 +855,7 @@
     background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.04) 50%, transparent 100%);
     animation: shimmer 1.4s infinite;
   }
-
+  /* ── STOCK MODAL (Gi Group logo click) ── */
   .stock-modal {
     position: fixed;
     inset: 0;
@@ -798,7 +869,10 @@
     pointer-events: none;
     transition: opacity .22s ease;
   }
-  .stock-modal.active { opacity: 1; pointer-events: all; }
+  .stock-modal.active {
+    opacity: 1;
+    pointer-events: all;
+  }
   .stock-box {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -809,7 +883,9 @@
     transform: translateY(12px);
     transition: transform .25s cubic-bezier(.22,.68,0,1.2);
   }
-  .stock-modal.active .stock-box { transform: translateY(0); }
+  .stock-modal.active .stock-box {
+    transform: translateY(0);
+  }
   .stock-title {
     font-family: 'Unbounded', sans-serif;
     font-size: 11px;
@@ -841,7 +917,10 @@
     font-size: 12px;
     color: var(--text-muted);
   }
-  .stock-qty span { color: var(--accent); font-weight: 600; }
+  .stock-qty span {
+    color: var(--accent);
+    font-weight: 600;
+  }
   .stock-sizes {
     margin-top: 5px;
     display: flex;
@@ -857,7 +936,10 @@
     font-size: 10px;
     color: var(--text-dim);
   }
-  .stock-size-chip span { color: var(--accent); font-weight: 600; }
+  .stock-size-chip span {
+    color: var(--accent);
+    font-weight: 600;
+  }
   .stock-close {
     display: block;
     width: 100%;
@@ -877,13 +959,15 @@
   }
   .stock-close:hover { border-color: var(--accent); color: var(--accent); }
   .stock-close:active { opacity: .7; }
-
+  /* ── Кастомна полоса прокрутки ── */
   ::-webkit-scrollbar               { width: 4px; }
   ::-webkit-scrollbar-track         { background: transparent; }
   ::-webkit-scrollbar-thumb         { background: var(--accent); border-radius: 4px; }
   ::-webkit-scrollbar-thumb:hover   { background: #00ff8855; }
+  /* Firefox */
   * { scrollbar-width: thin; scrollbar-color: var(--accent) transparent; }
 
+  /* ── Stock edit button + edit modal ── */
   .stock-section-head {
     display: flex;
     align-items: center;
@@ -930,7 +1014,9 @@
     margin-bottom: 8px;
   }
   .stock-boty-edit-row input[type="text"],
-  .stock-boty-edit-row input[type="number"] { margin-bottom: 0; }
+  .stock-boty-edit-row input[type="number"] {
+    margin-bottom: 0;
+  }
   .stock-boty-edit-row input.boty-size-input { width: 70px; text-align: center; }
   .stock-boty-edit-row input.boty-qty-input { width: 70px; text-align: center; }
   .stock-boty-remove-btn {
@@ -968,7 +1054,7 @@
 <body>
 
 <header>
-  <span class="logo" id="logo-btn" onclick="handleLogoClick()" style="cursor:pointer;user-select:none;">Gi Group</span>
+  <span class="logo" id="logo-btn" onclick="openStockModal()" style="cursor:pointer;user-select:none;">Gi Group</span>
   <div class="search-wrap">
     <span class="search-icon">⌕</span>
     <input type="search" id="search" placeholder="Hledání..." autocomplete="off">
@@ -978,7 +1064,6 @@
     <span class="hc-item" style="color:#f59e0b">· <span id="count-17-top">0</span></span>
     <span class="hc-item" style="color:#8b5cf6">· <span id="count-19-top">0</span></span>
   </div>
-  <button class="btn-add" id="btn-add-person" onclick="openAddModal()" title="Přidat osobu" style="display:none">＋</button>
   <button class="btn-save" id="btn-save-main" onclick="saveData()">Save</button>
 </header>
 
@@ -1006,9 +1091,8 @@
     <div class="section-label" style="color:#8b5cf6; border-bottom-color:#8b5cf640">Seznam od 19:00 · <span id="count-19">0</span></div>
     <div id="list-19"></div>
   </div>
-
+  <!-- Кнопка експорту — в самому низу після всіх списків -->
   <button class="export-bottom-btn" onclick="exportToCSV()">↓ Export seznamu</button>
-  <button class="export-bottom-btn danger" onclick="clearLists()">🗑 Vymazat seznamy 17:00 / 19:00</button>
 
 </main>
 
@@ -1019,6 +1103,7 @@
 
 <div class="lightbox" id="lightbox">
   <img id="lightbox-img" src="" alt="">
+  <!-- Картка з інформацією під фото -->
   <div class="lightbox-card" id="lightbox-card">
     <div class="lb-name-en" id="lb-name-en"></div>
     <div class="lb-name-ua" id="lb-name-ua"></div>
@@ -1061,7 +1146,7 @@
       </span>
     </div>
     <div class="lb-divider" id="lb-equip-divider"></div>
-    <div class="lb-row">
+	    <div class="lb-row">
       <span class="lb-label equip">Boty</span>
       <span class="lb-value muted" id="lb-boty">—</span>
     </div>
@@ -1073,15 +1158,16 @@
       <span class="lb-label equip">Vesta</span>
       <span class="lb-value muted" id="lb-vesta">—</span>
     </div>
-    <div class="lb-row" id="lb-zamek-row">
-      <span class="lb-label equip">Zámek</span>
-      <span class="lb-value muted" id="lb-zamek">—</span>
-    </div>
+	<div class="lb-row" id="lb-zamek-row">
+  <span class="lb-label equip">Zámek</span>
+  <span class="lb-value muted" id="lb-zamek">—</span>
+</div>
     <div class="lb-row" id="lb-dovolena-row" style="display:none">
       <span class="lb-label">Dovolená</span>
       <span class="lb-value yellow" id="lb-dovolena">—</span>
     </div>
   </div>
+  <!-- Залишаємо для сумісності -->
   <div class="lightbox-name">
     <span id="lightbox-name-en"></span>
     <span class="lightbox-name-ua" id="lightbox-name-ua"></span>
@@ -1091,19 +1177,20 @@
 <div class="edit-modal" id="edit-modal">
   <div class="edit-modal-box">
 
-    <div class="edit-modal-title" id="edit-modal-title">Upravit osobu</div>
-
+    <!-- Поле вводу імені -->
     <input type="text" id="edit-input" autocomplete="off">
 
+    <!-- Dovolená — одразу під іменем -->
     <div class="edit-modal-section-title" style="margin-bottom:6px">Dovolena</div>
     <input type="text" id="dovolena-input" autocomplete="off" placeholder="DOV">
 
+    <!-- Кнопки -->
     <div class="edit-modal-btns">
-      <button class="delete delete-btn" onclick="askDeletePerson()" style="display:none">Smazat</button>
       <button onclick="closeEditModal()">Cancel</button>
       <button class="save" onclick="saveEditModal()">Save</button>
     </div>
 
+    <!-- Приховані елементи для сумісності з JS (info-locker тощо) -->
     <span id="info-locker" style="display:none"></span>
     <span id="info-dispatcher" style="display:none"></span>
     <span id="info-city" style="display:none"></span>
@@ -1111,42 +1198,7 @@
   </div>
 </div>
 
-<!-- ADD PERSON MODAL -->
-<!-- Спрощена форма: поля Foto, Nástup, Smlouva do та секцію Vybavení
-     (Helma/Vesta/Boty/Zámek) прибрано з цього вікна навмисно —
-     нова людина створюється з цими полями порожніми,
-     заповнити їх можна пізніше через звичайне редагування. -->
-<div class="edit-modal" id="add-modal">
-  <div class="edit-modal-box">
-    <div class="edit-modal-title">Přidat novou osobu</div>
-    <input type="text" id="add-en" placeholder="Jméno a příjmení (EN) *" autocomplete="off">
-    <input type="text" id="add-ua" placeholder="Ім'я та прізвище (UA)" autocomplete="off">
-    <input type="text" id="add-viber" placeholder="Viber" autocomplete="off">
-    <input type="text" id="add-phone" placeholder="Telefon" autocomplete="off">
-    <input type="text" id="add-locker" placeholder="Skříňka č." autocomplete="off">
-    <input type="text" id="add-dispatcher" placeholder="Dispečer" autocomplete="off">
-    <input type="text" id="add-city" placeholder="Město ČR" autocomplete="off">
-    <div class="check-row">
-      <input type="checkbox" id="add-car">
-      <label for="add-car" style="cursor:pointer;">🚗 Auto</label>
-    </div>
-    <select id="add-flag">
-      <option value="🇺🇦">🇺🇦 UA</option>
-      <option value="🇨🇿">🇨🇿 CZ</option>
-      <option value="🇵🇱">🇵🇱 PL</option>
-      <option value="🇸🇰">🇸🇰 SK</option>
-      <option value="🇩🇪">🇩🇪 DE</option>
-      <option value="🇷🇴">🇷🇴 RO</option>
-      <option value="🇭🇺">🇭🇺 HU</option>
-    </select>
-    <div class="edit-modal-btns">
-      <button onclick="closeAddModal()">Cancel</button>
-      <button class="save" onclick="addPersonFromForm()">Save</button>
-    </div>
-  </div>
-</div>
-
-<!-- STOCK MODAL -->
+<!-- ══ STOCK MODAL ══ -->
 <div class="stock-modal" id="stock-modal" onclick="if(event.target===this)closeStockModal()">
   <div class="stock-box" onclick="event.stopPropagation()" style="max-height:88vh;overflow-y:auto;">
     <div style="position:relative;display:flex;align-items:center;justify-content:center;margin-bottom:14px;">
@@ -1154,11 +1206,13 @@
       <button onclick="closeStockModal()" style="position:absolute;right:0;background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer;line-height:1;padding:2px 6px;">✕</button>
     </div>
 
+    <!-- ── Nové kusy ── -->
     <div class="stock-section-head">
       <div style="font-family:'Unbounded',sans-serif;font-size:8px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);text-align:center;">Nové</div>
       <button class="stock-edit-btn" onclick="openStockEditModal()" title="Upravit kusy">✎ Upravit</button>
     </div>
 
+    <!-- Helma nová -->
     <div class="stock-item" style="padding:10px 14px;">
       <div style="display:flex;align-items:center;justify-content:space-between;">
         <div class="stock-item-name" style="margin-bottom:0">⛑ Helma</div>
@@ -1166,13 +1220,15 @@
       </div>
     </div>
 
+    <!-- Vesta nová -->
     <div class="stock-item" style="padding:10px 14px;">
       <div style="display:flex;align-items:center;justify-content:space-between;">
         <div class="stock-item-name" style="margin-bottom:0">🦺 Reflexní Vesta</div>
         <span id="stock-vesta-count" style="font-family:JetBrains Mono,monospace;font-size:13px;font-weight:600;color:var(--accent);">0 ks</span>
       </div>
     </div>
-
+	
+	<!-- Zámek nový -->
     <div class="stock-item" style="padding:10px 14px;">
       <div style="display:flex;align-items:center;justify-content:space-between;">
         <div class="stock-item-name" style="margin-bottom:0">🔒 Zámek</div>
@@ -1180,6 +1236,7 @@
       </div>
     </div>
 
+    <!-- Boty nová -->
     <div class="stock-item">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
         <div class="stock-item-name" style="margin-bottom:0">👟 Pracovní Boty</div>
@@ -1189,8 +1246,10 @@
       <div id="stock-boty-detail" style="font-family:JetBrains Mono,monospace;font-size:11px;color:var(--text-dim);line-height:1.7;"></div>
     </div>
 
+    <!-- ── Použité kusy ── -->
     <div style="font-family:'Unbounded',sans-serif;font-size:8px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin:14px 0 7px;text-align:center;">Použité</div>
 
+    <!-- Helma použitá -->
     <div class="stock-item" style="padding:10px 14px;">
       <div style="display:flex;align-items:center;justify-content:space-between;">
         <div class="stock-item-name" style="margin-bottom:0;color:var(--text-dim);">⛑ Helma</div>
@@ -1198,6 +1257,7 @@
       </div>
     </div>
 
+    <!-- Vesta použitá -->
     <div class="stock-item" style="padding:10px 14px;">
       <div style="display:flex;align-items:center;justify-content:space-between;">
         <div class="stock-item-name" style="margin-bottom:0;color:var(--text-dim);">🦺 Reflexní Vesta</div>
@@ -1205,6 +1265,7 @@
       </div>
     </div>
 
+    <!-- Boty použité -->
     <div class="stock-item">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
         <div class="stock-item-name" style="margin-bottom:0;color:var(--text-dim);">👟 Pracovní Boty</div>
@@ -1214,10 +1275,11 @@
       <div id="stock-boty-used-detail" style="font-family:JetBrains Mono,monospace;font-size:11px;color:var(--text-dim);line-height:1.7;"></div>
     </div>
 
+    <div style="font-family:JetBrains Mono,monospace;font-size:9px;color:var(--text-muted);text-align:center;letter-spacing:.05em;margin-top:10px;"> </div>
   </div>
 </div>
 
-<!-- STOCK EDIT MODAL -->
+<!-- ══ STOCK EDIT MODAL (тільки Nové) ══ -->
 <div class="edit-modal" id="stock-edit-modal">
   <div class="edit-modal-box stock-edit-box">
     <div class="edit-modal-title">Upravit skladové zásoby (Nové)</div>
@@ -1247,7 +1309,6 @@
 </div>
 
 <script>
-
 // ╔══════════════════════════════════════════════════════════════╗
 // ║           СПИСОК ЛЮДЕЙ — редагуй тут                        ║
 // ║                                                             ║
@@ -1437,8 +1498,8 @@ const PEOPLE = [
   {
     en:    "Hlushnov Roman",
     ua:    "Глушнов Роман",
-    viber: "Name",
-    phone: "+380 96 000 0000",
+    viber: "Roman Hlushnov",
+    phone: "+380 67 703 2631",
     photo: "photos/hlushnov_roman.jpg",
     flag:  "🇺🇦",
     locker: 00,
@@ -1948,8 +2009,8 @@ const PEOPLE = [
   {
     en:    "Yashchenko Dmytro",
     ua:    "Ященко Дмитро",
-    viber: "Name",
-    phone: "+380 96 000 0000",
+    viber: "Dima Yashchenko",
+    phone: "+380 68 497 1299",
     photo: "photos/yashchenko_dmytro.jpg",
     flag:  "🇺🇦",
     locker: 00,
@@ -2034,63 +2095,19 @@ const PEOPLE = [
 // Щоб увімкнути сортування за алфавітом — розкоментуй рядок нижче:
 // PEOPLE.sort((a, b) => a.en.localeCompare(b.en));
 
-// ── Локальне сховище (offline backup) ─────────────────────────
-const LS = {
-  get(k, d) { try { const v = localStorage.getItem('gi_' + k); return v !== null ? JSON.parse(v) : d; } catch (e) { return d; } },
-  set(k, v) { try { localStorage.setItem('gi_' + k, JSON.stringify(v)); } catch (e) {} },
-};
-
 // State
-let set17 = LS.get('set17', []);
-let set19 = LS.get('set19', []);
+let set17 = [];
+let set19 = [];
 let editingName = null;
-let editedNames = LS.get('editedNames', {});
-let customPeople = LS.get('customPeople', []);
-let hiddenPeople = new Set(LS.get('hidden', []));
-
-// ── Admin режим ──────────────────────────────────────────────
-// Увімк./вимк. — ДОВГЕ натискання (~2 сек) на логотип "Gi Group".
-// У admin-режимі у вікні редагування з'являється кнопка "Smazat",
-// а також стає видимою кнопка "+ Přidat osobu" (див. updateAddBtnVisibility нижче).
-// Стан зберігається на пристрої.
-let isAdmin = LS.get('admin', false);
-
-// Додаємо локально збережених (доданих раніше) людей у список
-customPeople.forEach(p => { if (p && !PEOPLE.find(x => x.en === p.en)) PEOPLE.push(p); });
-
-// Застосовуємо локально збережені перейменування та Dovolená
-function applyLocalOverrides() {
-  Object.entries(editedNames).forEach(([orig, newN]) => {
-    const p = PEOPLE.find(x => x._origEn === orig || x.en === orig);
-    if (p) { p._origEn = p._origEn || orig; p.en = newN; }
-  });
-  const dov = LS.get('dovolena', {});
-  Object.entries(dov).forEach(([k, v]) => {
-    const p = PEOPLE.find(x => (x._origEn || x.en) === k);
-    if (p) p.dovolena = v || '';
-  });
-}
-applyLocalOverrides();
-
-function saveLocal() {
-  LS.set('set17', set17);
-  LS.set('set19', set19);
-  LS.set('editedNames', editedNames);
-  LS.set('dovolena', collectDovolenaData());
-  LS.set('customPeople', customPeople);
-  LS.set('hidden', [...hiddenPeople]);
-  LS.set('ts', Date.now());
-}
+let editedNames = {}; // { originalEn: newName }
 
 function loadData() {
-  // Всі дані — з Firebase через dbRef.on('value')
-  // + локальна копія з localStorage (відновлена вище)
+  // Всі дані — тільки з Firebase через dbRef.on('value')
 }
 
 function saveData() {
   const toast = document.getElementById('toast');
   if (toast) { toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 2000); }
-  saveLocal();
   if (typeof syncToFirebase === 'function') syncToFirebase();
 }
 
@@ -2099,45 +2116,8 @@ function getInitials(name) {
   return (parts[0]?.[0] || '') + (parts[1]?.[0] || '');
 }
 
-function handleLogoClick() {
-  if (window._logoLongPressed) { window._logoLongPressed = false; return; }
-  openStockModal();
-}
-
-(function initLogoLongPress() {
-  const logo = document.getElementById('logo-btn');
-  if (!logo) return;
-  let timer = null;
-  const start = () => {
-    // Затримка довгого натискання для активації admin-режиму — 2000 мс (2 сек).
-    // Щоб змінити чутливість — зміни число нижче (у мілісекундах).
-    timer = setTimeout(() => {
-      window._logoLongPressed = true;
-      isAdmin = !isAdmin;
-      LS.set('admin', isAdmin);
-      logo.style.color = isAdmin ? '#f59e0b' : '';
-      showSyncToast(isAdmin ? '🔓 Admin režim ZAPNUTÝ' : '🔒 Admin režim vypnutý', isAdmin ? 'ok' : 'warn');
-      updateAddBtnVisibility();
-    }, 2000);
-  };
-  const cancel = () => clearTimeout(timer);
-  logo.addEventListener('pointerdown', start);
-  logo.addEventListener('pointerup', cancel);
-  logo.addEventListener('pointerleave', cancel);
-  logo.addEventListener('pointercancel', cancel);
-  if (isAdmin) logo.style.color = '#f59e0b';
-})();
-
-// Кнопка "Přidat osobu" видима лише в admin-режимі.
-// Викликається одразу при завантаженні сторінки та щоразу
-// після перемикання admin-режиму (довге натискання на логотип).
-function updateAddBtnVisibility() {
-  const btn = document.getElementById('btn-add-person');
-  if (btn) btn.style.display = isAdmin ? '' : 'none';
-}
-updateAddBtnVisibility();
-
 function createCard(person, listType) {
+  // listType: 'main' | 'present' | '17' | '19'
   const div = document.createElement('div');
   let cls = 'person';
   if (listType === 'present') cls += ' present-item';
@@ -2145,6 +2125,7 @@ function createCard(person, listType) {
   if (listType === '19') cls += ' item-19';
   div.className = cls;
 
+  // Avatar wrapper
   const avatarWrap = document.createElement('div');
   avatarWrap.className = 'avatar-wrap';
 
@@ -2170,6 +2151,7 @@ function createCard(person, listType) {
 
   const flagEl = document.createElement('div');
   flagEl.className = 'flag-below';
+  // Конвертуємо emoji прапор → текстовий код (UA, CZ, PL тощо)
   const flagMap = {
     '🇺🇦': 'UA', '🇨🇿': 'CZ', '🇵🇱': 'PL', '🇸🇰': 'SK',
     '🇩🇪': 'DE', '🇷🇴': 'RO', '🇭🇺': 'HU', '🇷🇺': 'RU',
@@ -2186,9 +2168,11 @@ if (person.car) {
 }
 avatarWrap.appendChild(flagEl);
 
+  // Info
   const info = document.createElement('div');
   info.className = 'info';
 
+  // EN ім'я + іконка редагування поруч
   const nameEnWrap = document.createElement('div');
   nameEnWrap.className = 'name-en-wrap';
 
@@ -2209,6 +2193,7 @@ avatarWrap.appendChild(flagEl);
     openEditModal(person.en);
   });
 
+  // Показуємо edit-btn при тапі на мобільному
   nameEnWrap.addEventListener('touchstart', () => {
     editBtn.classList.toggle('edit-btn-visible');
   }, { passive: true });
@@ -2224,6 +2209,7 @@ avatarWrap.appendChild(flagEl);
   viber.className = 'viber-name';
   viber.textContent = `Viber: ${person.viber}`;
 
+ // Там де персон доволена в фігурних душках перед тим риска і пробіл
   const dovolenaEl = document.createElement('div');
   dovolenaEl.className = 'viber-name';
   dovolenaEl.style.cssText = 'color:#f59e0b; font-size:11px;';
@@ -2244,9 +2230,11 @@ avatarWrap.appendChild(flagEl);
   info.appendChild(dovolenaEl);
   info.appendChild(phone);
 
+  // Галочки вертикально
   const rightCol = document.createElement('div');
-  rightCol.style.cssText = 'display:flex; flex-direction:column; align-items:center; gap:20px; flex-shrink:0;';
+  rightCol.style.cssText = 'display:flex; flex-direction:column; align-items:center; gap:20px; flex-shrink:0;'; // ← GAP між галочками — змінюй тут
 
+  // Галочка "17:00"
   const btn17 = document.createElement('div');
   btn17.className = 'check-btn' + (listType === '17' ? ' checked-17' : '');
   btn17.innerHTML = `<svg viewBox="0 0 16 16"><polyline points="2,8 6,12 14,4"/></svg><span class="btn-label">17:00</span>`;
@@ -2255,10 +2243,11 @@ avatarWrap.appendChild(flagEl);
     btn17.classList.toggle('checked-17');
     div.classList.add('card-removing');
     const savedScroll = window.scrollY;
-    const capturedName = person.en;
+    const capturedName = person.en; // capture at click time
     setTimeout(() => toggleList(capturedName, '17', savedScroll), 310);
   });
 
+  // Галочка "19:00"
   const btn19 = document.createElement('div');
   btn19.className = 'check-btn' + (listType === '19' ? ' checked-19' : '');
   btn19.innerHTML = `<svg viewBox="0 0 16 16"><polyline points="2,8 6,12 14,4"/></svg><span class="btn-label">19:00</span>`;
@@ -2267,7 +2256,7 @@ avatarWrap.appendChild(flagEl);
     btn19.classList.toggle('checked-19');
     div.classList.add('card-removing');
     const savedScroll = window.scrollY;
-    const capturedName = person.en;
+    const capturedName = person.en; // capture at click time
     setTimeout(() => toggleList(capturedName, '19', savedScroll), 310);
   });
 
@@ -2284,6 +2273,7 @@ function openLightbox(person) {
   const lb = document.getElementById('lightbox');
   const lbImg = document.getElementById('lightbox-img');
 
+  // Якщо фото є — показуємо, якщо нема — ховаємо img і показуємо placeholder
   lbImg.style.display = 'block';
   lbImg.src = person.photo;
   lbImg.onerror = function() {
@@ -2298,9 +2288,11 @@ function openLightbox(person) {
     ph.textContent = getInitials(person.en);
     ph.style.display = 'flex';
   };
+  // Ховаємо старий placeholder якщо є
   const oldPh = document.getElementById('lb-photo-placeholder');
   if (oldPh) oldPh.style.display = 'none';
 
+  // Заповнюємо картку
   const flagMap2 = {
     '🇺🇦': 'UA', '🇨🇿': 'CZ', '🇵🇱': 'PL', '🇸🇰': 'SK',
     '🇩🇪': 'DE', '🇷🇴': 'RO', '🇭🇺': 'HU', '🇷🇺': 'RU',
@@ -2310,6 +2302,7 @@ function openLightbox(person) {
   document.getElementById('lb-name-en').textContent = person.en || '';
   document.getElementById('lb-name-ua').textContent = person.ua || '';
 
+  // Показуємо прапор в картці
   const lbFlagRow = document.getElementById('lb-flag-row');
   const lbFlagEl  = document.getElementById('lb-flag');
   if (lbFlagEl) {
@@ -2336,6 +2329,7 @@ function openLightbox(person) {
 
   setLb('lb-viber', person.viber && person.viber !== 'Name' ? person.viber : '');
 
+  // Телефон — клікабельне посилання tel:
   const rawPhone = person.phone && person.phone !== '+380 XX XXX XX XX' ? person.phone : '';
   const lbPhoneEl = document.getElementById('lb-phone');
   if (lbPhoneEl) {
@@ -2368,6 +2362,7 @@ if (person.nastup || person.smlouvaDo) {
   setLb('lb-dispatcher', person.dispatcher, 'lb-dispatcher-row');
   setLb('lb-city',       person.city,       'lb-city-row');
 
+  // Helma / Boty / Vesta / Zámek — видача (завжди показуємо)
     const setLbEquip = (id, val) => {
     const el  = document.getElementById(id);
     if (!el) return;
@@ -2381,17 +2376,23 @@ if (person.nastup || person.smlouvaDo) {
     }
   };
 
+  // helma — кількість (число: "×2", або рядок як є)
   const helmaVal = person.helma !== '' && person.helma !== null && person.helma !== undefined
     ? (typeof person.helma === 'number' ? '×' + person.helma : person.helma) : '';
+  // boty — розмір (рядок)
   const botyVal = person.boty !== '' && person.boty !== null && person.boty !== undefined ? person.boty : '';
+  // vesta — кількість (число: "×2", або рядок як є)
   const vestaVal = person.vesta !== '' && person.vesta !== null && person.vesta !== undefined
     ? (typeof person.vesta === 'number' ? '×' + person.vesta : person.vesta) : '';
+  // zamek — номер замка
   const zamekVal = person.zamek !== '' && person.zamek !== null && person.zamek !== undefined ? person.zamek : '';
 
+  // zamek — не показуємо в lightbox (він у Skladové zásoby)
   setLbEquip('lb-helma', helmaVal);
   setLbEquip('lb-boty',  botyVal);
   setLbEquip('lb-vesta', vestaVal);
   setLbEquip('lb-zamek', zamekVal);
+  // Роздільник — завжди показуємо
   const equipDivider = document.getElementById('lb-equip-divider');
   if (equipDivider) equipDivider.style.display = '';
 
@@ -2407,8 +2408,13 @@ if (person.nastup || person.smlouvaDo) {
   lb.classList.add('active');
 }
 
+// Закриваємо тільки при кліку на фото або на темний фон
+// Картка з інформацією НЕ закриває lightbox
 document.getElementById('lightbox').addEventListener('click', (e) => {
   const card = document.getElementById('lightbox-card');
+  const lbImg = document.getElementById('lightbox-img');
+  const ph = document.getElementById('lb-photo-placeholder');
+  // Якщо клік на картку або її дочірні елементи — не закриваємо
   if (card && card.contains(e.target)) return;
   document.getElementById('lightbox').classList.remove('active');
 });
@@ -2422,6 +2428,7 @@ function copyToClipboard(text) {
     clearTimeout(copyTimer);
     copyTimer = setTimeout(() => t.classList.remove('show'), 2000);
   }).catch(() => {
+    // fallback
     const ta = document.createElement('textarea');
     ta.value = text;
     ta.style.position = 'fixed';
@@ -2438,6 +2445,7 @@ function copyToClipboard(text) {
   });
 }
 
+// showSyncToast — показує статус збереження
 let syncToastTimer = null;
 function showSyncToast(msg, type) {
   const el = document.getElementById('sync-toast');
@@ -2449,35 +2457,8 @@ function showSyncToast(msg, type) {
   syncToastTimer = setTimeout(() => el.classList.remove('show'), 3500);
 }
 
+// Дебаунс — один запит в Firebase після серії кліків
 let toggleSyncTimer = null;
-
-// ── Швидке та аварійне збереження у Firebase ────────────────────
-// Додавання/видалення зі списків 17:00 і 19:00 (toggleList нижче)
-// не пише в Firebase одразу при кожному кліку — це б перевантажило
-// базу при швидких кліках поспіль. Замість цього запис відкладається
-// на 150 мс (toggleSyncTimer) і якщо за цей час прийшла ще одна дія —
-// таймер перезапускається, а реально пишеться лише останній стан.
-//
-// Проблема: якщо користувач встигне закрити/згорнути сторінку раніше,
-// ніж спрацює ці 150 мс — зміна могла загубитись.
-// Рішення: flushPendingSync() примусово скасовує таймер і одразу
-// записує дані, щойно сторінка ховається (вкладка згорнута/закрита/
-// переключена). Спрацьовує для ОБОХ списків (17:00 і 19:00),
-// бо вони використовують один і той самий toggleSyncTimer.
-function flushPendingSync() {
-  if (toggleSyncTimer) {
-    clearTimeout(toggleSyncTimer);
-    toggleSyncTimer = null;
-    if (typeof syncToFirebase === 'function') syncToFirebase();
-  }
-}
-// visibilitychange 'hidden' — спрацьовує при згортанні/перемиканні вкладки
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'hidden') flushPendingSync();
-});
-// pagehide / beforeunload — спрацьовують при закритті сторінки/вкладки
-window.addEventListener('pagehide', flushPendingSync);
-window.addEventListener('beforeunload', flushPendingSync);
 
 function toggleList(name, listType, savedScroll) {
   const isRemoving17 = set17.includes(name);
@@ -2502,36 +2483,19 @@ function toggleList(name, listType, savedScroll) {
     });
   }
 
-  saveLocal();
-
-  // Debounce перед записом у Firebase — 150 мс (було 600 мс).
-  // Якщо сторінку закриють раніше — flushPendingSync() вище
-  // все одно збереже ці дані негайно.
+  // Дебаунс: один запит в Firebase після серії кліків (600мс)
   clearTimeout(toggleSyncTimer);
   toggleSyncTimer = setTimeout(() => {
-    toggleSyncTimer = null;
     if (typeof syncToFirebase === 'function') syncToFirebase();
-  }, 150);
+  }, 600);
 }
 
-function clearLists() {
-  if (!set17.length && !set19.length) { showExportToast('⚠️ Seznamy jsou prázdné'); return; }
-  if (!confirm(`Vymazat všechny seznamy?\n17:00 — ${set17.length} osob\n19:00 — ${set19.length} osob`)) return;
-  set17 = [];
-  set19 = [];
-  saveLocal();
-  render(document.getElementById('search').value);
-  syncToFirebase();
-  showSyncToast('🗑 Seznamy vymazány', 'ok');
-}
-
+// Edit modal
 function openEditModal(currentName) {
   editingName = currentName;
   document.getElementById('edit-input').value = currentName;
 
-  const titleEl = document.getElementById('edit-modal-title');
-  if (titleEl) titleEl.textContent = 'Upravit: ' + currentName;
-
+  // Заповнюємо інфо-панель
   const person = PEOPLE.find(p => p.en === currentName);
 
   function setInfoVal(id, val) {
@@ -2550,12 +2514,9 @@ function openEditModal(currentName) {
   setInfoVal('info-dispatcher', person?.dispatcher || '');
   setInfoVal('info-city',       person?.city       || '');
 
+  // Dovolená — заповнюємо поле вводу
   const dovInput = document.getElementById('dovolena-input');
   if (dovInput) dovInput.value = person?.dovolena || '';
-
-  // Кнопка "Smazat" — тільки для admin
-  const delBtn = document.querySelector('#edit-modal .delete-btn');
-  if (delBtn) delBtn.style.display = isAdmin ? '' : 'none';
 
   document.getElementById('edit-modal').classList.add('active');
   setTimeout(() => document.getElementById('edit-input').focus(), 100);
@@ -2575,45 +2536,26 @@ function saveEditModal() {
   if (person) {
     const origKey   = person._origEn || editingName;
     person._origEn  = origKey;
+    // Оновлюємо ім'я в списках 17/19
     const i17 = set17.indexOf(editingName);
     if (i17 !== -1) set17[i17] = newName;
     const i19 = set19.indexOf(editingName);
     if (i19 !== -1) set19[i19] = newName;
     person.en       = newName;
+    // Зберігаємо dovolena прямо в об'єкт людини
     person.dovolena = newDovolena;
+    // Зберігаємо тільки якщо ім'я реально змінилось
     if (origKey !== newName) {
       editedNames[origKey] = newName;
     } else {
       delete editedNames[origKey];
     }
+    // Все іде тільки в Firebase через syncToFirebase() нижче
   }
   closeEditModal();
-  saveLocal();
   render(document.getElementById('search').value);
+  // Одразу синхронізуємо і ім'я і dovolena з Firebase
   if (typeof syncToFirebase === 'function') syncToFirebase();
-}
-
-function askDeletePerson() {
-  if (!editingName) return;
-  const person = PEOPLE.find(p => p.en === editingName);
-  if (!person) { closeEditModal(); return; }
-  if (!confirm(`Opravdu smazat: ${person.en}?`)) return;
-  const key = person._origEn || person.en;
-  set17 = set17.filter(n => n !== person.en);
-  set19 = set19.filter(n => n !== person.en);
-  if (person._custom) {
-    customPeople = customPeople.filter(p => (p._origEn || p.en) !== key);
-    const i = PEOPLE.indexOf(person);
-    if (i !== -1) PEOPLE.splice(i, 1);
-  } else {
-    hiddenPeople.add(key);
-  }
-  delete editedNames[key];
-  closeEditModal();
-  saveLocal();
-  render(document.getElementById('search').value);
-  syncToFirebase();
-  showSyncToast('🗑 Osoba smazána', 'ok');
 }
 
 document.getElementById('edit-modal').addEventListener('click', (e) => {
@@ -2626,69 +2568,6 @@ document.getElementById('edit-input').addEventListener('keydown', (e) => {
 document.getElementById('dovolena-input').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') saveEditModal();
   if (e.key === 'Escape') closeEditModal();
-});
-
-// ── ADD PERSON MODAL ──────────────────────────────────────────
-function openAddModal() {
-  document.getElementById('add-modal').classList.add('active');
-  setTimeout(() => document.getElementById('add-en').focus(), 100);
-}
-function closeAddModal() {
-  document.getElementById('add-modal').classList.remove('active');
-}
-function addPersonFromForm() {
-  const en = document.getElementById('add-en').value.trim();
-  if (!en) { document.getElementById('add-en').focus(); return; }
-  if (PEOPLE.find(p => p.en === en)) { alert('Tato osoba už existuje!'); return; }
-  const lockerRaw = document.getElementById('add-locker').value.trim();
-  const person = {
-    en,
-    ua:         document.getElementById('add-ua').value.trim(),
-    viber:      document.getElementById('add-viber').value.trim(),
-    phone:      document.getElementById('add-phone').value.trim(),
-    photo:      '',
-    flag:       document.getElementById('add-flag').value,
-    locker:     lockerRaw ? Number(lockerRaw) : 0,
-    dispatcher: document.getElementById('add-dispatcher').value.trim(),
-    city:       document.getElementById('add-city').value.trim(),
-    // photo/nastup/smlouvaDo/helma/vesta/boty/zamek: полів для них
-    // немає у формі "Přidat osobu" (прибрано навмисно) — тому
-    // за замовчуванням порожні; заповнюються пізніше через "✎ Upravit".
-    nastup:     '',
-    smlouvaDo:  '',
-    car:        document.getElementById('add-car').checked,
-    dovolena:   '',
-    helma:      '',
-    vesta:      '',
-    boty:       '',
-    zamek:      '',
-    _custom:    true,
-  };
-  PEOPLE.push(person);
-  customPeople.push(person);
-  saveLocal();
-  closeAddModal();
-  ['add-en','add-ua','add-viber','add-phone','add-locker','add-dispatcher','add-city'].forEach(id => {
-    document.getElementById(id).value = '';
-  });
-  document.getElementById('add-car').checked = false;
-  render(document.getElementById('search').value);
-  syncToFirebase();
-  showSyncToast('✓ Osoba přidána', 'ok');
-}
-document.getElementById('add-modal').addEventListener('click', (e) => {
-  if (e.target === document.getElementById('add-modal')) closeAddModal();
-});
-document.querySelectorAll('#add-modal input').forEach(inp => {
-  inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') addPersonFromForm(); });
-});
-
-// Escape закриває всі вікна
-document.addEventListener('keydown', (e) => {
-  if (e.key !== 'Escape') return;
-  closeStockModal();
-  closeStockEditModal();
-  closeAddModal();
 });
 
 function render(query = '') {
@@ -2704,17 +2583,12 @@ function render(query = '') {
   list17.innerHTML     = '';
   list19.innerHTML     = '';
 
-  const visiblePeople = PEOPLE.filter(p => !hiddenPeople.has(p._origEn || p.en));
-
   const inAnyList = n => set17.includes(n) || set19.includes(n);
-  const mainPeople = visiblePeople.filter(p => !inAnyList(p.en));
-  const people17   = set17.map(n => visiblePeople.find(p => p.en === n)).filter(Boolean);
-  const people19   = set19.map(n => visiblePeople.find(p => p.en === n)).filter(Boolean);
+  const mainPeople = PEOPLE.filter(p => !inAnyList(p.en));
+  const people17   = set17.map(n => PEOPLE.find(p => p.en === n)).filter(Boolean);
+  const people19   = set19.map(n => PEOPLE.find(p => p.en === n)).filter(Boolean);
 
-  const match = p => !q || [p.en, p.ua, p.viber, p.phone, String(p.locker || ''), p.dispatcher]
-    .join(' ')
-    .toLowerCase()
-    .includes(q);
+  const match = p => !q || p.en.toLowerCase().includes(q) || p.ua.toLowerCase().includes(q);
 
   const filtered   = mainPeople.filter(match);
   const filtered17 = people17.filter(match);
@@ -2750,6 +2624,7 @@ function render(query = '') {
 loadData();
 render();
 
+
 // ══════════════════════════════════════════════════════════════
 // FIREBASE REALTIME DATABASE
 // ══════════════════════════════════════════════════════════════
@@ -2760,6 +2635,7 @@ firebase.initializeApp({
 
 const dbRef = firebase.database().ref('gigroup');
 
+// ── Стан кнопки Save ─────────────────────────────────────────
 function setBtnState(state, retryFn) {
   const btn = document.getElementById('btn-save-main');
   if (!btn) return;
@@ -2794,13 +2670,13 @@ function setBtnState(state, retryFn) {
   }
 }
 
+// ── Застосовуємо дані з Firebase ─────────────────────────────
 function applyRemoteData(data) {
   if (!data) return;
 
-  // КРОК 1: editedNames першими
+  // ── КРОК 1: editedNames ПЕРШИМИ — до будь-якої фільтрації ───
   if (data.editedNames && typeof data.editedNames === 'object') {
     editedNames = data.editedNames;
-    LS.set('editedNames', editedNames);
     Object.keys(editedNames).forEach(k => {
       if (editedNames[k] === k) delete editedNames[k];
     });
@@ -2810,40 +2686,21 @@ function applyRemoteData(data) {
     });
   }
 
-  // КРОК 1.5: люди, додані через кнопку «＋»
-  if (Array.isArray(data.peopleExtra)) {
-    const remoteKeys = new Set(data.peopleExtra.map(p => p && (p._origEn || p.en)).filter(Boolean));
-    for (let i = PEOPLE.length - 1; i >= 0; i--) {
-      const p = PEOPLE[i];
-      if (p._custom && !remoteKeys.has(p._origEn || p.en)) PEOPLE.splice(i, 1);
-    }
-    customPeople = data.peopleExtra.filter(Boolean);
-    LS.set('customPeople', customPeople);
-    customPeople.forEach(p => {
-      if (!PEOPLE.find(x => (x._origEn || x.en) === (p._origEn || p.en))) PEOPLE.push(p);
-    });
-  }
-
-  // КРОК 1.6: приховані (видалені) люди
-  if (Array.isArray(data.hiddenPeople)) {
-    hiddenPeople = new Set(data.hiddenPeople);
-    LS.set('hidden', [...hiddenPeople]);
-  }
-
-  // КРОК 2: validNames
+  // ── КРОК 2: validNames — включає імена з PEOPLE + поточні set17/set19
+  // як fallback щоб ніхто не випав через timing редагування імен
   const validNames = new Set([
     ...PEOPLE.flatMap(p => [p.en, p._origEn].filter(Boolean)),
-    ...set17, ...set19
+    ...set17, ...set19  // захист від race condition
   ]);
 
+  // Якщо зараз іде локальний запис — не перезаписуємо sets з Firebase,
+  // щоб не затерти щойно зроблений клік
   if (!isSyncing) {
     if (Array.isArray(data.set17)) set17 = data.set17.filter(n => validNames.has(n));
     if (Array.isArray(data.set19)) set19 = data.set19.filter(n => validNames.has(n));
-    LS.set('set17', set17);
-    LS.set('set19', set19);
   }
 
-  // КРОК 3: dovolena
+  // ── КРОК 3: dovolena ────────────────────────────────────────
   if (data.dovolenaData && typeof data.dovolenaData === 'object') {
     const fbKeys = new Set(Object.keys(data.dovolenaData));
     PEOPLE.forEach(p => {
@@ -2851,18 +2708,17 @@ function applyRemoteData(data) {
       if (fbKeys.has(key)) p.dovolena = data.dovolenaData[key] || '';
       else p.dovolena = '';
     });
-    LS.set('dovolena', data.dovolenaData);
   }
 
-  // КРОК 4: stockData (Nové)
+  // ── КРОК 4: stockData (Nové) ──────────────────────────────
   if (data.stockData && typeof data.stockData === 'object') {
-    LS.set('stock', data.stockData);
     applyStockData(data.stockData);
   }
 
   render(document.getElementById('search').value);
 }
 
+// ── Збираємо dovolena для збереження ─────────────────────────
 function collectDovolenaData() {
   const result = {};
   PEOPLE.forEach(p => {
@@ -2871,14 +2727,16 @@ function collectDovolenaData() {
   return result;
 }
 
+// ── Запис у Firebase ─────────────────────────────────────────
 let isSyncing = false;
 
 async function syncToFirebase() {
-  if (!fbReady) return;
+  if (!fbReady) return;  // захист: не пишемо до завантаження
 
+  // Перевірка інтернету
   if (!navigator.onLine) {
     setBtnState('offline');
-    showSyncToast('📵 Bez internetu. Uloženo lokálně.', 'warn');
+    showSyncToast('📵 Bez internetu. Data nebyla uložena.', 'warn');
     return;
   }
 
@@ -2890,22 +2748,14 @@ async function syncToFirebase() {
     if (p.dovolena) dovolenaData[key] = p.dovolena;
   });
 
+  // Знімаємо знімок списків у момент запису
   const snapshot17 = [...set17];
   const snapshot19 = [...set19];
   const writeTs = Date.now();
 
   try {
-    await dbRef.update({
-      set17: snapshot17,
-      set19: snapshot19,
-      editedNames,
-      dovolenaData,
-      peopleExtra: customPeople,
-      hiddenPeople: [...hiddenPeople],
-      ts: writeTs,
-    });
+    await dbRef.update({ set17: snapshot17, set19: snapshot19, editedNames, dovolenaData, ts: writeTs });
     lastWrittenTs = writeTs;
-    LS.set('ts', writeTs);
     setBtnState('ok');
   } catch (err) {
     console.error('Firebase error:', err);
@@ -2916,38 +2766,37 @@ async function syncToFirebase() {
   }
 }
 
+// ── Realtime слухач ───────────────────────────────────────────
 let fbReady = false;
 let lastWrittenTs = 0;
 
 dbRef.on('value', (snapshot) => {
-  const firstConnect = !fbReady;
   const data = snapshot.val();
   fbReady = true;
+  if (!data) return;
 
-  // Перше підключення: якщо локально є новіші зміни (зроблені офлайн) —
-  // надсилаємо їх у Firebase; інакше застосовуємо те, що у хмарі
-  if (firstConnect && data) {
-    const localTs = LS.get('ts', 0);
-    if (localTs > (data.ts || 0)) {
-      setTimeout(() => syncToFirebase(), 400);
-    }
-  }
-
-  if (!data) { render(document.getElementById('search').value); return; }
-
+  // Якщо це відлуння нашого ж запису — пропускаємо sets, але dovolena/editedNames оновлюємо
   const isOwnEcho = data.ts && data.ts === lastWrittenTs;
   if (isOwnEcho) {
+    // тільки dovolena і editedNames, sets не чіпаємо
     applyRemoteData({ ...data, set17: set17, set19: set19 });
   } else {
     applyRemoteData(data);
   }
 });
 
+// ── Перевизначаємо saveData ───────────────────────────────────
+// saveData вже містить syncToFirebase()
+
+// saveEditModal вже викликає syncToFirebase() напряму — окреме перевизначення не потрібне
+
 document.getElementById('search').addEventListener('input', e => render(e.target.value));
 
+// ── Експорт у CSV ─────────────────────────────────────────────
 function exportToCSV() {
   const rows = [];
 
+  // Спочатку всі з 17:00, потім всі з 19:00
   set17.forEach(name => rows.push(`${name} - (17:00)`));
   set19.forEach(name => rows.push(`${name} - (19:00)`));
 
@@ -2956,12 +2805,14 @@ function exportToCSV() {
     return;
   }
 
+  // Формат імені файлу: GiGroup_DDMMYYYY.csv
   const now   = new Date();
   const dd    = String(now.getDate()).padStart(2, '0');
   const mm    = String(now.getMonth() + 1).padStart(2, '0');
   const yyyy  = now.getFullYear();
   const fname = `GiGroup_${dd}${mm}${yyyy}.csv`;
 
+  // UTF-8 BOM для коректного відображення кирилиці в Excel
   const BOM = '\uFEFF';
   const csv = rows.join('\n') + '\n';
 
@@ -2986,12 +2837,8 @@ function showExportToast(msg) {
   setTimeout(() => el.classList.remove('show'), 2500);
 }
 
-window.addEventListener('online', () => {
-  showSyncToast('🟢 Připojení obnoveno — synchronizace...', 'ok');
-  setTimeout(() => { syncToFirebase(); syncStockToFirebase(); }, 800);
-});
-window.addEventListener('offline', () => showSyncToast('📵 Internet odpojen. Změny se uloží lokálně.', 'warn'));
-
+window.addEventListener('online',  () => showSyncToast('🟢 Připojení obnoveno', 'ok'));
+window.addEventListener('offline', () => showSyncToast('📵 Internet odpojen. Změny se neuloží.', 'warn'));
 
 // pagehide/beforeunload прибрано — вони затирали дані
 // при закритті сторінки до завантаження Firebase
@@ -3064,10 +2911,7 @@ let stockLive = {
   boty:  { ...STOCK_DATA.boty.sizes },
 };
 
-// Відновлюємо склад з локального сховища (для офлайн-роботи)
-const lsStock = LS.get('stock', null);
-if (lsStock) applyStockData(lsStock);
-
+// Застосовуємо stockData, що прийшли з Firebase, до stockLive
 function applyStockData(stockData) {
   if (typeof stockData.helma === 'number') stockLive.helma = stockData.helma;
   if (typeof stockData.vesta === 'number') stockLive.vesta = stockData.vesta;
@@ -3075,16 +2919,18 @@ function applyStockData(stockData) {
   if (stockData.boty && typeof stockData.boty === 'object') {
     stockLive.boty = { ...stockData.boty };
   }
+  // Якщо модальне вікно зі складом зараз відкрите — оновлюємо відображення одразу
   const stockModal = document.getElementById('stock-modal');
   if (stockModal && stockModal.classList.contains('active')) {
     renderStockModal();
   }
 }
 
+// ── Запис stockData (тільки Nové) у Firebase ──────────────────
 async function syncStockToFirebase() {
   if (!fbReady) return;
   if (!navigator.onLine) {
-    showSyncToast('📵 Bez internetu. Uloženo lokálně.', 'warn');
+    showSyncToast('📵 Bez internetu. Data nebyla uložena.', 'warn');
     return;
   }
   const writeTs = Date.now();
@@ -3099,13 +2945,6 @@ async function syncStockToFirebase() {
       ts: writeTs,
     });
     lastWrittenTs = writeTs;
-    LS.set('ts', writeTs);
-    LS.set('stock', {
-      helma: stockLive.helma,
-      vesta: stockLive.vesta,
-      zamek: stockLive.zamek,
-      boty:  { ...stockLive.boty },
-    });
     showSyncToast('✓ Sklad uložen', 'ok');
   } catch (err) {
     console.error('Firebase error (stock):', err);
@@ -3114,6 +2953,7 @@ async function syncStockToFirebase() {
 }
 
 function renderStockModal() {
+  // helper: рендер розмірів boty (підтримує розріджені об'єкти — нулі не обов'язкові)
   function renderSizes(sizes, detailEl, countEl, accentColor) {
     const entries = Object.entries(sizes || {})
       .filter(([, v]) => Number(v) > 0)
@@ -3129,6 +2969,7 @@ function renderStockModal() {
       : `<div style="color:var(--text-muted)">Žádné velikosti skladem</div>`;
   }
 
+  // ── Nové (з stockLive — редагований стан) ──
   document.getElementById('stock-helma-count').textContent = stockLive.helma + ' ks';
   document.getElementById('stock-vesta-count').textContent = stockLive.vesta + ' ks';
   document.getElementById('stock-zamek-count').textContent = stockLive.zamek + ' ks';
@@ -3139,6 +2980,7 @@ function renderStockModal() {
     'var(--accent)'
   );
 
+  // ── Použité (статичні, як і раніше) ──
   document.getElementById('stock-helma-used-count').textContent = STOCK_DATA.helmaUsed.count + ' ks';
   document.getElementById('stock-vesta-used-count').textContent = STOCK_DATA.vestaUsed.count + ' ks';
   renderSizes(
@@ -3158,6 +3000,7 @@ function closeStockModal() {
   document.getElementById('stock-modal').classList.remove('active');
 }
 
+// ── STOCK EDIT MODAL (редагування лише "Nové") ────────────────
 function addBotySizeRow(size, qty) {
   const list = document.getElementById('stock-edit-boty-list');
   const row = document.createElement('div');
@@ -3214,13 +3057,6 @@ function saveStockEdit() {
 
   closeStockEditModal();
   renderStockModal();
-  LS.set('stock', {
-    helma: stockLive.helma,
-    vesta: stockLive.vesta,
-    zamek: stockLive.zamek,
-    boty:  { ...stockLive.boty },
-  });
-  LS.set('ts', Date.now());
   syncStockToFirebase();
 }
 
