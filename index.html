@@ -1007,8 +1007,8 @@
     <div id="list-19"></div>
   </div>
 
-  <button class="export-bottom-btn" onclick="exportToCSV()">↓ Export seznamu</button>
   <button class="export-bottom-btn danger" onclick="clearLists()">🗑 Vymazat seznamy 17:00 / 19:00</button>
+  <button class="export-bottom-btn" onclick="exportToCSV()">↓ Export seznamu</button>
 
 </main>
 
@@ -2815,7 +2815,12 @@ function applyRemoteData(data) {
   if (!data) return;
 
   // КРОК 1: editedNames першими
-  if (data.editedNames && typeof data.editedNames === 'object') {
+  if (!data.editedNames) {
+    // у базі немає перейменувань — скидаємо локальні
+    PEOPLE.forEach(p => { if (p._origEn) { p.en = p._origEn; } });
+    editedNames = {};
+    LS.set('editedNames', editedNames);
+  } else if (typeof data.editedNames === 'object') {
     editedNames = data.editedNames;
     LS.set('editedNames', editedNames);
     Object.keys(editedNames).forEach(k => {
@@ -2828,13 +2833,14 @@ function applyRemoteData(data) {
   }
 
   // КРОК 1.5: люди, додані через кнопку «＋»
-  if (Array.isArray(data.peopleExtra)) {
-    const remoteKeys = new Set(data.peopleExtra.map(p => p && (p._origEn || p.en)).filter(Boolean));
+  {
+    const extra = Array.isArray(data.peopleExtra) ? data.peopleExtra : [];
+    const remoteKeys = new Set(extra.map(p => p && (p._origEn || p.en)).filter(Boolean));
     for (let i = PEOPLE.length - 1; i >= 0; i--) {
       const p = PEOPLE[i];
       if (p._custom && !remoteKeys.has(p._origEn || p.en)) PEOPLE.splice(i, 1);
     }
-    customPeople = data.peopleExtra.filter(Boolean);
+    customPeople = extra.filter(Boolean);
     LS.set('customPeople', customPeople);
     customPeople.forEach(p => {
       if (!PEOPLE.find(x => (x._origEn || x.en) === (p._origEn || p.en))) PEOPLE.push(p);
@@ -2842,10 +2848,8 @@ function applyRemoteData(data) {
   }
 
   // КРОК 1.6: приховані (видалені) люди
-  if (Array.isArray(data.hiddenPeople)) {
-    hiddenPeople = new Set(data.hiddenPeople);
-    LS.set('hidden', [...hiddenPeople]);
-  }
+  hiddenPeople = new Set(Array.isArray(data.hiddenPeople) ? data.hiddenPeople : []);
+  LS.set('hidden', [...hiddenPeople]);
 
   // КРОК 2: validNames
   const validNames = new Set([
@@ -2854,14 +2858,17 @@ function applyRemoteData(data) {
   ]);
 
   if (!isSyncing) {
-    if (Array.isArray(data.set17)) set17 = data.set17.filter(n => validNames.has(n));
-    if (Array.isArray(data.set19)) set19 = data.set19.filter(n => validNames.has(n));
+    // Firebase НЕ зберігає порожні масиви — після «Vymazat» ключ set17/set19
+    // просто зникає з бази. Відсутній ключ = порожній список (а не «лишити як є в кеші»).
+    set17 = Array.isArray(data.set17) ? data.set17.filter(n => validNames.has(n)) : [];
+    set19 = Array.isArray(data.set19) ? data.set19.filter(n => validNames.has(n)) : [];
     LS.set('set17', set17);
     LS.set('set19', set19);
   }
 
   // КРОК 3: dovolena
-  if (data.dovolenaData && typeof data.dovolenaData === 'object') {
+  {
+    if (!data.dovolenaData || typeof data.dovolenaData !== 'object') data = { ...data, dovolenaData: {} };
     const fbKeys = new Set(Object.keys(data.dovolenaData));
     PEOPLE.forEach(p => {
       const key = p._origEn || p.en;
