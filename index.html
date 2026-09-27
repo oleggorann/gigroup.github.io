@@ -934,6 +934,39 @@
   }
   .stock-edit-btn:hover, .stock-edit-btn:active { color: var(--accent); border-color: var(--accent); }
 
+  /* Кнопки "Skříňky" / "Telefony" у вікні Skladové zásoby */
+  .stock-list-btn {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 9px 6px;
+    cursor: pointer;
+    transition: color .15s, border-color .15s;
+  }
+  .stock-list-btn:hover, .stock-list-btn:active { color: var(--accent); border-color: var(--accent); }
+
+  /* Рядок людини у списках "Skříňky" / "Telefony" */
+  .list-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 9px 4px;
+    border-bottom: 1px solid var(--border);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+  .list-row:last-child { border-bottom: none; }
+  .list-row-name { color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .list-row-value { color: var(--accent); font-weight: 600; flex-shrink: 0; }
+  .list-row-value a { color: inherit; text-decoration: none; }
+  .list-empty { text-align: center; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 16px 0; }
+
   .stock-edit-box { max-width: 320px; }
   .stock-edit-row {
     display: flex;
@@ -1131,7 +1164,7 @@
 
     <!-- Dovolená — одразу під іменем -->
     <div class="edit-modal-section-title" style="margin-bottom:6px">Dovolena</div>
-    <input type="text" id="dovolena-input" autocomplete="off" placeholder="DOV">
+    <input type="text" id="dovolena-input" autocomplete="off" placeholder="Poznámka">
 
     <!-- Кнопки -->
     <div class="edit-modal-btns">
@@ -1261,6 +1294,27 @@
       <div id="stock-boty-used-detail" style="font-family:JetBrains Mono,monospace;font-size:11px;color:var(--text-dim);line-height:1.7;"></div>
     </div>
 
+    <!-- Роздільник + Skříňky / Telefony — швидкі списки, внизу вікна, лише в admin-режимі -->
+    <div id="stock-admin-section" style="display:none">
+      <div style="height:1px;background:var(--border);margin:16px 0 10px;"></div>
+      <div class="stock-title" style="font-size:9px;margin-bottom:8px;">Rychlý přehled</div>
+      <div style="display:flex;gap:8px;">
+        <button class="stock-list-btn" onclick="openLockersList()">🗄 Skříňky</button>
+        <button class="stock-list-btn" onclick="openPhonesList()">📞 Telefony</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- LIST MODAL — списки "Skříňky" та "Telefony" (спільне вікно, наповнюється в JS) -->
+<div class="stock-modal" id="list-modal" onclick="if(event.target===this)closeListModal()">
+  <div class="stock-box" id="list-box" onclick="event.stopPropagation()" style="max-height:80vh;overflow-y:auto;">
+    <div style="position:relative;display:flex;align-items:center;justify-content:center;margin-bottom:14px;">
+      <div class="stock-title" style="margin-bottom:0" id="list-modal-title">—</div>
+      <button onclick="closeListModal()" style="position:absolute;right:0;background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer;line-height:1;padding:2px 6px;">✕</button>
+    </div>
+    <div id="list-modal-body"></div>
   </div>
 </div>
 
@@ -1382,7 +1436,7 @@ const PEOPLE = [
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
-    zamek:  "",
+    zamek:  "1",
   },
   {
     en:    "Dvornikov Oleksii",
@@ -1589,14 +1643,14 @@ const PEOPLE = [
     phone: "+380 XX XXX XX XX",
     photo: "photos/mackiewicz_krzysztof.jpg",
     flag:  "🇵🇱",
-    locker: 116,
-    dispatcher: "",
+    locker: 77,
+    dispatcher: "3 Hala",
     city:       "Hradec Králové",
     dovolena:   "", 
     helma:  "1",
     vesta:  "1",
     boty:   "1x vel: ",
-    zamek:  "",
+    zamek:  "1",
   },
   {
     en:    "Martseniuk Iryna",
@@ -1635,12 +1689,12 @@ const PEOPLE = [
     en:    "Midianko Maksym",
     ua:    "Мідянко Максим",
     viber: "Максим",
-    phone: "+380 00 000 0000",
+    phone: "+420 72 223 8109",
     photo: "photos/midianko_maksym.jpg",
     flag:  "🇺🇦",
     locker: 84,
     dispatcher: "",
-    city:       "",
+    city:       "Hradec Králové",
     dovolena:   "", 
     helma:  "1",
     vesta:  "1",
@@ -1750,7 +1804,7 @@ const PEOPLE = [
     dovolena:   "", 
     helma:  "1",
     vesta:  "1",
-    boty:   "2x vel: ,",
+    boty:   "2x vel: 42",
   },
   {
     en:    "Petriv Mykhailo",
@@ -2183,7 +2237,7 @@ function handleLogoClick() {
       logo.style.color = isAdmin ? '#f59e0b' : '';
       showSyncToast(isAdmin ? '🔓 Admin režim ZAPNUTÝ' : '🔒 Admin režim vypnutý', isAdmin ? 'ok' : 'warn');
       updateAddBtnVisibility();
-    }, 2000);
+    }, 1200);
   };
   const cancel = () => clearTimeout(timer);
   logo.addEventListener('pointerdown', start);
@@ -2193,12 +2247,15 @@ function handleLogoClick() {
   if (isAdmin) logo.style.color = '#f59e0b';
 })();
 
-// Кнопка "Přidat osobu" видима лише в admin-режимі.
-// Викликається одразу при завантаженні сторінки та щоразу
-// після перемикання admin-режиму (довге натискання на логотип).
+// Кнопка "Přidat osobu" та блок "Rychlý přehled" (Skříňky/Telefony)
+// видимі лише в admin-режимі. Викликається одразу при завантаженні
+// сторінки та щоразу після перемикання admin-режиму (довге натискання
+// на логотип).
 function updateAddBtnVisibility() {
   const btn = document.getElementById('btn-add-person');
   if (btn) btn.style.display = isAdmin ? '' : 'none';
+  const adminSection = document.getElementById('stock-admin-section');
+  if (adminSection) adminSection.style.display = isAdmin ? '' : 'none';
 }
 updateAddBtnVisibility();
 
@@ -2789,10 +2846,12 @@ document.addEventListener('keydown', (e) => {
   closeStockModal();
   closeStockEditModal();
   closeAddModal();
+  closeListModal();
 });
 
 function render(query = '') {
   const q = query.toLowerCase().trim();
+  
   const peopleList = document.getElementById('people-list');
   const list17     = document.getElementById('list-17');
   const list19     = document.getElementById('list-19');
@@ -2816,7 +2875,7 @@ function render(query = '') {
     .toLowerCase()
     .includes(q);
 
-  const filtered   = mainPeople.filter(match);
+  const filtered   = mainPeople.filter(match).sort((a, b) => a.en.localeCompare(b.en));
   const filtered17 = people17.filter(match);
   const filtered19 = people19.filter(match);
 
@@ -3289,6 +3348,50 @@ function openStockModal() {
 
 function closeStockModal() {
   document.getElementById('stock-modal').classList.remove('active');
+}
+
+// ── LIST MODAL — "Skříňky" та "Telefony" ───────────────────────
+// Спільне вікно: renderListModal() наповнює його рядками "ім'я — значення".
+// Список людей — ті самі visiblePeople, що й у render() (приховані виключені).
+function renderListModal(title, rows) {
+  document.getElementById('list-modal-title').textContent = title;
+  const body = document.getElementById('list-modal-body');
+  body.innerHTML = '';
+  if (!rows.length) {
+    body.innerHTML = '<div class="list-empty">Žádné záznamy</div>';
+  } else {
+    rows.forEach(({ name, valueHtml }) => {
+      const row = document.createElement('div');
+      row.className = 'list-row';
+      row.innerHTML = `<span class="list-row-name">${name}</span><span class="list-row-value">${valueHtml}</span>`;
+      body.appendChild(row);
+    });
+  }
+  document.getElementById('list-modal').classList.add('active');
+}
+function closeListModal() {
+  document.getElementById('list-modal').classList.remove('active');
+}
+
+function openLockersList() {
+  const visiblePeople = PEOPLE.filter(p => !hiddenPeople.has(p._origEn || p.en));
+  const rows = visiblePeople
+    .filter(p => p.locker !== '' && p.locker != null && Number(p.locker) !== 0)
+    .sort((a, b) => Number(a.locker) - Number(b.locker))
+    .map(p => ({ name: p.en, valueHtml: '№ ' + p.locker }));
+  renderListModal('🗄 Skříňky', rows);
+}
+
+function openPhonesList() {
+  const visiblePeople = PEOPLE.filter(p => !hiddenPeople.has(p._origEn || p.en));
+  const rows = visiblePeople
+    .filter(p => p.phone && p.phone.trim())
+    .sort((a, b) => a.en.localeCompare(b.en))
+    .map(p => ({
+      name: p.en,
+      valueHtml: `<a href="tel:${p.phone.trim().replace(/\s/g, '')}">${p.phone.trim()}</a>`,
+    }));
+  renderListModal('📞 Telefony', rows);
 }
 
 // ── STOCK EDIT MODAL (редагування лише "Nové") ────────────────
