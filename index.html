@@ -457,6 +457,9 @@
   .check-btn.checked-present { background: var(--accent); border-color: var(--accent); }
   .check-btn.checked-17 { background: #f59e0b; border-color: #f59e0b; }
   .check-btn.checked-19 { background: #8b5cf6; border-color: #8b5cf6; }
+  /* Зсув галочки "19:00" вліво, щоб була рівно під "17:00".
+     Зміни число нижче (у px), щоб підлаштувати точніше. */
+  .check-btn-19 { margin-left: -4px; }
   .check-btn svg {
     width: 12px;
     height: 12px;
@@ -967,6 +970,22 @@
   .list-row-value a { color: inherit; text-decoration: none; }
   .list-empty { text-align: center; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 16px 0; }
 
+  /* Кнопка "↩ Obnovit" у списку "Vymazané osoby" */
+  .list-restore-btn {
+    background: var(--surface2);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background .15s, color .15s;
+  }
+  .list-restore-btn:hover, .list-restore-btn:active { background: var(--accent); color: #0b0e14; }
+
   .stock-edit-box { max-width: 320px; }
   .stock-edit-row {
     display: flex;
@@ -1301,6 +1320,9 @@
       <div style="display:flex;gap:8px;">
         <button class="stock-list-btn" onclick="openLockersList()">🗄 Skříňky</button>
         <button class="stock-list-btn" onclick="openPhonesList()">📞 Telefony</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <button class="stock-list-btn" onclick="openDeletedList()">🗑 Vymazané</button>
       </div>
     </div>
 
@@ -2235,6 +2257,13 @@ function saveData() {
   if (typeof syncToFirebase === 'function') syncToFirebase();
 }
 
+// Ховає цифри номера телефону зірочками, зберігаючи формат (пробіли, +).
+// В admin-режимі показуємо номер як є (див. виклики нижче).
+function maskPhone(phone) {
+  if (!phone) return '';
+  return phone.replace(/\d/g, '*');
+}
+
 function getInitials(name) {
   const parts = name.trim().split(' ');
   return (parts[0]?.[0] || '') + (parts[1]?.[0] || '');
@@ -2259,6 +2288,8 @@ function handleLogoClick() {
       logo.style.color = isAdmin ? '#f59e0b' : '';
       showSyncToast(isAdmin ? '🔓 Admin režim ZAPNUTÝ' : '🔒 Admin režim vypnutý', isAdmin ? 'ok' : 'warn');
       updateAddBtnVisibility();
+      // Перемальовуємо картки, щоб номери телефонів одразу показались/сховались
+      render(document.getElementById('search').value);
     }, 1200);
   };
   const cancel = () => clearTimeout(timer);
@@ -2387,7 +2418,11 @@ avatarWrap.appendChild(flagEl);
 
   const phone = document.createElement('div');
   phone.className = 'phone';
-  phone.textContent = person.phone || '';
+  // Номер прихований зірочками, поки не увімкнено admin-режим (довге
+  // натискання на логотип). Реальні цифри навіть не потрапляють у DOM,
+  // коли admin вимкнено — так їх не можна побачити навіть через
+  // "Переглянути код сторінки" / вибрати текст.
+  phone.textContent = isAdmin ? (person.phone || '') : maskPhone(person.phone);
 
   info.appendChild(nameEnWrap);
   info.appendChild(nameUa);
@@ -2414,7 +2449,9 @@ avatarWrap.appendChild(flagEl);
 
   // Галочка "19:00"
   const btn19 = document.createElement('div');
-  btn19.className = 'check-btn' + (listType === '19' ? ' checked-19' : '');
+  // check-btn-19 — трохи зсуває галочку "19:00" вліво, щоб вона була
+  // точно під галочкою "17:00" (див. margin-left у CSS нижче).
+  btn19.className = 'check-btn check-btn-19' + (listType === '19' ? ' checked-19' : '');
   btn19.innerHTML = `<svg viewBox="0 0 16 16"><polyline points="2,8 6,12 14,4"/></svg><span class="btn-label">19:00</span>`;
   btn19.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -2498,9 +2535,11 @@ function openLightbox(person) {
   const rawPhone = person.phone && person.phone !== '+380 XX XXX XX XX' ? person.phone : '';
   const lbPhoneEl = document.getElementById('lb-phone');
   if (lbPhoneEl) {
-    lbPhoneEl.textContent = rawPhone || '—';
+    // Поза admin-режимом показуємо замасковану версію і вимикаємо клік-дзвінок.
+    const shownPhone = isAdmin ? rawPhone : maskPhone(rawPhone);
+    lbPhoneEl.textContent = shownPhone || '—';
     lbPhoneEl.className = 'lb-value phone';
-    if (rawPhone) {
+    if (rawPhone && isAdmin) {
       lbPhoneEl.style.cursor = 'pointer';
       lbPhoneEl.style.textDecoration = 'underline';
       lbPhoneEl.onclick = (e) => {
@@ -2780,13 +2819,10 @@ function askDeletePerson() {
   const key = person._origEn || person.en;
   set17 = set17.filter(n => n !== person.en);
   set19 = set19.filter(n => n !== person.en);
-  if (person._custom) {
-    customPeople = customPeople.filter(p => (p._origEn || p.en) !== key);
-    const i = PEOPLE.indexOf(person);
-    if (i !== -1) PEOPLE.splice(i, 1);
-  } else {
-    hiddenPeople.add(key);
-  }
+  // І базових, і доданих ("Přidat osobu") людей лише ХОВАЄМО (hiddenPeople),
+  // не стираємо фізично — інакше вони не потраплять у список
+  // "🗑 Vymazané" і їх не можна буде відновити кнопкою "↩ Obnovit".
+  hiddenPeople.add(key);
   delete editedNames[key];
   closeEditModal();
   saveLocal();
@@ -3375,6 +3411,9 @@ function closeStockModal() {
 // ── LIST MODAL — "Skříňky" та "Telefony" ───────────────────────
 // Спільне вікно: renderListModal() наповнює його рядками "ім'я — значення".
 // Список людей — ті самі visiblePeople, що й у render() (приховані виключені).
+// Рядок з полем onAction малюється через DOM (не innerHTML-рядок),
+// щоб можна було безпечно передати замикання з реальним ключем людини
+// (для кнопки "↩ Obnovit"), без ризику зламати HTML через лапки в імені.
 function renderListModal(title, rows) {
   document.getElementById('list-modal-title').textContent = title;
   const body = document.getElementById('list-modal-body');
@@ -3382,10 +3421,25 @@ function renderListModal(title, rows) {
   if (!rows.length) {
     body.innerHTML = '<div class="list-empty">Žádné záznamy</div>';
   } else {
-    rows.forEach(({ name, valueHtml }) => {
+    rows.forEach(({ name, valueHtml, actionLabel, onAction }) => {
       const row = document.createElement('div');
       row.className = 'list-row';
-      row.innerHTML = `<span class="list-row-name">${name}</span><span class="list-row-value">${valueHtml}</span>`;
+      const nameSpan = document.createElement('span');
+      nameSpan.className = 'list-row-name';
+      nameSpan.textContent = name;
+      row.appendChild(nameSpan);
+      if (onAction) {
+        const btn = document.createElement('button');
+        btn.className = 'list-restore-btn';
+        btn.textContent = actionLabel || '';
+        btn.onclick = onAction;
+        row.appendChild(btn);
+      } else {
+        const valSpan = document.createElement('span');
+        valSpan.className = 'list-row-value';
+        valSpan.innerHTML = valueHtml || '';
+        row.appendChild(valSpan);
+      }
       body.appendChild(row);
     });
   }
@@ -3393,6 +3447,27 @@ function renderListModal(title, rows) {
 }
 function closeListModal() {
   document.getElementById('list-modal').classList.remove('active');
+}
+
+// "Vymazané" — люди, яких приховано (hiddenPeople). Вони не видаляються
+// фізично, лише ховаються — тому їх можна відновити.
+function restorePerson(key) {
+  hiddenPeople.delete(key);
+  saveLocal();
+  render(document.getElementById('search').value);
+  if (typeof syncToFirebase === 'function') syncToFirebase();
+  showSyncToast('↩ Osoba obnovena', 'ok');
+  openDeletedList(); // одразу оновлюємо список, щоб рядок зник
+}
+function openDeletedList() {
+  const rows = PEOPLE
+    .filter(p => hiddenPeople.has(p._origEn || p.en))
+    .sort((a, b) => a.en.localeCompare(b.en))
+    .map(p => {
+      const key = p._origEn || p.en;
+      return { name: p.en, actionLabel: '↩ Obnovit', onAction: () => restorePerson(key) };
+    });
+  renderListModal('🗑 Vymazané osoby', rows);
 }
 
 function openLockersList() {
