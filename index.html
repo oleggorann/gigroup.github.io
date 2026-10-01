@@ -459,7 +459,7 @@
   .check-btn.checked-19 { background: #8b5cf6; border-color: #8b5cf6; }
   /* Зсув галочки "19:00" вліво, щоб була рівно під "17:00".
      Зміни число нижче (у px), щоб підлаштувати точніше. */
-  .check-btn-19 { margin-left: -4px; }
+  .check-btn-17 { margin-left: -55px; }
   .check-btn svg {
     width: 12px;
     height: 12px;
@@ -1420,21 +1420,6 @@ const PEOPLE = [
     flag:  "🇺🇦",
     locker: 105,
     dispatcher: "Kuba - 1 Hala",
-    city:       "",
-    dovolena:   "", 
-    helma:  "1",
-    vesta:  "1",
-    boty:   "1x vel: ",
-  },
-  {
-    en:    "Chesnokov Pavlo",
-    ua:    "Чесноков Павло",
-    viber: "Паша",
-    phone: "+380 67 803 8967",
-    photo: "photos/chesnokov_pavlo.jpg",
-    flag:  "🇺🇦",
-    locker: 88,
-    dispatcher: "",
     city:       "",
     dovolena:   "", 
     helma:  "1",
@@ -2436,7 +2421,8 @@ avatarWrap.appendChild(flagEl);
 
   // Галочка "17:00"
   const btn17 = document.createElement('div');
-  btn17.className = 'check-btn' + (listType === '17' ? ' checked-17' : '');
+  // check-btn-17 — зсуває галочку "17:00" вліво (тепер вона знизу).
+  btn17.className = 'check-btn check-btn-17' + (listType === '17' ? ' checked-17' : '');
   btn17.innerHTML = `<svg viewBox="0 0 16 16"><polyline points="2,8 6,12 14,4"/></svg><span class="btn-label">17:00</span>`;
   btn17.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -2449,9 +2435,7 @@ avatarWrap.appendChild(flagEl);
 
   // Галочка "19:00"
   const btn19 = document.createElement('div');
-  // check-btn-19 — трохи зсуває галочку "19:00" вліво, щоб вона була
-  // точно під галочкою "17:00" (див. margin-left у CSS нижче).
-  btn19.className = 'check-btn check-btn-19' + (listType === '19' ? ' checked-19' : '');
+  btn19.className = 'check-btn' + (listType === '19' ? ' checked-19' : '');
   btn19.innerHTML = `<svg viewBox="0 0 16 16"><polyline points="2,8 6,12 14,4"/></svg><span class="btn-label">19:00</span>`;
   btn19.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -2462,8 +2446,9 @@ avatarWrap.appendChild(flagEl);
     setTimeout(() => toggleList(capturedName, '19', savedScroll), 310);
   });
 
-  rightCol.appendChild(btn17);
+  // Поміняно місцями: тепер "19:00" зверху, "17:00" знизу.
   rightCol.appendChild(btn19);
+  rightCol.appendChild(btn17);
 
   div.appendChild(avatarWrap);
   div.appendChild(info);
