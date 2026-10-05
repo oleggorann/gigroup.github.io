@@ -1658,17 +1658,17 @@ const PEOPLE = [
   {
     en:    "Kyshylyshyn Vitalii",
     ua:    "Кишилишин Віталій",
-    viber: "Name",
-    phone: "+380 96 000 0000",
+    viber: "Vitalii Kyshylyshyn",
+    phone: "+420 72 134 3845",
     photo: "photos/kyshylyshyn_vitalii.jpg",
     flag:  "🇺🇦",
-    locker: 00,
-    dispatcher: "",
-    city:       "",
+    locker: 121,
+    dispatcher: "1 Hala",
+    city:       "Hradec Králové",
     dovolena:   "", 
     helma:  "1",
     vesta:  "1",
-    boty:   "1x vel: ",
+    boty:   "1x vel: 40",
   },
   {
     en:    "Leiko Roman",
@@ -1689,8 +1689,8 @@ const PEOPLE = [
   {
     en:    "Lemchyk Andrii",
     ua:    "Лемчик Андрій",
-    viber: "Name",
-    phone: "+380 96 000 0000",
+    viber: "Lemchyk",
+    phone: "+420 77 619 2327",
     photo: "photos/lemchyk_andrii.jpg",
     flag:  "🇺🇦",
     locker: 00,
@@ -1704,8 +1704,8 @@ const PEOPLE = [
   {
     en:    "Lemchyk Mykhailo",
     ua:    "Лемчик Михайло",
-    viber: "Name",
-    phone: "+380 96 000 0000",
+    viber: "Андрій",
+    phone: "+380 96 764 1465",
     photo: "photos/lemchyk_mykhailo.jpg",
     flag:  "🇺🇦",
     locker: 00,
@@ -2507,7 +2507,7 @@ avatarWrap.appendChild(flagEl);
   const btn17 = document.createElement('div');
   // check-btn-17 — зсуває галочку "17:00" вліво (тепер вона знизу).
   btn17.className = 'check-btn check-btn-17' + (listType === '17' ? ' checked-17' : '');
-  btn17.innerHTML = `<svg viewBox="0 0 16 16"><polyline points="2,8 6,12 14,4"/></svg><span class="btn-label">17:00</span>`;
+  btn17.innerHTML = `<svg viewBox="0 0 16 16"><polyline points="2,8 6,12 14,4"/></svg><span class="btn-label">10:00</span>`;
   btn17.addEventListener('click', (e) => {
     e.stopPropagation();
     btn17.classList.toggle('checked-17');
@@ -2520,7 +2520,7 @@ avatarWrap.appendChild(flagEl);
   // Галочка "19:00"
   const btn19 = document.createElement('div');
   btn19.className = 'check-btn' + (listType === '19' ? ' checked-19' : '');
-  btn19.innerHTML = `<svg viewBox="0 0 16 16"><polyline points="2,8 6,12 14,4"/></svg><span class="btn-label">19:00</span>`;
+  btn19.innerHTML = `<svg viewBox="0 0 16 16"><polyline points="2,8 6,12 14,4"/></svg><span class="btn-label">8:00</span>`;
   btn19.addEventListener('click', (e) => {
     e.stopPropagation();
     btn19.classList.toggle('checked-19');
