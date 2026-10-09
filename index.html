@@ -1497,6 +1497,22 @@ const PEOPLE = [
     boty:   "1x vel: ",
   },
   {
+    en:    "Egermayer Tomáš",
+    ua:    "Егермаєр Томаш",
+    viber: "Name",
+    phone: "+420 77 421 5047",
+    photo: "photos/egermayer_tomas.jpg",
+    flag:  "🇨🇿",
+    locker: 00,
+    dispatcher: "Hala",
+    city:       "",
+    dovolena:   "", 
+    helma:  "1",
+    vesta:  "1",
+    boty:   "1x vel: ",
+    zamek:  "",
+  },
+  {
     en:    "Dziuba Maksym",
     ua:    "Дзюба Максим",
     viber: "Максим",
@@ -1660,7 +1676,7 @@ const PEOPLE = [
     ua:    "Кишилишин Віталій",
     viber: "Vitalii Kyshylyshyn",
     phone: "+420 72 134 3845",
-    photo: "photos/kyshylyshyn_vitalii.jpg",
+    photo: "photos/kyshylyshyn_vitalii.png",
     flag:  "🇺🇦",
     locker: 121,
     dispatcher: "1 Hala",
@@ -1698,7 +1714,6 @@ const PEOPLE = [
 	nastup:     "05.10.2026",
     city:       "Hořice",
     dovolena:   "", 
-	car:    true, 
     helma:  "",
     vesta:  "1",
     boty:   "1x vel: 43",
@@ -1712,12 +1727,14 @@ const PEOPLE = [
     flag:  "🇺🇦",
     locker: 107,
     dispatcher: "",
+	car:    true, 
 	nastup:     "05.10.2026",
     city:       "Hořice",
     dovolena:   "", 
     helma:  "",
     vesta:  "1",
     boty:   "1x vel: 43",
+    zamek:  "1",
   },
   {
     en:    "Mackiewicz Krzysztof Kamil",
@@ -1788,7 +1805,7 @@ const PEOPLE = [
     ua:    "Мідянко Максим",
     viber: "Максим",
     phone: "+420 72 223 8109",
-    photo: "photos/midianko_maksym.jpg",
+    photo: "photos/midianko_maksym.png",
     flag:  "🇺🇦",
     locker: 84,
     dispatcher: "",
@@ -1844,7 +1861,7 @@ const PEOPLE = [
 	car:    true, 
     helma:  "1",
     vesta:  "1",
-    boty:   "1x vel: 41, 08.09.26",
+    boty:   "2x vel: 41, 08.09.26",
   },
   {
     en:    "Orel Illia",
@@ -1967,7 +1984,7 @@ const PEOPLE = [
     city:       "",
     dovolena:   "", 
     helma:  "1",
-    vesta:  "1",	
+    vesta:  "2",	
     boty:   "1x vel: ",
   },
 	{
@@ -2201,7 +2218,7 @@ const PEOPLE = [
     en:    "Zaňková Markéta",
     ua:    "Занькова Маркета",
     viber: "Buldok Dog Dog",
-    phone: "+420 79 249 5097",
+    phone: "+420 73 797 8548",
     photo: "photos/zankova_marketa.jpg",
     flag:  "🇨🇿",
     locker: [27, 28, 39, 30],
@@ -2815,7 +2832,7 @@ function toggleList(name, listType, savedScroll) {
 
 function clearLists() {
   if (!set17.length && !set19.length) { showExportToast('⚠️ Seznamy jsou prázdné'); return; }
-  if (!confirm(`Vymazat všechny seznamy?\n17:00 — ${set17.length} osob\n19:00 — ${set19.length} osob`)) return;
+  if (!confirm(`Vymazat všechny seznamy?\n10:00 — ${set17.length} osob\n8:00 — ${set19.length} osob`)) return;
   set17 = [];
   set19 = [];
   saveLocal();
