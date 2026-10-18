@@ -59,7 +59,7 @@
     flex-shrink: 0;
   }
 
-  .search-wrap { flex: 1; position: relative; }
+  .search-wrap { flex: 1; position: relative; display:flex; flex-direction:column; gap:4px; min-width:0; }
 
   #search {
     width: 100%;
@@ -116,8 +116,8 @@
   }
 
   .hc-item::before { font-size: 9px; margin-right: 2px; }
-  .hc-item:nth-child(1)::before { content: "Список"; color: var(--text-muted); }
-  .hc-item:nth-child(2)::before { content: "17:00"; }
+  .hc-item:nth-child(1)::before { content: ""; color: var(--text-muted); }
+  .hc-item:nth-child(2)::before { content: "PN"; }
   .hc-item:nth-child(3)::before { content: "19:00"; }
   .hc-present { color: var(--accent); }
 
@@ -740,7 +740,7 @@
   .btn-col { padding-bottom: 4px; }
 
   @keyframes cardOut {
-    0%   { opacity: 1; transform: translateX(0) scaleY(1); max-height: 100px; }
+    0%   { opacity: 1; transform: translateX(0) scaleY(1); max-height: 180px; }
     35%  { opacity: .5; transform: translateX(32px) scaleY(1); }
     100% { opacity: 0; transform: translateX(90px) scaleY(0.5); max-height: 0; padding-top: 0; padding-bottom: 0; }
   }
@@ -1075,6 +1075,46 @@
   }
   .stock-boty-add-btn:hover { border-color: var(--accent); color: var(--accent); }
 
+  /* ── Нові списки: до 5:30 (блакитний) і PN (червоний) ──
+     .item-530 / .item-pn — фон і лінія картки в списку
+     .checked-530 / .checked-pn — колір увімкненої галочки */
+  .person.item-530 { background: #0a1420; border-bottom-color: #38bdf830; }
+  .person.item-530:active { background: #0a1420; }
+  .person.item-pn  { background: #1a0d0d; border-bottom-color: #ef444430; }
+  .person.item-pn:active  { background: #1a0d0d; }
+  .check-btn.checked-530 { background: #38bdf8; border-color: #38bdf8; }
+  .check-btn.checked-pn  { background: #ef4444; border-color: #ef4444; }
+  .check-btn.checked-530 svg,
+  .check-btn.checked-pn svg { opacity: 1; }
+
+  /* Save + рядок лічильників під ним (праворуч).
+     gap — відступ між кнопкою Save і рядком лічильників (мінімальний) */
+  .save-col { display:flex; flex-direction:column; align-items:flex-end; gap:1px; flex-shrink:0; }
+  /* Варіант рядка під полем пошуку — вирівнювання по центру поля пошуку */
+  .save-counts.save-counts-left { justify-content: center; padding-left: 0; padding-right: 0; }
+  /* Рядок лічильників 5:30 / 17:00 / 19:00 / PN: gap — відстань між ними, font-size — розмір */
+  .save-counts { display:flex; flex-direction:row; gap:10px; justify-content:flex-end; padding-right:2px; font-family:'JetBrains Mono',monospace; font-size:9px; line-height:1; white-space:nowrap; }
+  /* ══ РОЗМІР ГАЛОЧОК НА КАРТКАХ ══
+     --check-size — сторона квадратної галочки (ширина = висота).
+       24px — як було раніше (коли галочок було дві); менше число = менші галочки.
+     Сама «пташка» всередині автоматично масштабується (половина розміру кнопки).
+     Відступи між галочками — у createCard: rightCol.style.cssText (column-gap / row-gap).
+     Розмір підписів під галочками — у блоці .check-btn .btn-label (font-size). */
+  :root { --check-size: 24px; }
+  .person .check-btn { width: var(--check-size); height: var(--check-size); }
+  .person .check-btn svg { width: calc(var(--check-size) * 0.5); height: calc(var(--check-size) * 0.5); }
+  /* ── Вирівнювання шапки: logo, лічильник людей і кнопка Save — по ЦЕНТРУ шапки по висоті ──
+     align-items:center — усі елементи шапки центруються по вертикалі (поле пошуку разом
+     з рядком лічильників під ним теж центрується як один блок).
+     #search height — висота поля пошуку (змінюй, якщо потрібно вище/нижче).
+     Щоб притиснути все до верху шапки — заміни center на flex-start і додай padding-top. */
+  header { align-items: center; padding-top: 0; }
+  #search { height: 32px; }
+  .logo, .header-counts, .save-col, .btn-add { height: auto; align-self: center; }
+  .logo { display: block; }
+  .header-counts { justify-content: center; }
+  .save-col { justify-content: center; }
+  /* Висоту кнопки Save НЕ перевизначаємо — вона оригінальна (padding: 8px 12px у блоці .btn-save вище) */
 </style>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -1084,16 +1124,26 @@
 <header>
   <span class="logo" id="logo-btn" onclick="handleLogoClick()" style="cursor:pointer;user-select:none;">Gi Group</span>
   <div class="search-wrap">
-    <span class="search-icon">⌕</span>
-    <input type="search" id="search" placeholder="Hledání..." autocomplete="off">
+    <div style="position:relative">
+      <span class="search-icon">⌕</span>
+      <input type="search" id="search" placeholder="Hledání..." autocomplete="off">
+    </div>
+    <!-- Рядок лічильників під полем пошуку (по центру): PN, 5:30, 17:00, 19:00.
+         Числа оновлює render() через класи cnt-* -->
+    <div class="save-counts save-counts-left">
+      <span style="color:#ef4444">PN·<span class="cnt-pn">0</span></span>
+      <span style="color:#38bdf8">5:30·<span class="cnt-530">0</span></span>
+      <span style="color:#f59e0b">17:00·<span class="cnt-17">0</span></span>
+      <span style="color:#8b5cf6">19:00·<span class="cnt-19">0</span></span>
+    </div>
   </div>
   <div class="header-counts">
     <span class="hc-item">· <span id="count">0</span></span>
-    <span class="hc-item" style="color:#f59e0b">· <span id="count-17-top">0</span></span>
-    <span class="hc-item" style="color:#8b5cf6">· <span id="count-19-top">0</span></span>
   </div>
   <button class="btn-add" id="btn-add-person" onclick="openAddModal()" title="Přidat osobu" style="display:none">＋</button>
-  <button class="btn-save" id="btn-save-main" onclick="saveData()">Save</button>
+  <div class="save-col">
+    <button class="btn-save" id="btn-save-main" onclick="saveData()">Save</button>
+  </div>
 </header>
 
 <div id="ptr-indicator">
@@ -1128,7 +1178,20 @@
     <div id="list-19"></div>
   </div>
 
-  <button class="export-bottom-btn danger" onclick="clearLists()">🗑 Vymazat seznamy 17:00 / 19:00</button>
+  <!-- Секція списку "до 5:30" (блакитна). Показується лише коли в списку є люди (див. render) -->
+  <div id="section-530" style="display:none">
+    <div class="section-label" style="color:#38bdf8; border-bottom-color:#38bdf840">Seznam do 5:30 · <span id="count-530">0</span></div>
+    <div id="list-530"></div>
+  </div>
+
+  <!-- Секція списку "PN" (червона). Показується лише коли в списку є люди (див. render) -->
+  <div id="section-pn" style="display:none">
+    <div class="section-label" style="color:#ef4444; border-bottom-color:#ef444440">Seznam PN / DOV · <span id="count-pn">0</span></div>
+    <div id="list-pn"></div>
+  </div>
+
+  <!-- Очищає списки 17:00, 19:00 та до 5:30. Список PN НЕ чіпає (див. clearLists) -->
+  <button class="export-bottom-btn danger" onclick="clearLists()">🗑 Vymazat seznamy</button>
   <!-- Кнопка експорту — в самому низу після всіх списків -->
   <button class="export-bottom-btn" onclick="exportToCSV()">↓ Export seznamu</button>
 
@@ -1421,7 +1484,7 @@
 // ║  photo      — шлях до фото (відносно HTML-файлу)            ║
 // ║  flag       — прапор країни: 🇺🇦 / 🇨🇿 / 🇵🇱           	     ║
 // ║  locker     — номер шафки:   locker: 85                     ║
-// ║  dispatcher — диспетчер:     dispatcher: "Kuba - 1 Hala"    ║
+// ║  dispatcher — диспетчер:     dispatcher: "Daniel - 1 Hala"    ║
 // ║  city       — місто в Чехії: city: "Hradec Králové"         ║
 // ║  dovolena   — відпустка:     dovolena: "DOV 1.7–14.7"       ║
 // ║  nastup     — дата виходу:   nastup: "01.03.2025"           ║
@@ -1442,7 +1505,7 @@ const PEOPLE = [
     photo: "photos/anosov_oleksandr.jpg",
     flag:  "🇺🇦",
     locker: 103,
-    dispatcher: "Kuba - 1 Hala",
+    dispatcher: "Daniel - 1 Hala",
     city:       "",
     dovolena:   "", 
 	car:    true, 
@@ -1458,7 +1521,7 @@ const PEOPLE = [
     phone: "+380 68 229 2395",
     flag:  "🇺🇦",
     locker: 105,
-    dispatcher: "Kuba - 1 Hala",
+    dispatcher: "Daniel - 1 Hala",
     city:       "",
     dovolena:   "", 
     helma:  "1",
@@ -1568,7 +1631,7 @@ const PEOPLE = [
     photo: "photos/fedorenko_oleksii.jpg",
     flag:  "🇺🇦",
     locker: 124,
-    dispatcher: "Kuba - 1 Hala",
+    dispatcher: "Daniel - 1 Hala",
     city:       "",
     dovolena:   "", 
 	nastup:     "30.08.2026",
@@ -1649,7 +1712,7 @@ const PEOPLE = [
     photo: "photos/kapatsyna_vladyslav.jpg",
     flag:  "🇺🇦",
     locker: 108,
-    dispatcher: "Kuba - 1 Hala",
+    dispatcher: "Daniel - 1 Hala",
     city:       "",
     dovolena:   "", 
     helma:  "1",
@@ -1872,7 +1935,7 @@ const PEOPLE = [
     photo: "photos/orel_illia.jpg",
     flag:  "🇺🇦",
     locker: 113,
-    dispatcher: "Kuba - 1 Hala",
+    dispatcher: "Daniel - 1 Hala",
     city:       "Hradec Králové - Ubytovna",
     dovolena:   "", 
     helma:  "1",
@@ -1917,7 +1980,7 @@ const PEOPLE = [
     photo: "photos/pavliuk_vladyslav.jpg",
     flag:  "🇺🇦",
     locker: 114,
-    dispatcher: "Kuba - 1 Hala",
+    dispatcher: "Daniel - 1 Hala",
     city:       "Hradec Králové - Ubytovna",
     dovolena:   "", 
     helma:  "1",
@@ -1932,7 +1995,7 @@ const PEOPLE = [
     photo: "photos/petriv_mykhailo.jpg",
     flag:  "🇺🇦",
     locker: 115,
-    dispatcher: "Kuba - 1 Hala",
+    dispatcher: "Daniel - 1 Hala",
     city:       "Nechanice",
     dovolena:   "", 
 	car:    true, 
@@ -1981,7 +2044,7 @@ const PEOPLE = [
     photo: "photos/popovych_stanislav.jpg",
     flag:  "🇺🇦",
     locker: 95,
-    dispatcher: "Kuba - 1 Hala",
+    dispatcher: "Daniel - 1 Hala",
     city:       "",
     dovolena:   "", 
     helma:  "1",
@@ -1996,7 +2059,7 @@ const PEOPLE = [
     photo: "photos/csaba_ruszo.jpg",
     flag:  "🇨🇿",
     locker: 104,
-    dispatcher: "Kuba - 1 Hala",
+    dispatcher: "Daniel - 1 Hala",
     city:       "Jaroměř",
     dovolena:   "", 
     helma:  "1",
@@ -2042,7 +2105,7 @@ const PEOPLE = [
     photo: "photos/sirenko_vitalii.jpg",
     flag:  "🇺🇦",
     locker: 96,
-    dispatcher: "Kuba - 1 Hala",
+    dispatcher: "Daniel - 1 Hala",
     city:       "",
     dovolena:   "", 
 	car:    true, 
@@ -2086,8 +2149,8 @@ const PEOPLE = [
   {
     en:    "Stateczny Adam Wojciech",
     ua:    "Статечний Адам Войцех",
-    viber: "Name",
-    phone: "+380 XX XXX XX XX",
+    viber: "Adam Stateczny",
+    phone: "+486 90 050 194",
     photo: "photos/stateczny_adam.jpg",
     flag:  "🇵🇱",
     locker: 79,
@@ -2255,7 +2318,7 @@ const PEOPLE = [
     photo: "photos/zarovnenko_oleksandr.jpg",
     flag:  "🇺🇦",
 	locker: 106,
-    dispatcher: "Kuba - 1 Hala",
+    dispatcher: "Daniel - 1 Hala",
     city:       "",
     dovolena:   "", 
     helma:  "1",
@@ -2266,8 +2329,8 @@ const PEOPLE = [
   {
     en:    "Zieniewicz Arkadiusz Sebastian",
     ua:    "Зєнєвіч Аркадіуш Себастіан",
-    viber: "Name",
-    phone: "+380 XX XXX XX XX",
+    viber: "Arkadiusz",
+    phone: "+487 30 866 461",
     photo: "photos/zieniewicz_arkadiusz.jpg",
     flag:  "🇵🇱",
     locker: 0,
@@ -2312,6 +2375,10 @@ const LS = {
 // State
 let set17 = LS.get('set17', []);
 let set19 = LS.get('set19', []);
+// Список «до 5:30» — масив імен (en); зберігається локально і у Firebase (ключ set530)
+let set530 = LS.get('set530', []);
+// Список «PN» — масив імен (en); зберігається локально і у Firebase (ключ setPN)
+let setPN  = LS.get('setPN', []);
 let editingName = null;
 let editedNames = LS.get('editedNames', {});
 let customPeople = LS.get('customPeople', []);
@@ -2344,6 +2411,9 @@ applyLocalOverrides();
 function saveLocal() {
   LS.set('set17', set17);
   LS.set('set19', set19);
+  // Нові списки теж пишемо в локальне сховище (offline backup)
+  LS.set('set530', set530);
+  LS.set('setPN', setPN);
   LS.set('editedNames', editedNames);
   LS.set('dovolena', collectDovolenaData());
   LS.set('customPeople', customPeople);
@@ -2425,6 +2495,9 @@ function createCard(person, listType) {
   if (listType === 'present') cls += ' present-item';
   if (listType === '17') cls += ' item-17';
   if (listType === '19') cls += ' item-19';
+  // Фон картки для нових списків: до 5:30 (блакитний) та PN (червоний)
+  if (listType === '530') cls += ' item-530';
+  if (listType === 'PN')  cls += ' item-pn';
   div.className = cls;
 
   // Avatar wrapper
@@ -2510,6 +2583,7 @@ avatarWrap.appendChild(flagEl);
   const viber = document.createElement('div');
   viber.className = 'viber-name';
   viber.textContent = `Viber: ${person.viber}`;
+  // Рядок Viber видно всім (як і раніше), не лише в admin-режимі
 
  // Там де персон доволена в фігурних душках перед тим риска і пробіл
   const dovolenaEl = document.createElement('div');
@@ -2528,7 +2602,9 @@ avatarWrap.appendChild(flagEl);
   // натискання на логотип). Реальні цифри навіть не потрапляють у DOM,
   // коли admin вимкнено — так їх не можна побачити навіть через
   // "Переглянути код сторінки" / вибрати текст.
-  phone.textContent = isAdmin ? (person.phone || '') : maskPhone(person.phone);
+  // Номер показується як є (без зірочок), але сам рядок на картці видно лише в admin
+  phone.textContent = person.phone || '';
+  phone.style.display = isAdmin ? '' : 'none';
 
   info.appendChild(nameEnWrap);
   info.appendChild(nameUa);
@@ -2536,40 +2612,41 @@ avatarWrap.appendChild(flagEl);
   info.appendChild(dovolenaEl);
   info.appendChild(phone);
 
-  // Галочки вертикально
+  // Галочки списків — сітка 2×2 справа на картці (на «старому» місці, праворуч від тексту).
+  // Права колонка: 17:00 (зверху) і 19:00 (знизу).
+  // Ліва колонка (навпроти них): PN (зверху) і 5:30 (знизу).
+  // column-gap — відстань між колонками; row-gap — між рядками
+  // (залишай місце під підписами галочок); padding-bottom — відступ знизу.
   const rightCol = document.createElement('div');
-  rightCol.style.cssText = 'display:flex; flex-direction:column; align-items:center; gap:20px; flex-shrink:0;'; // ← GAP між галочками — змінюй тут
+  rightCol.style.cssText = 'display:grid; grid-template-columns:auto auto; column-gap:22px; row-gap:16px; align-items:center; justify-items:center; flex-shrink:0; padding-bottom:8px;';
 
-  // Галочка "17:00"
-  const btn17 = document.createElement('div');
-  // check-btn-17 — зсуває галочку "17:00" вліво (тепер вона знизу).
-  btn17.className = 'check-btn check-btn-17' + (listType === '17' ? ' checked-17' : '');
-  btn17.innerHTML = `<svg viewBox="0 0 16 16"><polyline points="2,8 6,12 14,4"/></svg><span class="btn-label">10:00</span>`;
-  btn17.addEventListener('click', (e) => {
-    e.stopPropagation();
-    btn17.classList.toggle('checked-17');
-    div.classList.add('card-removing');
-    const savedScroll = window.scrollY;
-    const capturedName = person.en; // capture at click time
-    setTimeout(() => toggleList(capturedName, '17', savedScroll), 310);
-  });
+  // Фабрика галочки: key — ключ списку ('PN' | '530' | '17' | '19'),
+  // cls — CSS-клас увімкненого стану, label — підпис під галочкою.
+  // Клік: анімація зникнення картки → toggleList() додає/прибирає людину зі списку.
+  const makeCheck = (key, cls, label) => {
+    const b = document.createElement('div');
+    // Галочка вже увімкнена, якщо картка зараз знаходиться саме в цьому списку
+    b.className = 'check-btn' + (listType === key ? ' ' + cls : '');
+    b.innerHTML = `<svg viewBox="0 0 16 16"><polyline points="2,8 6,12 14,4"/></svg><span class="btn-label">${label}</span>`;
+    b.addEventListener('click', (e) => {
+      e.stopPropagation();
+      b.classList.toggle(cls);
+      div.classList.add('card-removing');
+      const savedScroll = window.scrollY;
+      const capturedName = person.en; // capture at click time
+      setTimeout(() => toggleList(capturedName, key, savedScroll), 310);
+    });
+    return b;
+  };
 
-  // Галочка "19:00"
-  const btn19 = document.createElement('div');
-  btn19.className = 'check-btn' + (listType === '19' ? ' checked-19' : '');
-  btn19.innerHTML = `<svg viewBox="0 0 16 16"><polyline points="2,8 6,12 14,4"/></svg><span class="btn-label">8:00</span>`;
-  btn19.addEventListener('click', (e) => {
-    e.stopPropagation();
-    btn19.classList.toggle('checked-19');
-    div.classList.add('card-removing');
-    const savedScroll = window.scrollY;
-    const capturedName = person.en; // capture at click time
-    setTimeout(() => toggleList(capturedName, '19', savedScroll), 310);
-  });
-
-  // Поміняно місцями: тепер "19:00" зверху, "17:00" знизу.
-  rightCol.appendChild(btn19);
-  rightCol.appendChild(btn17);
+  // Порядок додавання = порядок у сітці (зліва направо, зверху вниз):
+  //   PN    | 17:00
+  //   5:30  | 19:00
+  // Підписи (останній аргумент) можна змінити тут
+  rightCol.appendChild(makeCheck('PN',  'checked-pn',  'PN'));
+  rightCol.appendChild(makeCheck('17',  'checked-17',  '17:00'));
+  rightCol.appendChild(makeCheck('530', 'checked-530', '5:30'));
+  rightCol.appendChild(makeCheck('19',  'checked-19',  '19:00'));
 
   div.appendChild(avatarWrap);
   div.appendChild(info);
@@ -2642,10 +2719,10 @@ function openLightbox(person) {
   const lbPhoneEl = document.getElementById('lb-phone');
   if (lbPhoneEl) {
     // Поза admin-режимом показуємо замасковану версію і вимикаємо клік-дзвінок.
-    const shownPhone = isAdmin ? rawPhone : maskPhone(rawPhone);
+    const shownPhone = rawPhone;
     lbPhoneEl.textContent = shownPhone || '—';
     lbPhoneEl.className = 'lb-value phone';
-    if (rawPhone && isAdmin) {
+    if (rawPhone) {
       lbPhoneEl.style.cursor = 'pointer';
       lbPhoneEl.style.textDecoration = 'underline';
       lbPhoneEl.onclick = (e) => {
@@ -2797,18 +2874,25 @@ window.addEventListener('pagehide', flushPendingSync);
 window.addEventListener('beforeunload', flushPendingSync);
 
 function toggleList(name, listType, savedScroll) {
-  const isRemoving17 = set17.includes(name);
-  const isRemoving19 = set19.includes(name);
+  // Чи людина вже в тому списку, на який клікнули (тоді клік = прибрати зі списку)
+  const wasInTarget =
+    (listType === '17'  && set17.includes(name))  ||
+    (listType === '19'  && set19.includes(name))  ||
+    (listType === '530' && set530.includes(name)) ||
+    (listType === 'PN'  && setPN.includes(name));
 
-  set17 = set17.filter(n => n !== name);
-  set19 = set19.filter(n => n !== name);
+  // Людина може бути лише в ОДНОМУ списку — спочатку прибираємо її з усіх чотирьох
+  set17  = set17.filter(n => n !== name);
+  set19  = set19.filter(n => n !== name);
+  set530 = set530.filter(n => n !== name);
+  setPN  = setPN.filter(n => n !== name);
 
-  const wasInTarget = (listType === '17' && isRemoving17) ||
-                      (listType === '19' && isRemoving19);
-
+  // Якщо клікнули на інший список — додаємо людину в нього
   if (!wasInTarget) {
     if (listType === '17') set17.push(name);
     else if (listType === '19') set19.push(name);
+    else if (listType === '530') set530.push(name);
+    else if (listType === 'PN') setPN.push(name);
   }
 
   render(document.getElementById('search').value);
@@ -2821,9 +2905,7 @@ function toggleList(name, listType, savedScroll) {
 
   saveLocal();
 
-  // Debounce перед записом у Firebase — 150 мс (було 600 мс).
-  // Якщо сторінку закриють раніше — flushPendingSync() вище
-  // все одно збереже ці дані негайно.
+  // Debounce перед записом у Firebase — 150 мс.
   clearTimeout(toggleSyncTimer);
   toggleSyncTimer = setTimeout(() => {
     toggleSyncTimer = null;
@@ -2831,11 +2913,15 @@ function toggleList(name, listType, savedScroll) {
   }, 150);
 }
 
+// Кнопка «Vymazat seznamy»: очищає списки 17:00, 19:00 та до 5:30.
+// Список PN навмисно НЕ чіпаємо (setPN залишається як є).
 function clearLists() {
-  if (!set17.length && !set19.length) { showExportToast('⚠️ Seznamy jsou prázdné'); return; }
-  if (!confirm(`Vymazat všechny seznamy?\n10:00 — ${set17.length} osob\n8:00 — ${set19.length} osob`)) return;
+  if (!set17.length && !set19.length && !set530.length) { showExportToast('⚠️ Seznamy jsou prázdné'); return; }
+  if (!confirm(`Vymazat seznamy (kromě PN)?\nOD 17:00 — ${set17.length} osob\nOD 19:00 — ${set19.length} osob\nDO 5:30 — ${set530.length} osob`)) return;
   set17 = [];
   set19 = [];
+  set530 = [];
+  // setPN не очищаємо — PN має зберігатися
   saveLocal();
   render(document.getElementById('search').value);
   syncToFirebase();
@@ -2900,6 +2986,9 @@ function saveEditModal() {
     if (i17 !== -1) set17[i17] = newName;
     const i19 = set19.indexOf(editingName);
     if (i19 !== -1) set19[i19] = newName;
+    // Перейменування: оновлюємо ім'я і в нових списках
+    const i530 = set530.indexOf(editingName); if (i530 !== -1) set530[i530] = newName;
+    const iPN  = setPN.indexOf(editingName);  if (iPN  !== -1) setPN[iPN]   = newName;
     person.en       = newName;
     // Зберігаємо dovolena прямо в об'єкт людини
     person.dovolena = newDovolena;
@@ -2925,6 +3014,9 @@ function askDeletePerson() {
   const key = person._origEn || person.en;
   set17 = set17.filter(n => n !== person.en);
   set19 = set19.filter(n => n !== person.en);
+  // Видалення людини: прибираємо її і з нових списків
+  set530 = set530.filter(n => n !== person.en);
+  setPN  = setPN.filter(n => n !== person.en);
   // І базових, і доданих ("Přidat osobu") людей лише ХОВАЄМО (hiddenPeople),
   // не стираємо фізично — інакше вони не потраплять у список
   // "🗑 Vymazané" і їх не можна буде відновити кнопкою "↩ Obnovit".
@@ -3019,6 +3111,11 @@ function render(query = '') {
   const peopleList = document.getElementById('people-list');
   const list17     = document.getElementById('list-17');
   const list19     = document.getElementById('list-19');
+  // Контейнери і секції нових списків (до 5:30 та PN)
+  const list530    = document.getElementById('list-530');
+  const listPN     = document.getElementById('list-pn');
+  const section530 = document.getElementById('section-530');
+  const sectionPN  = document.getElementById('section-pn');
   const noResults  = document.getElementById('no-results');
   const section17  = document.getElementById('section-17');
   const section19  = document.getElementById('section-19');
@@ -3026,13 +3123,20 @@ function render(query = '') {
   peopleList.innerHTML = '';
   list17.innerHTML     = '';
   list19.innerHTML     = '';
+  // Очищаємо нові списки перед перемальовуванням
+  list530.innerHTML    = '';
+  listPN.innerHTML     = '';
 
   const visiblePeople = PEOPLE.filter(p => !hiddenPeople.has(p._origEn || p.en));
 
-  const inAnyList = n => set17.includes(n) || set19.includes(n);
+  // Людина, що є в будь-якому зі списків, зникає з основного списку
+  const inAnyList = n => set17.includes(n) || set19.includes(n) || set530.includes(n) || setPN.includes(n);
   const mainPeople = visiblePeople.filter(p => !inAnyList(p.en));
   const people17   = set17.map(n => visiblePeople.find(p => p.en === n)).filter(Boolean);
   const people19   = set19.map(n => visiblePeople.find(p => p.en === n)).filter(Boolean);
+  // Об'єкти людей для нових списків (за збереженим порядком імен)
+  const people530  = set530.map(n => visiblePeople.find(p => p.en === n)).filter(Boolean);
+  const peoplePN   = setPN.map(n => visiblePeople.find(p => p.en === n)).filter(Boolean);
 
   const match = p => !q || [p.en, p.ua, p.viber, p.phone, String(p.locker || ''), p.dispatcher]
     .join(' ')
@@ -3042,6 +3146,9 @@ function render(query = '') {
   const filtered   = mainPeople.filter(match).sort((a, b) => a.en.localeCompare(b.en));
   const filtered17 = people17.filter(match);
   const filtered19 = people19.filter(match);
+  // Фільтр пошуку застосовується і до нових списків
+  const filtered530 = people530.filter(match);
+  const filteredPN  = peoplePN.filter(match);
 
   const sk = document.getElementById('skeleton-list');
   if (sk) sk.style.display = 'none';
@@ -3049,8 +3156,13 @@ function render(query = '') {
   document.getElementById('count').textContent = filtered.length;
   noResults.style.display = filtered.length === 0 && mainPeople.length > 0 ? 'block' : 'none';
 
-  document.getElementById('count-17-top').textContent = people17.length;
-  document.getElementById('count-19-top').textContent = people19.length;
+  // Лічильники в обох рядках (під пошуком і під Save): 5:30, 17:00, 19:00, PN.
+  // Оновлюємо ВСІ елементи з відповідним класом cnt-*
+  const setCnt = (cls, n) => document.querySelectorAll('.' + cls).forEach(el => { el.textContent = n; });
+  setCnt('cnt-530', people530.length);
+  setCnt('cnt-17',  people17.length);
+  setCnt('cnt-19',  people19.length);
+  setCnt('cnt-pn',  peoplePN.length);
 
   if (people17.length > 0) {
     section17.style.display = 'block';
@@ -3066,6 +3178,24 @@ function render(query = '') {
     filtered19.forEach(p => list19.appendChild(createCard(p, '19')));
   } else {
     section19.style.display = 'none';
+  }
+
+  // Секція «до 5:30»: показуємо лише якщо в списку хтось є
+  if (people530.length > 0) {
+    section530.style.display = 'block';
+    document.getElementById('count-530').textContent = filtered530.length;
+    filtered530.forEach(p => list530.appendChild(createCard(p, '530')));
+  } else {
+    section530.style.display = 'none';
+  }
+
+  // Секція «PN»: показуємо лише якщо в списку хтось є
+  if (peoplePN.length > 0) {
+    sectionPN.style.display = 'block';
+    document.getElementById('count-pn').textContent = filteredPN.length;
+    filteredPN.forEach(p => listPN.appendChild(createCard(p, 'PN')));
+  } else {
+    sectionPN.style.display = 'none';
   }
 }
 
@@ -3163,7 +3293,7 @@ function applyRemoteData(data) {
   // як fallback щоб ніхто не випав через timing редагування імен
   const validNames = new Set([
     ...PEOPLE.flatMap(p => [p.en, p._origEn].filter(Boolean)),
-    ...set17, ...set19  // захист від race condition
+    ...set17, ...set19, ...set530, ...setPN  // захист від race condition
   ]);
 
   // Якщо зараз іде локальний запис — не перезаписуємо sets з Firebase,
@@ -3175,6 +3305,11 @@ function applyRemoteData(data) {
     set19 = Array.isArray(data.set19) ? data.set19.filter(n => validNames.has(n)) : [];
     LS.set('set17', set17);
     LS.set('set19', set19);
+    // Нові списки з бази (відсутній ключ = порожній список, бо Firebase не зберігає порожні масиви)
+    set530 = Array.isArray(data.set530) ? data.set530.filter(n => validNames.has(n)) : [];
+    setPN  = Array.isArray(data.setPN)  ? data.setPN.filter(n => validNames.has(n))  : [];
+    LS.set('set530', set530);
+    LS.set('setPN', setPN);
   }
 
   // ── КРОК 3: dovolena ────────────────────────────────────────
@@ -3232,12 +3367,18 @@ async function syncToFirebase() {
   // Знімаємо знімок списків у момент запису
   const snapshot17 = [...set17];
   const snapshot19 = [...set19];
+  // Знімки нових списків у момент запису (як і для 17:00 / 19:00)
+  const snapshot530 = [...set530];
+  const snapshotPN  = [...setPN];
   const writeTs = Date.now();
 
   try {
     await dbRef.update({
       set17: snapshot17,
       set19: snapshot19,
+      // Нові списки пишемо в базу разом з іншими даними
+      set530: snapshot530,
+      setPN: snapshotPN,
       editedNames,
       dovolenaData,
       peopleExtra: customPeople,
@@ -3280,7 +3421,8 @@ dbRef.on('value', (snapshot) => {
   const isOwnEcho = data.ts && data.ts === lastWrittenTs;
   if (isOwnEcho) {
     // тільки dovolena і editedNames, sets не чіпаємо
-    applyRemoteData({ ...data, set17: set17, set19: set19 });
+    // Відлуння власного запису: усі 4 списки лишаємо локальні, щоб не затерти щойно зроблений клік
+    applyRemoteData({ ...data, set17: set17, set19: set19, set530: set530, setPN: setPN });
   } else {
     applyRemoteData(data);
   }
@@ -3298,6 +3440,9 @@ function exportToCSV() {
   // Спочатку всі з 17:00, потім всі з 19:00
   set17.forEach(name => rows.push(`${name} - (17:00)`));
   set19.forEach(name => rows.push(`${name} - (19:00)`));
+  // Нові списки в експорті CSV: після 17:00 і 19:00
+  set530.forEach(name => rows.push(`${name} - (do 5:30)`));
+  setPN.forEach(name => rows.push(`${name} - (PN)`));
 
   if (rows.length === 0) {
     showExportToast('⚠️ Seznam je prázdný');
@@ -3309,7 +3454,7 @@ function exportToCSV() {
   const dd    = String(now.getDate()).padStart(2, '0');
   const mm    = String(now.getMonth() + 1).padStart(2, '0');
   const yyyy  = now.getFullYear();
-  const fname = `GiGroup_${dd}${mm}${yyyy}.csv`;
+  const fname = `GiGroup_${dd}.${mm}.${yyyy}.csv`;
 
   // UTF-8 BOM для коректного відображення кирилиці в Excel
   const BOM  = '\uFEFF';
