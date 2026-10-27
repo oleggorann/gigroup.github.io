@@ -1115,6 +1115,9 @@
   .header-counts { justify-content: center; }
   .save-col { justify-content: center; }
   /* Висоту кнопки Save НЕ перевизначаємо — вона оригінальна (padding: 8px 12px у блоці .btn-save вище) */
+.row-num{position:absolute;left:2px;top:3px;font-size:8px;line-height:1;color:var(--text-muted);font-family:'JetBrains Mono',monospace;pointer-events:none}
+.header-counts .hc-item.hc-total::before{content:""}
+.hc-total{color:var(--accent)}
 </style>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -1139,6 +1142,7 @@
   </div>
   <div class="header-counts">
     <span class="hc-item">· <span id="count">0</span></span>
+    <span class="hc-item hc-total">Σ <span id="count-total">0</span></span>
   </div>
   <button class="btn-add" id="btn-add-person" onclick="openAddModal()" title="Přidat osobu" style="display:none">＋</button>
   <div class="save-col">
@@ -1291,7 +1295,7 @@
     <div class="edit-modal-btns">
       <button class="delete delete-btn" onclick="askDeletePerson()" style="display:none">Smazat</button>
       <button onclick="closeEditModal()">Cancel</button>
-      <button class="save" onclick="saveEditModal()"></button>
+      <button class="save" onclick="saveEditModal()">Save</button>
     </div>
 
     <!-- Приховані елементи для сумісності з JS (info-locker тощо) -->
@@ -1514,7 +1518,7 @@ const PEOPLE = [
     boty:   "1x vel: ",
   },
   {
-    en:    "Antonik László",
+    en:    "Antonik Laszlo",
     ua:    "Антонік Ласло",
     viber: "Name",
     phone: "+380 99 000 0000",
@@ -2099,8 +2103,8 @@ const PEOPLE = [
   {
     en:    "Sirenko Vitalii",
     ua:    "Сіренко Віталій",
-    viber: "Name",
-    phone: "+380 XX XXX XX XX",
+    viber: "Ветал",
+    phone: "+380 50 104 4805",
     photo: "photos/sirenko_vitalii.jpg",
     flag:  "🇺🇦",
     locker: 96,
@@ -2122,7 +2126,7 @@ const PEOPLE = [
     flag:  "🇺🇦",
     locker: 112,
     dispatcher: "Matěj - 1 Hala",
-    city:       "Nový Bydžov",
+    city:       "Hradec Králové",
     dovolena:   "", 
     helma:  "1",
     vesta:  "1",
@@ -2487,7 +2491,7 @@ function updateAddBtnVisibility() {
 }
 updateAddBtnVisibility();
 
-function createCard(person, listType) {
+function createCard(person, listType, idx) {
   // listType: 'main' | 'present' | '17' | '19'
   const div = document.createElement('div');
   let cls = 'person';
@@ -2633,7 +2637,7 @@ avatarWrap.appendChild(flagEl);
       div.classList.add('card-removing');
       const savedScroll = window.scrollY;
       const capturedName = person.en; // capture at click time
-      setTimeout(() => toggleList(capturedName, key, savedScroll), 310);
+      toggleList(capturedName, key, savedScroll);
     });
     return b;
   };
@@ -2647,6 +2651,7 @@ avatarWrap.appendChild(flagEl);
   rightCol.appendChild(makeCheck('530', 'checked-530', '5:30'));
   rightCol.appendChild(makeCheck('19',  'checked-19',  '19:00'));
 
+  if (idx) { const n = document.createElement('div'); n.className = 'row-num'; n.textContent = idx; div.appendChild(n); }
   div.appendChild(avatarWrap);
   div.appendChild(info);
   div.appendChild(rightCol);
@@ -2873,57 +2878,23 @@ window.addEventListener('pagehide', flushPendingSync);
 window.addEventListener('beforeunload', flushPendingSync);
 
 function toggleList(name, listType, savedScroll) {
-  // Чи людина вже в тому списку, на який клікнули (тоді клік = прибрати зі списку)
-  const wasInTarget =
-    (listType === '17'  && set17.includes(name))  ||
-    (listType === '19'  && set19.includes(name))  ||
-    (listType === '530' && set530.includes(name)) ||
-    (listType === 'PN'  && setPN.includes(name));
-
-  // Людина може бути лише в ОДНОМУ списку — спочатку прибираємо її з усіх чотирьох
-  set17  = set17.filter(n => n !== name);
-  set19  = set19.filter(n => n !== name);
-  set530 = set530.filter(n => n !== name);
-  setPN  = setPN.filter(n => n !== name);
-
-  // Якщо клікнули на інший список — додаємо людину в нього
-  if (!wasInTarget) {
-    if (listType === '17') set17.push(name);
-    else if (listType === '19') set19.push(name);
-    else if (listType === '530') set530.push(name);
-    else if (listType === 'PN') setPN.push(name);
-  }
-
-  render(document.getElementById('search').value);
-
-  if (wasInTarget && savedScroll !== undefined) {
-    requestAnimationFrame(() => {
-      window.scrollTo({ top: savedScroll, behavior: 'instant' });
-    });
-  }
-
-  saveLocal();
-
-  // Debounce перед записом у Firebase — 150 мс.
-  clearTimeout(toggleSyncTimer);
-  toggleSyncTimer = setTimeout(() => {
-    toggleSyncTimer = null;
-    if (typeof syncToFirebase === 'function') syncToFirebase();
-  }, 150);
+  const p = PEOPLE.find(x => x.en === name); if (!p) return;
+  const key = personKey(p), removing = remote.lists[key]?.l === listType;
+  const ref = dbRef.child('lists/' + key);
+  if (removing) delete remote.lists[key]; else remote.lists[key] = { l: listType, t: Date.now() };
+  applyLists(removing ? savedScroll : undefined);
+  dbWrite(removing ? ref.remove() : ref.set({ l: listType, t: firebase.database.ServerValue.TIMESTAMP }));
 }
 
 // Кнопка «Vymazat seznamy»: очищає списки 17:00, 19:00 та до 5:30.
 // Список PN навмисно НЕ чіпаємо (setPN залишається як є).
 function clearLists() {
   if (!set17.length && !set19.length && !set530.length) { showExportToast('⚠️ Seznamy jsou prázdné'); return; }
-  if (!confirm(`Vymazat seznamy (kromě PN)?\nOD 17:00 — ${set17.length} osob\nOD 19:00 — ${set19.length} osob\nDO 5:30 — ${set530.length} osob`)) return;
-  set17 = [];
-  set19 = [];
-  set530 = [];
-  // setPN не очищаємо — PN має зберігатися
-  saveLocal();
-  render(document.getElementById('search').value);
-  syncToFirebase();
+  if (!confirm(`Vymazat seznamy (kromě PN)?\nOD 17:00 — ${set17.length}\nOD 19:00 — ${set19.length}\nDO 5:30 — ${set530.length}`)) return;
+  const u = {};
+  Object.entries(remote.lists).forEach(([k, o]) => { if (o.l !== 'PN') { u[k] = null; delete remote.lists[k]; } });
+  applyLists();
+  dbWrite(dbRef.child('lists').update(u));
   showSyncToast('🗑 Seznamy vymazány', 'ok');
 }
 
@@ -2972,59 +2943,31 @@ function closeEditModal() {
 }
 
 function saveEditModal() {
-  const newName     = document.getElementById('edit-input').value.trim();
-  const newDovolena = document.getElementById('dovolena-input')?.value.trim() ?? '';
+  const newName = document.getElementById('edit-input').value.trim();
+  const newDov  = document.getElementById('dovolena-input')?.value.trim() ?? '';
   if (!newName || !editingName) { closeEditModal(); return; }
-
+  if (!requireDb()) return;
   const person = PEOPLE.find(p => p.en === editingName);
   if (person) {
-    const origKey   = person._origEn || editingName;
-    person._origEn  = origKey;
-    // Оновлюємо ім'я в списках 17/19
-    const i17 = set17.indexOf(editingName);
-    if (i17 !== -1) set17[i17] = newName;
-    const i19 = set19.indexOf(editingName);
-    if (i19 !== -1) set19[i19] = newName;
-    // Перейменування: оновлюємо ім'я і в нових списках
-    const i530 = set530.indexOf(editingName); if (i530 !== -1) set530[i530] = newName;
-    const iPN  = setPN.indexOf(editingName);  if (iPN  !== -1) setPN[iPN]   = newName;
-    person.en       = newName;
-    // Зберігаємо dovolena прямо в об'єкт людини
-    person.dovolena = newDovolena;
-    // Зберігаємо тільки якщо ім'я реально змінилось
-    if (origKey !== newName) {
-      editedNames[origKey] = newName;
-    } else {
-      delete editedNames[origKey];
-    }
+    const key = personKey(person), orig = person._origEn || person.en;
+    if (orig !== newName) remote.renamed[key] = newName; else delete remote.renamed[key];
+    if (newDov) remote.dovolena[key] = newDov; else delete remote.dovolena[key];
+    dbWrite(dbRef.update({ ['renamed/' + key]: orig !== newName ? newName : null, ['dovolena/' + key]: newDov || null }));
   }
   closeEditModal();
-  saveLocal();
-  render(document.getElementById('search').value);
-  // Одразу синхронізуємо і ім'я і dovolena з Firebase
-  if (typeof syncToFirebase === 'function') syncToFirebase();
+  applyAll();
 }
 
 function askDeletePerson() {
-  if (!editingName) return;
+  if (!editingName || !requireDb()) return;
   const person = PEOPLE.find(p => p.en === editingName);
   if (!person) { closeEditModal(); return; }
   if (!confirm(`Opravdu smazat: ${person.en}?`)) return;
-  const key = person._origEn || person.en;
-  set17 = set17.filter(n => n !== person.en);
-  set19 = set19.filter(n => n !== person.en);
-  // Видалення людини: прибираємо її і з нових списків
-  set530 = set530.filter(n => n !== person.en);
-  setPN  = setPN.filter(n => n !== person.en);
-  // І базових, і доданих ("Přidat osobu") людей лише ХОВАЄМО (hiddenPeople),
-  // не стираємо фізично — інакше вони не потраплять у список
-  // "🗑 Vymazané" і їх не можна буде відновити кнопкою "↩ Obnovit".
-  hiddenPeople.add(key);
-  delete editedNames[key];
+  const key = personKey(person);
+  remote.hidden[key] = true; delete remote.lists[key]; delete remote.renamed[key];
+  dbWrite(dbRef.update({ ['hidden/' + key]: true, ['lists/' + key]: null, ['renamed/' + key]: null }));
   closeEditModal();
-  saveLocal();
-  render(document.getElementById('search').value);
-  syncToFirebase();
+  applyAll();
   showSyncToast('🗑 Osoba smazána', 'ok');
 }
 
@@ -3076,8 +3019,8 @@ function addPersonFromForm() {
     zamek:      '',
     _custom:    true,
   };
-  PEOPLE.push(person);
-  customPeople.push(person);
+  if (!requireDb()) return; const _k = personKey(person); remote.extra[_k] = person; dbWrite(dbRef.child('extra/' + _k).set(person));
+  
   saveLocal();
   closeAddModal();
   ['add-en','add-ua','add-viber','add-phone','add-locker','add-dispatcher','add-city'].forEach(id => {
@@ -3086,7 +3029,7 @@ function addPersonFromForm() {
   document.getElementById('add-car').checked = false;
   render(document.getElementById('search').value);
   syncToFirebase();
-  showSyncToast('✓ Osoba přidána', 'ok');
+  applyAll(); showSyncToast('✓ Osoba přidána', 'ok');
 }
 document.getElementById('add-modal').addEventListener('click', (e) => {
   if (e.target === document.getElementById('add-modal')) closeAddModal();
@@ -3162,11 +3105,12 @@ function render(query = '') {
   setCnt('cnt-17',  people17.length);
   setCnt('cnt-19',  people19.length);
   setCnt('cnt-pn',  peoplePN.length);
+  document.getElementById('count-total').textContent = people17.length + people19.length + people530.length;
 
   if (people17.length > 0) {
     section17.style.display = 'block';
     document.getElementById('count-17').textContent = filtered17.length;
-    filtered17.forEach(p => list17.appendChild(createCard(p, '17')));
+    filtered17.forEach((p, i) => list17.appendChild(createCard(p, '17', i + 1)));
   } else {
     section17.style.display = 'none';
   }
@@ -3174,7 +3118,7 @@ function render(query = '') {
   if (people19.length > 0) {
     section19.style.display = 'block';
     document.getElementById('count-19').textContent = filtered19.length;
-    filtered19.forEach(p => list19.appendChild(createCard(p, '19')));
+    filtered19.forEach((p, i) => list19.appendChild(createCard(p, '19', i + 1)));
   } else {
     section19.style.display = 'none';
   }
@@ -3183,7 +3127,7 @@ function render(query = '') {
   if (people530.length > 0) {
     section530.style.display = 'block';
     document.getElementById('count-530').textContent = filtered530.length;
-    filtered530.forEach(p => list530.appendChild(createCard(p, '530')));
+    filtered530.forEach((p, i) => list530.appendChild(createCard(p, '530', i + 1)));
   } else {
     section530.style.display = 'none';
   }
@@ -3228,7 +3172,7 @@ function setBtnState(state, retryFn) {
     btn.style.opacity = '1';
     btn.style.background = 'var(--accent)';
     btn.disabled = false;
-    setTimeout(() => { btn.textContent = 'Save'; btn.style.background = 'var(--accent)'; }, 2000);
+    setTimeout(() => { btn.textContent = ''; btn.style.background = 'var(--accent)'; }, 2000);
   }
   if (state === 'error') {
     btn.textContent = '✗ Retry?';
@@ -3236,7 +3180,7 @@ function setBtnState(state, retryFn) {
     btn.style.background = '#ef4444';
     btn.disabled = false;
     if (retryFn) btn.onclick = () => { btn.style.background = 'var(--accent)'; retryFn(); };
-    setTimeout(() => { btn.textContent = 'Save'; btn.style.background = 'var(--accent)'; btn.onclick = () => saveData(); }, 5000);
+    setTimeout(() => { btn.textContent = ''; btn.style.background = 'var(--accent)'; btn.onclick = () => saveData(); }, 5000);
   }
   if (state === 'offline') {
     btn.textContent = '📵 Offline';
@@ -3245,92 +3189,6 @@ function setBtnState(state, retryFn) {
     btn.disabled = false;
     setTimeout(() => { btn.textContent = 'Save'; btn.style.background = 'var(--accent)'; }, 4000);
   }
-}
-
-// ── Застосовуємо дані з Firebase ─────────────────────────────
-function applyRemoteData(data) {
-  if (!data) return;
-
-  // ── КРОК 1: editedNames ПЕРШИМИ — до будь-якої фільтрації ───
-  if (!data.editedNames) {
-    // у базі немає перейменувань — скидаємо локальні
-    PEOPLE.forEach(p => { if (p._origEn) { p.en = p._origEn; } });
-    editedNames = {};
-    LS.set('editedNames', editedNames);
-  } else if (typeof data.editedNames === 'object') {
-    editedNames = data.editedNames;
-    LS.set('editedNames', editedNames);
-    Object.keys(editedNames).forEach(k => {
-      if (editedNames[k] === k) delete editedNames[k];
-    });
-    Object.entries(editedNames).forEach(([orig, newN]) => {
-      const p = PEOPLE.find(x => x._origEn === orig || x.en === orig);
-      if (p) { p._origEn = p._origEn || orig; p.en = newN; }
-    });
-  }
-
-  // КРОК 1.5: люди, додані через кнопку «＋»
-  {
-    const extra = Array.isArray(data.peopleExtra) ? data.peopleExtra : [];
-    const remoteKeys = new Set(extra.map(p => p && (p._origEn || p.en)).filter(Boolean));
-    for (let i = PEOPLE.length - 1; i >= 0; i--) {
-      const p = PEOPLE[i];
-      if (p._custom && !remoteKeys.has(p._origEn || p.en)) PEOPLE.splice(i, 1);
-    }
-    customPeople = extra.filter(Boolean);
-    LS.set('customPeople', customPeople);
-    customPeople.forEach(p => {
-      if (!PEOPLE.find(x => (x._origEn || x.en) === (p._origEn || p.en))) PEOPLE.push(p);
-    });
-  }
-
-  // КРОК 1.6: приховані (видалені) люди
-  hiddenPeople = new Set(Array.isArray(data.hiddenPeople) ? data.hiddenPeople : []);
-  LS.set('hidden', [...hiddenPeople]);
-
-  // ── КРОК 2: validNames — включає імена з PEOPLE + поточні set17/set19
-  // як fallback щоб ніхто не випав через timing редагування імен
-  const validNames = new Set([
-    ...PEOPLE.flatMap(p => [p.en, p._origEn].filter(Boolean)),
-    ...set17, ...set19, ...set530, ...setPN  // захист від race condition
-  ]);
-
-  // Якщо зараз іде локальний запис — не перезаписуємо sets з Firebase,
-  // щоб не затерти щойно зроблений клік
-  if (!isSyncing) {
-    // Firebase НЕ зберігає порожні масиви — після «Vymazat» ключ set17/set19
-    // просто зникає з бази. Відсутній ключ = порожній список (а не «лишити як є в кеші»).
-    set17 = Array.isArray(data.set17) ? data.set17.filter(n => validNames.has(n)) : [];
-    set19 = Array.isArray(data.set19) ? data.set19.filter(n => validNames.has(n)) : [];
-    LS.set('set17', set17);
-    LS.set('set19', set19);
-    // Нові списки з бази (відсутній ключ = порожній список, бо Firebase не зберігає порожні масиви)
-    set530 = Array.isArray(data.set530) ? data.set530.filter(n => validNames.has(n)) : [];
-    setPN  = Array.isArray(data.setPN)  ? data.setPN.filter(n => validNames.has(n))  : [];
-    LS.set('set530', set530);
-    LS.set('setPN', setPN);
-  }
-
-  // ── КРОК 3: dovolena ────────────────────────────────────────
-  {
-    if (!data.dovolenaData || typeof data.dovolenaData !== 'object') data = { ...data, dovolenaData: {} };
-    const fbKeys = new Set(Object.keys(data.dovolenaData));
-    PEOPLE.forEach(p => {
-      const key = p._origEn || p.en;
-      if (fbKeys.has(key)) p.dovolena = data.dovolenaData[key] || '';
-      else p.dovolena = '';
-    });
-    LS.set('dovolena', data.dovolenaData);
-  }
-
-  // КРОК 4: stockData (Nové)
-  // ── КРОК 4: stockData (Nové) ──────────────────────────────
-  if (data.stockData && typeof data.stockData === 'object') {
-    LS.set('stock', data.stockData);
-    applyStockData(data.stockData);
-  }
-
-  render(document.getElementById('search').value);
 }
 
 // ── Збираємо dovolena для збереження ─────────────────────────
@@ -3342,94 +3200,83 @@ function collectDovolenaData() {
   return result;
 }
 
-// ── Запис у Firebase ─────────────────────────────────────────
-let isSyncing = false;
+// ══ FIREBASE: кожна людина / параметр — окремий вузол ══
+let fbReady = false, lastWrittenTs = 0;
+function syncToFirebase() {}   // заглушка: старий спосіб запису більше не використовується
+const sanitizeKey = s => String(s).replace(/[.#$\/\[\]]/g, '_');
+const personKey   = p => sanitizeKey(p._origEn || p.en);
+const findByKey   = k => PEOPLE.find(p => personKey(p) === k);
+const remote = { lists: {}, hidden: {}, extra: {}, renamed: {}, dovolena: {} };
 
-async function syncToFirebase() {
-  if (!fbReady) return;  // захист: не пишемо до завантаження
-
-  // Перевірка інтернету
-  if (!navigator.onLine) {
-    setBtnState('offline');
-    showSyncToast('📵 Bez internetu. Uloženo lokálně.', 'warn');
-    return;
-  }
-
-  isSyncing = true;
+function requireDb() {
+  if (!fbReady) { showSyncToast('⏳ Čekám na připojení k databázi', 'warn'); return false; }
+  return true;
+}
+function dbWrite(p) {
+  if (!navigator.onLine) { setBtnState('offline'); showSyncToast('📵 Bez internetu. Zápis počká na připojení.', 'warn'); return p; }
   setBtnState('saving');
-  const dovolenaData = {};
-  PEOPLE.forEach(p => {
-    const key = p._origEn || p.en;
-    if (p.dovolena) dovolenaData[key] = p.dovolena;
+  return p.then(() => setBtnState('ok')).catch(err => {
+    console.error(err); setBtnState('error', () => location.reload());
+    showSyncToast('❌ Chyba zápisu do databáze', 'error');
   });
-
-  // Знімаємо знімок списків у момент запису
-  const snapshot17 = [...set17];
-  const snapshot19 = [...set19];
-  // Знімки нових списків у момент запису (як і для 17:00 / 19:00)
-  const snapshot530 = [...set530];
-  const snapshotPN  = [...setPN];
-  const writeTs = Date.now();
-
-  try {
-    await dbRef.update({
-      set17: snapshot17,
-      set19: snapshot19,
-      // Нові списки пишемо в базу разом з іншими даними
-      set530: snapshot530,
-      setPN: snapshotPN,
-      editedNames,
-      dovolenaData,
-      peopleExtra: customPeople,
-      hiddenPeople: [...hiddenPeople],
-      ts: writeTs,
-    });
-    lastWrittenTs = writeTs;
-    LS.set('ts', writeTs);
-    setBtnState('ok');
-  } catch (err) {
-    console.error('Firebase error:', err);
-    setBtnState('error', () => syncToFirebase());
-    showSyncToast(navigator.onLine ? '❌ Chyba. Klikněte znovu na Save.' : '📵 Bez internetu.', 'error');
-  } finally {
-    isSyncing = false;
-  }
 }
 
-// ── Realtime слухач ───────────────────────────────────────────
-let fbReady = false;
-let lastWrittenTs = 0;
+function applyLists(scrollY) {
+  const by = { '17': [], '19': [], '530': [], 'PN': [] };
+  Object.entries(remote.lists).sort((a, b) => (a[1].t || 0) - (b[1].t || 0))
+    .forEach(([k, o]) => { const p = findByKey(k); if (p && by[o.l]) by[o.l].push(p.en); });
+  set17 = by['17']; set19 = by['19']; set530 = by['530']; setPN = by['PN'];
+  saveLocal();
+  const go = () => {
+    render(document.getElementById('search').value);
+    if (scrollY !== undefined) requestAnimationFrame(() => window.scrollTo({ top: scrollY, behavior: 'instant' }));
+  };
+  document.querySelector('.card-removing') ? setTimeout(go, 310) : go();
+}
 
-dbRef.on('value', (snapshot) => {
-  const firstConnect = !fbReady;
-  const data = snapshot.val();
-  fbReady = true;
+function applyAll() {
+  const wanted = new Set(Object.keys(remote.extra));
+  for (let i = PEOPLE.length - 1; i >= 0; i--) { const p = PEOPLE[i]; if (p._custom && !wanted.has(personKey(p))) PEOPLE.splice(i, 1); }
+  Object.entries(remote.extra).forEach(([k, p]) => { if (!findByKey(k)) PEOPLE.push({ ...p, _custom: true }); });
+  editedNames = {};
+  PEOPLE.forEach(p => {
+    const k = personKey(p), orig = p._origEn || p.en, nn = remote.renamed[k];
+    if (nn) { p._origEn = orig; p.en = nn; editedNames[orig] = nn; } else if (p._origEn) p.en = p._origEn;
+    p.dovolena = remote.dovolena[k] || '';
+  });
+  hiddenPeople = new Set(PEOPLE.filter(p => remote.hidden[personKey(p)]).map(p => p._origEn || p.en));
+  customPeople = PEOPLE.filter(p => p._custom);
+  applyLists();
+}
 
-  // Перше підключення: якщо локально є новіші зміни (зроблені офлайн) —
-  // надсилаємо їх у Firebase; інакше застосовуємо те, що у хмарі
-  if (firstConnect && data) {
-    const localTs = LS.get('ts', 0);
-    if (localTs > (data.ts || 0)) {
-      setTimeout(() => syncToFirebase(), 400);
-    }
-  }
-
-  if (!data) { render(document.getElementById('search').value); return; }
-
-  // Якщо це відлуння нашого ж запису — пропускаємо sets, але dovolena/editedNames оновлюємо
-  const isOwnEcho = data.ts && data.ts === lastWrittenTs;
-  if (isOwnEcho) {
-    // тільки dovolena і editedNames, sets не чіпаємо
-    // Відлуння власного запису: усі 4 списки лишаємо локальні, щоб не затерти щойно зроблений клік
-    applyRemoteData({ ...data, set17: set17, set19: set19, set530: set530, setPN: setPN });
-  } else {
-    applyRemoteData(data);
-  }
+const loadedBranches = new Set();
+Object.keys(remote).forEach(name => {
+  dbRef.child(name).on('value', snap => {
+    remote[name] = snap.val() || {};
+    loadedBranches.add(name);
+    if (loadedBranches.size < 5) return;
+    if (!fbReady) { fbReady = true; migrateOld(); }
+    applyAll();
+  });
 });
+dbRef.child('stockData').on('value', s => { const d = s.val(); if (d) { LS.set('stock', d); applyStockData(d); } });
 
-// ── Перевизначаємо saveData ───────────────────────────────────
-// saveData вже містить syncToFirebase()
-// saveEditModal вже викликає syncToFirebase() напряму — окреме перевизначення не потрібне
+function migrateOld() {
+  dbRef.child('migrated').transaction(v => v ? undefined : true, (err, committed) => {
+    if (err || !committed) return;
+    dbRef.once('value').then(s => {
+      const d = s.val() || {}, u = {};
+      const keyOf = n => { const p = PEOPLE.find(x => x.en === n || x._origEn === n); return p ? personKey(p) : sanitizeKey(n); };
+      [['set17','17'],['set19','19'],['set530','530'],['setPN','PN']].forEach(([f, l]) =>
+        (d[f] || []).forEach((n, i) => { u['lists/' + keyOf(n)] = { l, t: i + 1 }; }));
+      (d.hiddenPeople || []).forEach(n => { u['hidden/' + sanitizeKey(n)] = true; });
+      (d.peopleExtra  || []).forEach(p => { if (p) u['extra/' + sanitizeKey(p._origEn || p.en)] = p; });
+      Object.entries(d.editedNames  || {}).forEach(([o, n]) => { if (typeof n === 'string') u['renamed/'  + sanitizeKey(o)] = n; });
+      Object.entries(d.dovolenaData || {}).forEach(([o, v]) => { if (typeof v === 'string') u['dovolena/' + sanitizeKey(o)] = v; });
+      if (Object.keys(u).length) dbRef.update(u);
+    });
+  });
+}
 document.getElementById('search').addEventListener('input', e => render(e.target.value));
 
 // ── Експорт у CSV ─────────────────────────────────────────────
@@ -3726,13 +3573,14 @@ function closeListModal() {
 
 // "Vymazané" — люди, яких приховано (hiddenPeople). Вони не видаляються
 // фізично, лише ховаються — тому їх можна відновити.
-function restorePerson(key) {
-  hiddenPeople.delete(key);
-  saveLocal();
-  render(document.getElementById('search').value);
-  if (typeof syncToFirebase === 'function') syncToFirebase();
+function restorePerson(origName) {
+  if (!requireDb()) return;
+  const k = sanitizeKey(origName);
+  delete remote.hidden[k];
+  dbWrite(dbRef.child('hidden/' + k).remove());
+  applyAll();
   showSyncToast('↩ Osoba obnovena', 'ok');
-  openDeletedList(); // одразу оновлюємо список, щоб рядок зник
+  openDeletedList();
 }
 function openDeletedList() {
   const rows = PEOPLE
