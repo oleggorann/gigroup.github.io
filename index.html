@@ -1118,6 +1118,17 @@
 .row-num{position:absolute;left:2px;top:3px;font-size:8px;line-height:1;color:var(--text-muted);font-family:'JetBrains Mono',monospace;pointer-events:none}
 .header-counts .hc-item.hc-total::before{content:""}
 .hc-total{color:var(--accent)}
+
+.check-btn.on svg{opacity:1}
+.person .check-btn .btn-label{font-weight:600}
+.section-label{position:sticky;top:var(--header-h);background:var(--bg);z-index:20}
+.cfg-row{border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:8px;padding:10px;margin-bottom:10px;background:var(--surface2)}
+.cfg-top{display:flex;gap:6px;align-items:center;margin-bottom:8px}
+.cfg-top input[type=color]{width:38px;height:34px;padding:0;margin:0;border:1px solid var(--border);background:none;flex-shrink:0}
+.cfg-top .f-short{margin:0;flex:1;min-width:0}
+.cfg-row>input{margin-bottom:8px}
+.cfg-row .check-row{margin:0}
+.cfg-row .check-row input{margin:0}
 </style>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -1133,12 +1144,7 @@
     </div>
     <!-- Рядок лічильників під полем пошуку (по центру): PN, 5:30, 17:00, 19:00.
          Числа оновлює render() через класи cnt-* -->
-    <div class="save-counts save-counts-left">
-      <span style="color:#ef4444">PN·<span class="cnt-pn">0</span></span>
-      <span style="color:#38bdf8">5:30·<span class="cnt-530">0</span></span>
-      <span style="color:#f59e0b">17:00·<span class="cnt-17">0</span></span>
-      <span style="color:#8b5cf6">19:00·<span class="cnt-19">0</span></span>
-    </div>
+    <div class="save-counts save-counts-left" id="hdr-counts"></div>
   </div>
   <div class="header-counts">
     <span class="hc-item">· <span id="count">0</span></span>
@@ -1172,29 +1178,8 @@
     <div id="no-results">Nic víc jsem nenašel ＼(〇_ｏ)／ Zkuste zadat jiné jméno. </div>
   </div>
 
-  <div id="section-17" style="display:none">
-    <div class="section-label" style="color:#f59e0b; border-bottom-color:#f59e0b40">Seznam od 17:00 · <span id="count-17">0</span></div>
-    <div id="list-17"></div>
-  </div>
+  <div id="lists-container"></div>
 
-  <div id="section-19" style="display:none">
-    <div class="section-label" style="color:#8b5cf6; border-bottom-color:#8b5cf640">Seznam od 19:00 · <span id="count-19">0</span></div>
-    <div id="list-19"></div>
-  </div>
-
-  <!-- Секція списку "до 5:30" (блакитна). Показується лише коли в списку є люди (див. render) -->
-  <div id="section-530" style="display:none">
-    <div class="section-label" style="color:#38bdf8; border-bottom-color:#38bdf840">Seznam do 5:30 · <span id="count-530">0</span></div>
-    <div id="list-530"></div>
-  </div>
-
-  <!-- Секція списку "PN" (червона). Показується лише коли в списку є люди (див. render) -->
-  <div id="section-pn" style="display:none">
-    <div class="section-label" style="color:#ef4444; border-bottom-color:#ef444440">Seznam PN / DOV · <span id="count-pn">0</span></div>
-    <div id="list-pn"></div>
-  </div>
-
-  <!-- Очищає списки 17:00, 19:00 та до 5:30. Список PN НЕ чіпає (див. clearLists) -->
   <button class="export-bottom-btn danger" onclick="clearLists()">🗑 Vymazat seznamy</button>
   <!-- Кнопка експорту — в самому низу після всіх списків -->
   <button class="export-bottom-btn" onclick="exportToCSV()">↓ Export seznamu</button>
@@ -1429,6 +1414,10 @@
       </div>
       <div style="display:flex;gap:8px;margin-top:8px;">
         <button class="stock-list-btn" onclick="openDeletedList()">🗑 Vymazané</button>
+        <button class="stock-list-btn" onclick="openListsCfg()">⚙ Seznamy</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <button class="stock-list-btn" onclick="openHistory()">🕘 Historie změn</button>
       </div>
     </div>
 
@@ -1448,6 +1437,17 @@
 
 <!-- STOCK EDIT MODAL -->
 <!-- ══ STOCK EDIT MODAL (тільки Nové) ══ -->
+<div class="edit-modal" id="cfg-modal" style="z-index:850">
+  <div class="edit-modal-box" style="max-width:380px;max-height:86vh;overflow-y:auto">
+    <div class="edit-modal-title">⚙ Správa seznamů</div>
+    <div id="cfg-rows"></div>
+    <div class="stock-boty-add-btn" onclick="cfgAdd()">+ Přidat seznam (např. od 16:00)</div>
+    <div class="edit-modal-btns">
+      <button onclick="closeListsCfg()">Cancel</button>
+      <button class="save" onclick="saveListsCfg()">Save</button>
+    </div>
+  </div>
+</div>
 <div class="edit-modal" id="stock-edit-modal">
   <div class="edit-modal-box stock-edit-box">
     <div class="edit-modal-title">Upravit skladové zásoby (Nové)</div>
@@ -2020,7 +2020,7 @@ const PEOPLE = [
 	car:    true, 
     helma:  "1",
     vesta:  "1",
-    boty:   "1x vel: 43",
+    boty:   "1x vel: 43, 1x 44 (10.11.26)",
     zamek:  "",
   },
     {
@@ -2055,7 +2055,7 @@ const PEOPLE = [
     boty:   "1x vel: 41, 1x (12.10.26)",
   },
 	{
-    en:    "Ruszó Csaba",
+    en:    "Ruszo Csaba",
     ua:    "Русзо Чаба",
     viber: "Csaba Ruszó",
     phone: "+421 91 109 5906",
@@ -2130,7 +2130,7 @@ const PEOPLE = [
     dovolena:   "", 
     helma:  "1",
     vesta:  "1",
-    boty:   "1x vel: 45",
+    boty:   "1x vel: 45, 1x 46 (9.11.26)",
     zamek:  "",
   },
   {
@@ -2376,6 +2376,18 @@ const LS = {
 };
 
 // State
+// Списки керуються через ⚙ Seznamy (admin) і зберігаються у Firebase: gigroup/listDefs
+// perm = постійний список (не чиститься кнопкою Vymazat, не входить у Σ)
+const DEFAULT_DEFS = [
+  { id: 'PN',  short: 'PN',    title: 'Seznam PN / DOV', exp: 'PN',      color: '#ef4444', perm: true },
+  { id: '17',  short: '17:00', title: 'Seznam od 17:00', exp: '17:00',   color: '#f59e0b' },
+  { id: '530', short: '5:30',  title: 'Seznam do 5:30',  exp: 'do 5:30', color: '#38bdf8' },
+  { id: '19',  short: '19:00', title: 'Seznam od 19:00', exp: '19:00',   color: '#8b5cf6' },
+];
+let ALLDEFS = (d => Array.isArray(d) && d.length ? d : DEFAULT_DEFS)(LS.get('defs', null));
+let DEFS = ALLDEFS.filter(d => !d.hide);
+let SETS = LS.get('sets', {});
+const hexA = (h, a) => { const n = parseInt(String(h).replace('#', ''), 16) || 0; return `rgba(${n >> 16 & 255},${n >> 8 & 255},${n & 255},${a})`; };
 let set17 = LS.get('set17', []);
 let set19 = LS.get('set19', []);
 // Список «до 5:30» — масив імен (en); зберігається локально і у Firebase (ключ set530)
@@ -2412,11 +2424,11 @@ function applyLocalOverrides() {
 applyLocalOverrides();
 
 function saveLocal() {
-  LS.set('set17', set17);
-  LS.set('set19', set19);
+  LS.set('sets', SETS); LS.set('defs', ALLDEFS);
+  
   // Нові списки теж пишемо в локальне сховище (offline backup)
-  LS.set('set530', set530);
-  LS.set('setPN', setPN);
+  
+  
   LS.set('editedNames', editedNames);
   LS.set('dovolena', collectDovolenaData());
   LS.set('customPeople', customPeople);
@@ -2494,14 +2506,9 @@ updateAddBtnVisibility();
 function createCard(person, listType, idx) {
   // listType: 'main' | 'present' | '17' | '19'
   const div = document.createElement('div');
-  let cls = 'person';
-  if (listType === 'present') cls += ' present-item';
-  if (listType === '17') cls += ' item-17';
-  if (listType === '19') cls += ' item-19';
-  // Фон картки для нових списків: до 5:30 (блакитний) та PN (червоний)
-  if (listType === '530') cls += ' item-530';
-  if (listType === 'PN')  cls += ' item-pn';
-  div.className = cls;
+  div.className = 'person';
+  const curDef = DEFS.find(d => d.id === listType);
+  if (curDef) { div.style.background = hexA(curDef.color, .09); div.style.borderBottomColor = hexA(curDef.color, .22); }
 
   // Avatar wrapper
   const avatarWrap = document.createElement('div');
@@ -2621,35 +2628,18 @@ avatarWrap.appendChild(flagEl);
   // column-gap — відстань між колонками; row-gap — між рядками
   // (залишай місце під підписами галочок); padding-bottom — відступ знизу.
   const rightCol = document.createElement('div');
-  rightCol.style.cssText = 'display:grid; grid-template-columns:auto auto; column-gap:22px; row-gap:16px; align-items:center; justify-items:center; flex-shrink:0; padding-bottom:8px;';
-
-  // Фабрика галочки: key — ключ списку ('PN' | '530' | '17' | '19'),
-  // cls — CSS-клас увімкненого стану, label — підпис під галочкою.
-  // Клік: анімація зникнення картки → toggleList() додає/прибирає людину зі списку.
-  const makeCheck = (key, cls, label) => {
+  const cols = DEFS.length > 4 ? 3 : 2;
+  rightCol.style.cssText = `display:grid; grid-template-columns:repeat(${cols},auto); column-gap:${cols === 3 ? 14 : 22}px; row-gap:16px; align-items:center; justify-items:center; flex-shrink:0; padding-bottom:8px;`;
+  DEFS.forEach(d => {
     const b = document.createElement('div');
-    // Галочка вже увімкнена, якщо картка зараз знаходиться саме в цьому списку
-    b.className = 'check-btn' + (listType === key ? ' ' + cls : '');
-    b.innerHTML = `<svg viewBox="0 0 16 16"><polyline points="2,8 6,12 14,4"/></svg><span class="btn-label">${label}</span>`;
-    b.addEventListener('click', (e) => {
-      e.stopPropagation();
-      b.classList.toggle(cls);
-      div.classList.add('card-removing');
-      const savedScroll = window.scrollY;
-      const capturedName = person.en; // capture at click time
-      toggleList(capturedName, key, savedScroll);
-    });
-    return b;
-  };
-
-  // Порядок додавання = порядок у сітці (зліва направо, зверху вниз):
-  //   PN    | 17:00
-  //   5:30  | 19:00
-  // Підписи (останній аргумент) можна змінити тут
-  rightCol.appendChild(makeCheck('PN',  'checked-pn',  'PN'));
-  rightCol.appendChild(makeCheck('17',  'checked-17',  '17:00'));
-  rightCol.appendChild(makeCheck('530', 'checked-530', '5:30'));
-  rightCol.appendChild(makeCheck('19',  'checked-19',  '19:00'));
+    const on = listType === d.id;
+    b.className = 'check-btn' + (on ? ' on' : '');
+    if (on) { b.style.background = d.color; b.style.borderColor = d.color; }
+    b.innerHTML = '<svg viewBox="0 0 16 16"><polyline points="2,8 6,12 14,4"/></svg><span class="btn-label"></span>';
+    const lbl = b.querySelector('.btn-label'); lbl.textContent = d.short; lbl.style.color = d.color;
+    b.addEventListener('click', (e) => { e.stopPropagation(); div.classList.add('card-removing'); toggleList(person.en, d.id, window.scrollY); });
+    rightCol.appendChild(b);
+  });
 
   if (idx) { const n = document.createElement('div'); n.className = 'row-num'; n.textContent = idx; div.appendChild(n); }
   div.appendChild(avatarWrap);
@@ -2880,21 +2870,25 @@ window.addEventListener('beforeunload', flushPendingSync);
 function toggleList(name, listType, savedScroll) {
   const p = PEOPLE.find(x => x.en === name); if (!p) return;
   const key = personKey(p), removing = remote.lists[key]?.l === listType;
+  const from = remote.lists[key] ? remote.lists[key].l : null;
   const ref = dbRef.child('lists/' + key);
   if (removing) delete remote.lists[key]; else remote.lists[key] = { l: listType, t: Date.now() };
   applyLists(removing ? savedScroll : undefined);
   dbWrite(removing ? ref.remove() : ref.set({ l: listType, t: firebase.database.ServerValue.TIMESTAMP }));
+  logHistory({ a: 'move', p: p.en, f: from, to: removing ? null : listType });
 }
 
 // Кнопка «Vymazat seznamy»: очищає списки 17:00, 19:00 та до 5:30.
 // Список PN навмисно НЕ чіпаємо (setPN залишається як є).
 function clearLists() {
-  if (!set17.length && !set19.length && !set530.length) { showExportToast('⚠️ Seznamy jsou prázdné'); return; }
-  if (!confirm(`Vymazat seznamy (kromě PN)?\nOD 17:00 — ${set17.length}\nOD 19:00 — ${set19.length}\nDO 5:30 — ${set530.length}`)) return;
-  const u = {};
-  Object.entries(remote.lists).forEach(([k, o]) => { if (o.l !== 'PN') { u[k] = null; delete remote.lists[k]; } });
+  const clr = ALLDEFS.filter(d => !d.perm);   // і приховані списки теж чистяться
+  if (!clr.some(d => (SETS[d.id] || []).length)) { showExportToast('⚠️ Seznamy jsou prázdné'); return; }
+  if (!confirm('Vymazat seznamy (kromě trvalých)?\n' + clr.map(d => `${d.short}${d.hide ? ' (skrytý)' : ''} — ${(SETS[d.id] || []).length}`).join('\n'))) return;
+  const ids = new Set(clr.map(d => d.id)), u = {};
+  Object.entries(remote.lists).forEach(([k, o]) => { if (ids.has(o.l)) { u[k] = null; delete remote.lists[k]; } });
   applyLists();
   dbWrite(dbRef.child('lists').update(u));
+  logHistory({ a: 'clear', n: Object.keys(u).length });
   showSyncToast('🗑 Seznamy vymazány', 'ok');
 }
 
@@ -3049,97 +3043,36 @@ document.addEventListener('keydown', (e) => {
 
 function render(query = '') {
   const q = query.toLowerCase().trim();
-  
   const peopleList = document.getElementById('people-list');
-  const list17     = document.getElementById('list-17');
-  const list19     = document.getElementById('list-19');
-  // Контейнери і секції нових списків (до 5:30 та PN)
-  const list530    = document.getElementById('list-530');
-  const listPN     = document.getElementById('list-pn');
-  const section530 = document.getElementById('section-530');
-  const sectionPN  = document.getElementById('section-pn');
-  const noResults  = document.getElementById('no-results');
-  const section17  = document.getElementById('section-17');
-  const section19  = document.getElementById('section-19');
-
-  peopleList.innerHTML = '';
-  list17.innerHTML     = '';
-  list19.innerHTML     = '';
-  // Очищаємо нові списки перед перемальовуванням
-  list530.innerHTML    = '';
-  listPN.innerHTML     = '';
-
-  const visiblePeople = PEOPLE.filter(p => !hiddenPeople.has(p._origEn || p.en));
-
-  // Людина, що є в будь-якому зі списків, зникає з основного списку
-  const inAnyList = n => set17.includes(n) || set19.includes(n) || set530.includes(n) || setPN.includes(n);
-  const mainPeople = visiblePeople.filter(p => !inAnyList(p.en));
-  const people17   = set17.map(n => visiblePeople.find(p => p.en === n)).filter(Boolean);
-  const people19   = set19.map(n => visiblePeople.find(p => p.en === n)).filter(Boolean);
-  // Об'єкти людей для нових списків (за збереженим порядком імен)
-  const people530  = set530.map(n => visiblePeople.find(p => p.en === n)).filter(Boolean);
-  const peoplePN   = setPN.map(n => visiblePeople.find(p => p.en === n)).filter(Boolean);
-
-  const match = p => !q || [p.en, p.ua, p.viber, p.phone, String(p.locker || ''), p.dispatcher]
-    .join(' ')
-    .toLowerCase()
-    .includes(q);
-
-  const filtered   = mainPeople.filter(match).sort((a, b) => a.en.localeCompare(b.en));
-  const filtered17 = people17.filter(match);
-  const filtered19 = people19.filter(match);
-  // Фільтр пошуку застосовується і до нових списків
-  const filtered530 = people530.filter(match);
-  const filteredPN  = peoplePN.filter(match);
-
-  const sk = document.getElementById('skeleton-list');
-  if (sk) sk.style.display = 'none';
+  const cont = document.getElementById('lists-container');
+  const noResults = document.getElementById('no-results');
+  peopleList.innerHTML = ''; cont.innerHTML = '';
+  const visible = PEOPLE.filter(p => !hiddenPeople.has(p._origEn || p.en));
+  const inAny = n => DEFS.some(d => (SETS[d.id] || []).includes(n));
+  const match = p => !q || [p.en, p.ua, p.viber, p.phone, String(p.locker || ''), p.dispatcher].join(' ').toLowerCase().includes(q);
+  const main = visible.filter(p => !inAny(p.en));
+  const filtered = main.filter(match).sort((a, b) => a.en.localeCompare(b.en));
+  const sk = document.getElementById('skeleton-list'); if (sk) sk.style.display = 'none';
   filtered.forEach(p => peopleList.appendChild(createCard(p, 'main')));
   document.getElementById('count').textContent = filtered.length;
-  noResults.style.display = filtered.length === 0 && mainPeople.length > 0 ? 'block' : 'none';
-
-  // Лічильники в обох рядках (під пошуком і під Save): 5:30, 17:00, 19:00, PN.
-  // Оновлюємо ВСІ елементи з відповідним класом cnt-*
-  const setCnt = (cls, n) => document.querySelectorAll('.' + cls).forEach(el => { el.textContent = n; });
-  setCnt('cnt-530', people530.length);
-  setCnt('cnt-17',  people17.length);
-  setCnt('cnt-19',  people19.length);
-  setCnt('cnt-pn',  peoplePN.length);
-  document.getElementById('count-total').textContent = people17.length + people19.length + people530.length;
-
-  if (people17.length > 0) {
-    section17.style.display = 'block';
-    document.getElementById('count-17').textContent = filtered17.length;
-    filtered17.forEach((p, i) => list17.appendChild(createCard(p, '17', i + 1)));
-  } else {
-    section17.style.display = 'none';
-  }
-
-  if (people19.length > 0) {
-    section19.style.display = 'block';
-    document.getElementById('count-19').textContent = filtered19.length;
-    filtered19.forEach((p, i) => list19.appendChild(createCard(p, '19', i + 1)));
-  } else {
-    section19.style.display = 'none';
-  }
-
-  // Секція «до 5:30»: показуємо лише якщо в списку хтось є
-  if (people530.length > 0) {
-    section530.style.display = 'block';
-    document.getElementById('count-530').textContent = filtered530.length;
-    filtered530.forEach((p, i) => list530.appendChild(createCard(p, '530', i + 1)));
-  } else {
-    section530.style.display = 'none';
-  }
-
-  // Секція «PN»: показуємо лише якщо в списку хтось є
-  if (peoplePN.length > 0) {
-    sectionPN.style.display = 'block';
-    document.getElementById('count-pn').textContent = filteredPN.length;
-    filteredPN.forEach(p => listPN.appendChild(createCard(p, 'PN')));
-  } else {
-    sectionPN.style.display = 'none';
-  }
+  noResults.style.display = filtered.length === 0 && main.length > 0 ? 'block' : 'none';
+  let total = 0;
+  const hdr = document.getElementById('hdr-counts'); hdr.innerHTML = '';
+  DEFS.forEach(d => {
+    const ppl = (SETS[d.id] || []).map(n => visible.find(p => p.en === n)).filter(Boolean);
+    if (!d.perm) total += ppl.length;
+    const sp = document.createElement('span'); sp.style.color = d.color; sp.textContent = `${d.short}·${ppl.length}`; hdr.appendChild(sp);
+    if (!ppl.length) return;
+    const shown = ppl.filter(match);
+    const sec = document.createElement('div');
+    const lab = document.createElement('div'); lab.className = 'section-label';
+    lab.style.cssText = `color:${d.color};border-bottom-color:${hexA(d.color, .25)}`;
+    lab.textContent = `${d.title} · ${shown.length}`;
+    sec.appendChild(lab);
+    shown.forEach((p, i) => sec.appendChild(createCard(p, d.id, d.perm ? 0 : i + 1)));
+    cont.appendChild(sec);
+  });
+  document.getElementById('count-total').textContent = total;
 }
 
 // Init
@@ -3206,7 +3139,7 @@ function syncToFirebase() {}   // заглушка: старий спосіб з
 const sanitizeKey = s => String(s).replace(/[.#$\/\[\]]/g, '_');
 const personKey   = p => sanitizeKey(p._origEn || p.en);
 const findByKey   = k => PEOPLE.find(p => personKey(p) === k);
-const remote = { lists: {}, hidden: {}, extra: {}, renamed: {}, dovolena: {} };
+const remote = { lists: {}, hidden: {}, extra: {}, renamed: {}, dovolena: {}, listDefs: {} };
 
 function requireDb() {
   if (!fbReady) { showSyncToast('⏳ Čekám na připojení k databázi', 'warn'); return false; }
@@ -3222,10 +3155,10 @@ function dbWrite(p) {
 }
 
 function applyLists(scrollY) {
-  const by = { '17': [], '19': [], '530': [], 'PN': [] };
+  const by = {}; ALLDEFS.forEach(d => { by[d.id] = []; });
   Object.entries(remote.lists).sort((a, b) => (a[1].t || 0) - (b[1].t || 0))
     .forEach(([k, o]) => { const p = findByKey(k); if (p && by[o.l]) by[o.l].push(p.en); });
-  set17 = by['17']; set19 = by['19']; set530 = by['530']; setPN = by['PN'];
+  SETS = by;
   saveLocal();
   const go = () => {
     render(document.getElementById('search').value);
@@ -3234,7 +3167,15 @@ function applyLists(scrollY) {
   document.querySelector('.card-removing') ? setTimeout(go, 310) : go();
 }
 
+function applyDefs() {
+  if (!loadedBranches.has('listDefs')) return;
+  const arr = Object.values(remote.listDefs || {}).filter(Boolean).sort((a, b) => (a.o || 0) - (b.o || 0));
+  ALLDEFS = arr.length ? arr : DEFAULT_DEFS;
+  DEFS = ALLDEFS.filter(d => !d.hide);
+  LS.set('defs', ALLDEFS);
+}
 function applyAll() {
+  applyDefs();
   const wanted = new Set(Object.keys(remote.extra));
   for (let i = PEOPLE.length - 1; i >= 0; i--) { const p = PEOPLE[i]; if (p._custom && !wanted.has(personKey(p))) PEOPLE.splice(i, 1); }
   Object.entries(remote.extra).forEach(([k, p]) => { if (!findByKey(k)) PEOPLE.push({ ...p, _custom: true }); });
@@ -3254,7 +3195,7 @@ Object.keys(remote).forEach(name => {
   dbRef.child(name).on('value', snap => {
     remote[name] = snap.val() || {};
     loadedBranches.add(name);
-    if (loadedBranches.size < 5) return;
+    if (!['lists', 'hidden', 'extra', 'renamed', 'dovolena'].every(n => loadedBranches.has(n))) return; // listDefs - neobov'yazkova gilka
     if (!fbReady) { fbReady = true; migrateOld(); }
     applyAll();
   });
@@ -3284,11 +3225,8 @@ function exportToCSV() {
   const rows = [];
 
   // Спочатку всі з 17:00, потім всі з 19:00
-  set17.forEach(name => rows.push(`${name} - (17:00)`));
-  set19.forEach(name => rows.push(`${name} - (19:00)`));
-  // Нові списки в експорті CSV: після 17:00 і 19:00
-  set530.forEach(name => rows.push(`${name} - (do 5:30)`));
-  setPN.forEach(name => rows.push(`${name} - (PN)`));
+  [...DEFS.filter(d => !d.perm), ...DEFS.filter(d => d.perm)].forEach(d =>
+    (SETS[d.id] || []).forEach(name => rows.push(`${name} - (${d.exp || d.short})`)));
 
   if (rows.length === 0) {
     showExportToast('⚠️ Seznam je prázdný');
@@ -3625,6 +3563,104 @@ function addBotySizeRow(size, qty) {
     <button type="button" class="stock-boty-remove-btn" onclick="this.parentElement.remove()">✕</button>
   `;
   list.appendChild(row);
+}
+
+// ── ⚙ Správa seznamů (admin): додати / перейменувати / перефарбувати / змінити порядок / видалити ──
+let CFG = [];
+function openListsCfg() { CFG = ALLDEFS.map(d => ({ ...d })); cfgRender(); document.getElementById('cfg-modal').classList.add('active'); }
+function closeListsCfg() { document.getElementById('cfg-modal').classList.remove('active'); }
+function cfgRender() {
+  const box = document.getElementById('cfg-rows'); box.innerHTML = '';
+  CFG.forEach((d, i) => {
+    const r = document.createElement('div'); r.className = 'cfg-row'; r.style.borderLeftColor = d.color;
+    r.innerHTML = '<div class="cfg-top"><input type="color"><input class="f-short" placeholder="Popisek (16:00)" maxlength="8"><button class="stock-boty-remove-btn" data-a="up">↑</button><button class="stock-boty-remove-btn" data-a="dn">↓</button><button class="stock-boty-remove-btn" data-a="rm">✕</button></div><input class="f-title" placeholder="Nadpis (Seznam od 16:00)"><input class="f-exp" placeholder="Text v exportu (16:00)"><label class="check-row"><input type="checkbox" class="f-perm"> Trvalý seznam (nečistit, nepočítat do Σ)</label><label class="check-row" style="margin-top:8px"><input type="checkbox" class="f-hide"> Skrýt dočasně (bez smazání)</label>';
+    const q = s => r.querySelector(s);
+    q('input[type=color]').value = d.color || '#22c55e'; q('.f-short').value = d.short || ''; q('.f-title').value = d.title || ''; q('.f-exp').value = d.exp || ''; q('.f-perm').checked = !!d.perm;
+    q('input[type=color]').oninput = e => { d.color = e.target.value; r.style.borderLeftColor = d.color; };
+    q('.f-short').oninput = e => { d.short = e.target.value; };
+    q('.f-title').oninput = e => { d.title = e.target.value; };
+    q('.f-exp').oninput = e => { d.exp = e.target.value; };
+    q('.f-perm').onchange = e => { d.perm = e.target.checked; };
+    q('.f-hide').checked = !!d.hide; r.style.opacity = d.hide ? .5 : 1;
+    q('.f-hide').onchange = e => { d.hide = e.target.checked; r.style.opacity = d.hide ? .5 : 1; };
+    r.querySelectorAll('button').forEach(b => { b.onclick = () => cfgMove(i, b.dataset.a); });
+    box.appendChild(r);
+  });
+}
+function cfgMove(i, a) {
+  if (a === 'rm') { if (!confirm('Smazat seznam "' + (CFG[i].short || '?') + '"? Lidé se vrátí do hlavního seznamu.')) return; CFG.splice(i, 1); }
+  else { const j = a === 'up' ? i - 1 : i + 1; if (j < 0 || j >= CFG.length) return; [CFG[i], CFG[j]] = [CFG[j], CFG[i]]; }
+  cfgRender();
+}
+function cfgAdd() { CFG.push({ id: 'c' + Date.now().toString(36), short: '', title: '', exp: '', color: '#22c55e', perm: false }); cfgRender(); }
+function saveListsCfg() {
+  if (!requireDb()) return;
+  const out = {}, ids = new Set();
+  CFG.forEach((d, i) => {
+    const short = (d.short || '').trim(); if (!short) return;
+    out[d.id] = { id: d.id, short, title: (d.title || '').trim() || 'Seznam ' + short, exp: (d.exp || '').trim() || short, color: d.color, perm: !!d.perm, hide: !!d.hide, o: i };
+    ids.add(d.id);
+  });
+  if (!ids.size) { alert('Musí zůstat aspoň jeden seznam s popiskem'); return; }
+  const u = { listDefs: out };
+  Object.entries(remote.lists).forEach(([k, o]) => { if (!ids.has(o.l)) { u['lists/' + k] = null; delete remote.lists[k]; } });
+  remote.listDefs = out;
+  dbWrite(dbRef.update(u));
+  closeListsCfg(); applyAll();
+  showSyncToast('✓ Seznamy uloženy', 'ok');
+}
+document.getElementById('cfg-modal').addEventListener('click', e => { if (e.target.id === 'cfg-modal') closeListsCfg(); });
+
+// ── 🕘 Історія змін: gigroup/history (хто, кого, з якого списку в який, коли) ──
+// IP визначаємо автоматично (api.ipify.org, запасний — cloudflare); результат кешується на 30 хв
+let _ipP = null, _ipT = 0;
+function getIP() {
+  if (_ipP && Date.now() - _ipT < 1800000) return _ipP;
+  _ipT = Date.now();
+  const get = (url, parse) => {
+    if (typeof fetch !== 'function') return Promise.reject(0);
+    const c = new AbortController(), tm = setTimeout(() => c.abort(), 4000);
+    return fetch(url, { cache: 'no-store', signal: c.signal }).then(r => r.text()).then(t => { clearTimeout(tm); const v = parse(t); if (!v) throw 0; return v; });
+  };
+  _ipP = get('https://api.ipify.org?format=json', t => (JSON.parse(t).ip || '').trim())
+    .catch(() => get('https://www.cloudflare.com/cdn-cgi/trace', t => ((t.match(/^ip=(.+)$/m) || [])[1] || '').trim()))
+    .catch(() => { _ipT = 0; return ''; });
+  return _ipP;
+}
+function logHistory(e) {
+  try {
+    const ref = dbRef.child('history').push();   // ключ створюється одразу -> порядок записів = порядок кліків
+    e.t = firebase.database.ServerValue.TIMESTAMP;
+    getIP().then(ip => { e.ip = ip || ''; const r = ref.set(e); if (r && r.catch) r.catch(() => {}); });
+  } catch (err) { console.error(err); }
+}
+getIP();
+function openHistory() {
+  renderListModal('🕘 Historie změn', []);
+  const body = document.getElementById('list-modal-body');
+  body.innerHTML = '<div class="list-empty">Načítám…</div>';
+  dbRef.child('history').orderByKey().limitToLast(300).once('value').then(s => {
+    const arr = Object.values(s.val() || {}).sort((a, b) => (b.t || 0) - (a.t || 0));
+    body.innerHTML = '';
+    if (!arr.length) { body.innerHTML = '<div class="list-empty">Zatím žádné záznamy</div>'; return; }
+    const def = id => ALLDEFS.find(d => d.id === id);
+    const nm = id => id ? (def(id) ? def(id).short : id) : '—';
+    arr.forEach(e => {
+      const r = document.createElement('div'); r.className = 'list-row'; r.style.cssText = 'flex-direction:column;align-items:stretch;gap:2px';
+      const top = document.createElement('div'); top.style.cssText = 'display:flex;justify-content:space-between;gap:8px';
+      const a = document.createElement('span'); a.className = 'list-row-name';
+      const b = document.createElement('span'); b.className = 'list-row-value'; b.style.whiteSpace = 'nowrap';
+      if (e.a === 'clear') { a.textContent = 'Vymazat seznamy (' + (e.n || 0) + ')'; b.textContent = '🗑'; }
+      else { a.textContent = e.p || '?'; b.textContent = nm(e.f) + ' → ' + nm(e.to); if (e.to && def(e.to)) b.style.color = def(e.to).color; }
+      top.append(a, b);
+      const sub = document.createElement('div'); sub.style.cssText = 'font-size:10px;color:var(--text-muted)';
+      sub.textContent = (e.ip ? '🌐 ' + e.ip : e.who ? '👤 ' + e.who : '🌐 IP neznámá') + ' · ' + new Date(e.t || 0).toLocaleString('cs-CZ', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+      r.append(top, sub); body.appendChild(r);
+    });
+    const del = document.createElement('button'); del.className = 'stock-close'; del.textContent = '🗑 Smazat historii';
+    del.onclick = () => { if (confirm('Smazat celou historii?')) dbRef.child('history').remove().then(openHistory); };
+    body.appendChild(del);
+  }).catch(() => { body.innerHTML = '<div class="list-empty">Historii se nepodařilo načíst</div>'; });
 }
 
 function openStockEditModal() {
