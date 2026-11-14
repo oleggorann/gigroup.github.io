@@ -3257,7 +3257,7 @@ function exportToCSV() {
   const rows = [];
 
   // Спочатку всі з 17:00, потім всі з 19:00
-  [...DEFS.filter(d => !d.perm), ...DEFS.filter(d => d.perm)].forEach(d =>
+    DEFS.filter(d => !d.perm).forEach(d =>   // постійні списки (PN) в експорт не потрапляють
     (SETS[d.id] || []).forEach(name => rows.push(`${name} - (${d.exp || d.short})`)));
 
   if (rows.length === 0) {
