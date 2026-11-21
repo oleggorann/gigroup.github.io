@@ -2687,7 +2687,19 @@ avatarWrap.appendChild(flagEl);
     if (on) { b.style.background = d.color; b.style.borderColor = d.color; }
     b.innerHTML = '<svg viewBox="0 0 16 16"><polyline points="2,8 6,12 14,4"/></svg><span class="btn-label"></span>';
     const lbl = b.querySelector('.btn-label'); lbl.textContent = d.short; lbl.style.color = d.color;
-    b.addEventListener('click', (e) => { e.stopPropagation(); div.classList.add('card-removing'); toggleList(person.en, d.id, window.scrollY); });
+    // Не даємо кнопці забрати фокус у поля пошуку (інакше клавіатура закривається і курсор зникає)
+    b.addEventListener('mousedown', (e) => e.preventDefault());
+    b.addEventListener('click', (e) => {
+      e.stopPropagation();
+      // Очищаємо поле пошуку при будь-якому натисканні на галочку (поставити/зняти).
+      // render() у applyLists() бере значення з #search, тому список одразу показується без фільтра.
+      const searchEl = document.getElementById('search');
+      const hadFocus = searchEl && (document.activeElement === searchEl || searchEl.value !== '');
+      if (searchEl) searchEl.value = '';
+      div.classList.add('card-removing'); toggleList(person.en, d.id, window.scrollY);
+      // Якщо курсор був у полі пошуку — залишаємо його там, щоб одразу вводити наступне ім'я
+      if (hadFocus) searchEl.focus({ preventScroll: true });
+    });
     rightCol.appendChild(b);
   });
 
